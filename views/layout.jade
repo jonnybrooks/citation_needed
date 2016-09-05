@@ -1,0 +1,10 @@
+doctype html
+html
+	head
+		title= title
+		link(rel='stylesheet', href='/styles/style.css')
+		script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js')
+	body
+		block content
+		script(src='/js/main.js')
+		block templates
