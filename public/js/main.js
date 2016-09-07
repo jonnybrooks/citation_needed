@@ -1,13 +1,36 @@
-var rk = genRoomKey(4); // generate the roomKey
-var socket; // declare the socket
+let rk = genRoomKey(4); // generate the roomKey
+let socket; // declare the socket
 
-document.getElementById('key').innerHTML = rk; // display this room's key
-
-socket = io('http://localhost:8888'); // connect to the socket server
-socket.on('established', function () {
+socket = io('http://localhost:8888/room'); // connect to the socket server
+socket.on('connect', () => {
 	console.log('established');
-	socket.emit('create', {type: 'room', _roomKey: rk}); // generate the room
-});
+	changeView('lobby');	
+	$('#view-lobby .key').text(rk); // display this room's key
+	socket.emit('create', { _roomKey: rk }); // generate the room
+})
+socket.on('player-connect', obj => {
+	console.log('new player has connected: %s', JSON.stringify(o.player));
+	let frag = fragment($('#t-player').html());
+
+	console.dir($('#t-player').length);
+
+	$(frag).find('.player .name').text(obj.player.name);
+	$(frag).find('.player .id').text(obj.player._socketId);
+	$('#view-lobby .players').append(frag);
+})
+
+function changeView(view) {
+	let frag = fragment($(`#v-view-${view}`).html());
+	$('#view-container').html(frag);
+}
+
+function fragment(htmlStr) {
+	let frag = document.createDocumentFragment();
+	let temp = document.createElement('div');
+	temp.innerHTML = htmlStr;
+	while (temp.firstChild) { frag.appendChild(temp.firstChild);}
+	return frag;
+}
 
 function genRoomKey(len) {
 	let id = '';

@@ -1,17 +1,31 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title>Player</title>
+		<title>P Test</title>
 		<link rel="stylesheet" href="/styles/style.css"/>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.slim.min.js"></script>
 	</head>
 	<body>
-		<h1>Everest Test</h1>
-		<form id="player-form">
-			<input name="_roomKey" id="_roomKey" placeholder="key"/>
-			<input name="name" id="name" placeholder="name"/>
-			<div id="submit">submit</div>
-		</form>		
+		<div id="view-container"></div>
 		<script src="/js/player.js"></script>
+		<script id="v-view-player-registration" type="text/view">
+			<div id="view-player-registration" class="view">
+				<h1>Test</h1>
+				<form class="submit-player">
+					<input name="_roomKey" class="_roomKey" placeholder="key"/>
+					<input name="name" class="name" placeholder="name"/>
+					<div class="submit">Submit</div>
+				</form>
+			</div>
+		</script>
+		<script id="v-view-lobby" type="text/view">
+			<div id="view-lobby" class="view">
+				<h1>Name</h1>
+				<form id="submit-game-start">				
+					<div class="submit">Begin</div>
+				</form>
+			</div>			
+		</script>
 	</body>
 </html>

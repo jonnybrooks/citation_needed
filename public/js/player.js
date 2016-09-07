@@ -1,12 +1,33 @@
-var socket = io('http://localhost:8888');
-socket.on('established', function () {
-	console.log('established');	
-});
+var socket = io('http://localhost:8888/player');
+socket.on('connect', () => {
+	console.log('established');
+	changeView('player-registration');
+})
+socket.on('enter-lobby', () => {
+	changeView('lobby');
+})
+socket.on('force-disconnect', () => {
+	console.log('server issued a disconnect request');
+	changeView('player-registration');
+})
 
-document.getElementById('submit').addEventListener('click', function(e){
+$('body').on('click', '#view-player-registration .submit', e => {
+	console.log('click registered');
 	socket.emit('create', {
-		type: 'player', 
-		_roomKey: document.getElementById('_roomKey').value, 
-		name: document.getElementById('name').value
+		_roomKey: $('#view-player-registration ._roomKey').val(),
+		name: $('#view-player-registration .name').val()
 	})
 })
+
+function changeView(view) {
+	let frag = fragment($(`#v-view-${view}`).html());
+	$('#view-container').html(frag);
+}
+
+function fragment(htmlStr) {
+	var frag = document.createDocumentFragment();
+	var temp = document.createElement('div');
+	temp.innerHTML = htmlStr;
+	while (temp.firstChild) { frag.appendChild(temp.firstChild);}
+	return frag;
+}

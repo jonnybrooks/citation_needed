@@ -1,18 +1,25 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title>Lobby</title>
+		<title>R Test</title>
 		<link rel="stylesheet" href="/styles/style.css"/>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.slim.min.js"></script>
 	</head>
 	<body>
-		<h1>Everest Test</h1>
-		<p id="key"></p>
-		<div id="players"></div>
+		<div id="view-container"></div>
 		<script src="/js/main.js"></script>
-		<script type="text/template" id="template-player">
-			<h2 class="name"></h2>
-			<p class="id"></p>
+		<script id="v-view-lobby" type="text/view">
+			<div id="view-lobby" class="view">
+				<p class="key" contenteditable></p>
+				<ul class="players"></ul>
+			</div>			
+		</script>
+		<script id="t-player" type="text/template">
+			<li class="player">
+				<h2 class="name"></h2>
+				<p class="id"></p>
+			</li>			
 		</script>
 	</body>	
 </html>
