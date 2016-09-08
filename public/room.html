@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>R Test</title>
+		<link rel="stylesheet" href="/styles/style.css"/>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.slim.min.js"></script>
+	</head>
+	<body>
+		<div id="view-container">
+			<div id="view-lobby" class="view">
+				<h1 class="key"></h1>
+				<div class="players"></div>
+			</div>
+			<!--
+			<div id="view-video-transition" class="view">
+				<video width="480" poster="" controls>
+					<source src="" type="video/mp4">					
+					Your browser does not support the HTML5 video tag.
+				</video>
+			</div>
+			<div id="view-answer-phase" class="view">
+				<div class="players"></div>
+			</div>
+			<div id="view-voting-phase" class="view">
+				<h1 class="question"></h1>
+				<div class="answers"></div>
+			</div>
+			<div id="view-scores" class="view">
+				<div class="leaderboard"></div>				
+			</div>
+		</div>		
+		<script id="t-answer" type="text/template">
+			<div class="answer">
+				<p class="content"></p>
+				<p></p>
+			</div>	
+		</script>		
+		-->		
+		<script id="t-player" type="text/template">
+			<div class="player">
+				<h2 class="name"></h2>
+				<p class="id"></p>
+				<p class="status"></p>
+			</div>
+		</script>
+		<script src="/js/room.js"></script>
+	</body>	
+</html>

@@ -1,32 +1,59 @@
-var socket = io('http://localhost:8888/player');
-socket.on('connect', () => {
-	console.log('established');
-	changeView('player-registration');
-})
-socket.on('enter-lobby', () => {
-	changeView('lobby');
-})
-socket.on('force-disconnect', () => {
-	console.log('server issued a disconnect request');
-	changeView('player-registration');
-})
+let socket; 
+let player;
 
-$('body').on('click', '#view-player-registration .submit', e => {
-	console.log('click registered');
-	socket.emit('create', {
-		_roomKey: $('#view-player-registration ._roomKey').val(),
-		name: $('#view-player-registration .name').val()
+socket = io('http://localhost:8888/player');
+socket.on('connect', () => {
+	console.log('socket connection established');
+
+	$('body').off('click', '#view-player-registration .submit');
+	$('body').on('click', '#view-player-registration .submit', e => {
+		let roomKey = $('#view-player-registration .roomKey').val();
+		let name = $('#view-player-registration .name').val();
+
+		player = new Player({ // instantiate the player
+			socketId: `/player#${socket.id}`,
+			roomKey: roomKey, 
+			name: name
+		});
+
+		socket.emit('register', player); // register the player with the server
 	})
 })
 
-function changeView(view) {
-	let frag = fragment($(`#v-view-${view}`).html());
-	$('#view-container').html(frag);
+socket.on('player-registered', rk => {
+	console.log('player registered on room with key: %s', rk);
+	socket.emit('relay', {
+		from: player.socketId, 
+		to: player.roomKey,
+		action: 'getPlayerList'
+	})
+})
+socket.on('disconnect', () => {
+	console.log('disconnected from server');
+})
+socket.on('force-disconnect', () => {
+	console.log('server issued a forced-disconnect request');	
+})
+
+socket.on('relay', message => {
+	actions[message.action] ? actions[message.action](message) : console.log('Action does not exist');
+})
+
+// $('body').hide();
+
+let actions = {
+	'printPlayerList': message => console.log(message.args.pl)
+}
+
+function Player(conf) {	
+	this.socketId = conf.socketId;
+	this.roomKey = conf.roomKey;
+	this.name = conf.name;	
 }
 
 function fragment(htmlStr) {
-	var frag = document.createDocumentFragment();
-	var temp = document.createElement('div');
+	let frag = document.createDocumentFragment();
+	let temp = document.createElement('div');
 	temp.innerHTML = htmlStr;
 	while (temp.firstChild) { frag.appendChild(temp.firstChild);}
 	return frag;

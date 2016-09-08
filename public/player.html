@@ -7,25 +7,44 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.slim.min.js"></script>
 	</head>
 	<body>
-		<div id="view-container"></div>
-		<script src="/js/player.js"></script>
-		<script id="v-view-player-registration" type="text/view">
+		<div id="view-container">
 			<div id="view-player-registration" class="view">
 				<h1>Test</h1>
 				<form class="submit-player">
-					<input name="_roomKey" class="_roomKey" placeholder="key"/>
+					<input name="roomKey" class="roomKey" placeholder="key"/>
 					<input name="name" class="name" placeholder="name"/>
 					<div class="submit">Submit</div>
 				</form>
 			</div>
-		</script>
-		<script id="v-view-lobby" type="text/view">
+			<!--
 			<div id="view-lobby" class="view">
 				<h1>Name</h1>
-				<form id="submit-game-start">				
+				<form class="submit-game-start">
 					<div class="submit">Begin</div>
 				</form>
-			</div>			
-		</script>
+			</div>	
+			<div id="view-submit-answer" class="view">
+				<h1>Name</h1>
+				<form class="submit-answer" data-answerId="">
+					<p class="question"></p>
+					<input name="answer" class="answer" placeholder="answer"/>
+					<div class="submit">Next</div>
+				</form>
+				<form class="submit-answer" data-answerId="">
+					<p class="question"></p>
+					<input name="answer" class="answer" placeholder="answer"/>
+					<div class="submit">Next</div>
+				</form>
+			</div>	
+			<div id="view-submit-vote" class="view">
+				<h1>Name</h1>
+				<form class="submit-vote">
+					<input name="name" class="name" placeholder="name"/>
+					<div class="submit">Begin</div>
+				</form>
+			</div>	
+			-->
+		</div>
+		<script src="/js/player.js"></script>
 	</body>
 </html>
