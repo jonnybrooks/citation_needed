@@ -22,11 +22,12 @@ socket.on('connect', () => {
 
 socket.on('player-registered', rk => {
 	console.log('player registered on room with key: %s', rk);
-	socket.emit('relay', {
+	let message = { 
 		from: player.socketId, 
-		to: player.roomKey,
-		action: 'getPlayerList'
-	})
+		to: player.roomKey, 
+		request: 'relayPlayerList'
+	}
+	socket.emit('relay', message);
 })
 socket.on('disconnect', () => {
 	console.log('disconnected from server');
@@ -36,12 +37,14 @@ socket.on('force-disconnect', () => {
 })
 
 socket.on('relay', message => {
-	actions[message.action] ? actions[message.action](message) : console.log('Action does not exist');
+	responses[message.request] ? 
+		responses[message.request](message) : 
+		console.log(`no response handler exists for ${message.request}`);	
 })
 
 // $('body').hide();
 
-let actions = {
+let responses = {
 	'printPlayerList': message => console.log(message.args.pl)
 }
 

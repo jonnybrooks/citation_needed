@@ -1,21 +1,18 @@
 let socket;
 let room;
-let roomKey = genRoomKey(4);
-
-$('#view-lobby .key').text(roomKey); // display this room's key
 
 socket = io('http://localhost:8888/room'); // connect to the socket server
 socket.on('connect', () => {
-	console.log('socket connection established');
-	room = new Room({	// create the room
-		socketId: `/room#${socket.id}`, 
-		roomKey: roomKey, 
-		maxPlayers: 2 
-	})
-	socket.emit('register', roomKey ); // register the room with the server
+	console.log('socket connection established');	
 })
 socket.on('room-registered', rk => {
 	console.log('room registered with key: %s', rk);
+	$('#view-lobby .key').text(rk); // display this room's key
+	room = new Room({	// create the room
+		socketId: `/room#${socket.id}`, 
+		roomKey: rk, 
+		maxPlayers: 2
+	})
 })
 socket.on('player-registered', player => {
 	console.log('new player has connected: %s', JSON.stringify(player));
@@ -29,17 +26,19 @@ socket.on('player-registered', player => {
 })
 
 socket.on('relay', message => {
-	actions[message.action] ? actions[message.action](message) : console.log('Action does not exist');
+	responses[message.request] ? 
+		responses[message.request](message) : 
+		console.log(`no response handler exists for ${message.request}`);	
 })
 
 $('body').hide();
 
-let actions = {
-	'getPlayerList': message => {
+let responses = {
+	'relayPlayerList': message => {
 		socket.emit('relay', {
 			from: message.to,
 			to: message.from,
-			action: 'printPlayerList',
+			request: 'printPlayerList',
 			args: { pl: room.players }				
 		})
 	}
@@ -59,12 +58,4 @@ function fragment(htmlStr) {
 	temp.innerHTML = htmlStr;
 	while (temp.firstChild) { frag.appendChild(temp.firstChild);}
 	return frag;
-}
-
-function genRoomKey(len) {
-	let rk = '';
-	for(let i = 0; i < len; i++) {
-		rk+=Math.floor(Math.random() * 10);
-	}
-	return rk;
 }
