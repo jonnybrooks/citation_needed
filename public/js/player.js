@@ -22,18 +22,12 @@ socket.on('connect', () => {
 
 socket.on('player-registered', rk => {
 	console.log('player registered on room with key: %s', rk);
-	let message = { 
-		from: player.socketId, 
-		to: player.roomKey, 
-		request: 'relayPlayerList'
-	}
-	socket.emit('relay', message);
 })
 socket.on('disconnect', () => {
 	console.log('disconnected from server');
 })
 socket.on('force-disconnect', () => {
-	console.log('server issued a forced-disconnect request');	
+	console.log('server issued a forced-disconnect request');
 })
 
 socket.on('relay', message => {
@@ -45,7 +39,7 @@ socket.on('relay', message => {
 // $('body').hide();
 
 let responses = {
-	'printPlayerList': message => console.log(message.args.pl)
+	'displayThisQuestion': message => console.log(message.args.question)
 }
 
 function Player(conf) {	
