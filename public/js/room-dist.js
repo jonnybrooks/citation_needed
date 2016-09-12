@@ -4,46 +4,25 @@ var socket = undefined;
 var room = undefined;
 
 socket = io('http://localhost:8888/room'); // connect to the socket server
-// socket = io('http://192.168.0.26:8888/room'); // connect to the socket server
+// socket = io('http://cn.jonathan-brooks.co.uk/room'); // connect to the socket server
 socket.on('connect', function () {
-	// console.log('socket connection established');	
+	console.log('socket connection established');
 	$('#view-lobby .players').html('');
 });
-socket.on('room-registered', function (rk) {
-	// console.log('room registered with key: %s', rk);
-	$('#view-lobby .key').text(rk); // display this room's key
-	room = new Room({ // create the room
-		socketId: '/room#' + socket.id,
-		roomKey: rk,
-		maxPlayers: 1,
-		maxPlayers: 1
-	});
-});
-socket.on('register-player', function (player) {
-	// console.log('room registered with key: %s', rk);
-	if (Object.keys(room.players).length < room.maxPlayers) {
-		// if room is at capacity
-		room.players[player.socketId] = player; // add this player to the local room
-		socket.emit('registration-accept', player); // allow entry to this player			
-	} else {
-		socket.emit('registration-reject', player); // refuse entry to this player
-	}
+socket.on('room-registered', function (r) {
+	console.log('room registered with key: %s', r.roomKey);
+	room = r; // set local copy of room to remote copy
+	$('#view-lobby .key').text(r.roomKey); // display this room's key
 });
 socket.on('player-registered', function (player) {
-	// console.log('new player has connected: %s', JSON.stringify(player));
+	console.log('new player has connected: %s', JSON.stringify(player));
 	var frag = fragment($('#template-player').html());
+
+	room.players[player.socket.id] = player; // register this player on the local copy
 
 	$(frag).find('.player .name').text(player.name);
 	$(frag).find('.player .id').text(player.socketId);
 	$('#view-lobby .players').append(frag);
-
-	if (Object.keys(room.players).length === room.minPlayers) {
-		socket.emit('relay', {
-			from: room.roomKey,
-			to: Object.keys(room.players)[0],
-			request: 'displayStartButton' // show start button
-		});
-	}
 });
 
 socket.on('relay', function (message) {
@@ -102,16 +81,6 @@ function roundTwo() {
 			from: room.roomKey, to: p2, request: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
 		});
 	}
-}
-
-function Room(conf) {
-	this.roomKey = conf.roomKey;
-	this.socketId = conf.socketId;
-	this.maxPlayers = conf.maxPlayers;
-	this.minPlayers = conf.minPlayers;
-	this.players = {};
-	this.questions = {};
-	this.timer = null;
 }
 
 function fragment(htmlStr) {

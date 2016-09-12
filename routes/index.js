@@ -4,7 +4,8 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 
-let roomKeyStore = {};
+let rooms = {};
+let roomKeyMap = {};
 
 // GET request to create room
 router.get('/room', (req, res, next) => {
@@ -21,22 +22,20 @@ module.exports = io => {
 	
 	// Handle room connection
 	nsp.rooms.on('connection', socket => {
-		let roomKey = genRoomKey(4);
-		socket.join(roomKey); // register this room to the socket room with roomKey
-		socket.emit('room-registered', roomKey);
 
-		socket.on('registration-accept', player => {
-			let pSocket = io.sockets.connected[player.socketId]; // get player attempting to register
-			pSocket.join(player.roomKey); // register this player to the room with roomKey
-			nsp.players.to(player.socketId).emit('player-registered', player.roomKey); // emit player-registered to this room
-			socket.emit('player-registered', player.roomKey); // emit player-registered to this room			
-	    })
-		socket.on('registration-reject', player => {			
-			nsp.players.to(player.socketId).emit('player-refused'); // emit player-registered to this room
-	    })
-		socket.on('disconnect', () => {
-		
-		})
+		let room = new Room({
+			socketId: socket.id,
+			roomKey: genRoomKey(4),			
+			minPlayers: 1,
+			maxPlayers: 1
+		});
+
+		rooms[socket.id] = room;
+		roomKeyMap[room.roomKey] = socket.id;
+
+		socket.join(room.roomKey); // register this room to the socket room with roomKey
+		socket.emit('room-registered', room); // notify the room client it's been registered
+
 		socket.on('relay', message => {
 			nsp.players.to(message.to).emit('relay', message); // relay message from room to player
 	    })
@@ -44,12 +43,27 @@ module.exports = io => {
 
 	// Handle player connection
 	nsp.players.on('connection', socket => {
-		socket.on('attempt-registration', player => {
-			nsp.rooms.to(player.roomKey).emit('register-player', player);
-	    })
-	    socket.on('disconnect', () => {
+		socket.on('attempt-registration', reg => {
+			let room = rooms[roomKeyMap[reg.roomKey]];
 
-		})
+			if(Object.keys(room.players).length < room.maxPlayers) {
+				
+				let player = new Player({
+					socketId: socket.id,
+					roomKey: reg.roomKey,
+					name: reg.name
+				})
+
+				room.players[socket.id] = player;				
+
+				socket.join(player.roomKey); // register this player to the room with roomKey
+				socket.emit(player.roomKey).emit('player-registered', player); // notify the player client it's been registered
+				nsp.rooms.to(player.roomKey).emit('player-registered', player); // notify the room client it's been registered
+			}
+			else {
+				socket.emit('player-refused'); // emit player-registered to this room
+			}
+	    })
 	    socket.on('relay', message => {
 	    	nsp.rooms.to(message.to).emit('relay', message); // relay message from player to room
 	    })
@@ -65,7 +79,24 @@ function genRoomKey(len) {
 		return k;
 	}
 	let rk = genKey();
-	while(roomKeyStore.hasOwnProperty(rk)) rk = genKey();
-	roomKeyStore[rk] = true;
+	while(roomKeyMap.hasOwnProperty(rk)) rk = genKey();
+	roomKeyMap[rk] = true;
 	return rk;
+}
+
+function Room(conf) {
+	this.socketId = conf.socketId;
+	this.roomKey = conf.roomKey;
+	this.maxPlayers = conf.maxPlayers;
+	this.minPlayers = conf.minPlayers;
+	this.players = {};
+	this.questions = {};
+	this.timer = null;
+}
+
+function Player(conf) {	
+	this.socketId = conf.socketId;
+	this.roomKey = conf.roomKey;
+	this.name = conf.name;
+	this.submissionsComplete = {};
 }

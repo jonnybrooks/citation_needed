@@ -4,21 +4,23 @@ var socket = undefined;
 var player = undefined;
 
 socket = io('http://localhost:8888/player');
-// socket = io('http://192.168.0.26:8888/player'); // connect to the socket server
+// socket = io('http://cn.jonathan-brooks.co.uk/player'); // connect to the socket server
 socket.on('connect', function () {
 	console.log('socket connection established');
 });
 
-socket.on('player-registered', function (rk) {
-	console.log('player registered on room with key: %s', rk);
+socket.on('player-registered', function (p) {
+	// console.log('player registered on room with key: %s', rk);
+
+	player = p;
+
 	$('.display-name span').text(player.name);
 	$('.view').hide().filter('#view-lobby').show(); // go to lobby once player registered
 });
-socket.on('disconnect', function () {
-	console.log('disconnected from server');
-});
-socket.on('force-disconnect', function () {
-	console.log('server issued a forced-disconnect request');
+socket.on('player-refused', function () {
+	// console.log('player registered on room with key: %s', rk);
+	$('.display-name span').text(player.name);
+	$('.view').hide().filter('#view-lobby').show(); // go to lobby once player registered
 });
 
 socket.on('relay', function (message) {
@@ -40,13 +42,6 @@ var responses = {
 	}
 };
 
-function Player(conf) {
-	this.socketId = conf.socketId;
-	this.roomKey = conf.roomKey;
-	this.name = conf.name;
-	this.submissionsComplete = {};
-}
-
 $('.submit-player').on('submit', function (e) {
 	e.preventDefault();
 	var form = $(this).serializeArray();
@@ -58,6 +53,7 @@ $('.submit-player').on('submit', function (e) {
 
 	socket.emit('attempt-registration', player); // register the player with the server
 });
+
 $('.submit-answer').on('submit', function (e) {
 	e.preventDefault();
 	var form = $(this).serializeArray();
@@ -79,6 +75,7 @@ $('.submit-answer').on('submit', function (e) {
 
 	socket.emit('relay', message);
 });
+
 $('.submit-game-start').on('submit', function (e) {
 	e.preventDefault();
 	$(this).hide();
