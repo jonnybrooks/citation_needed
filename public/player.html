@@ -1,50 +1,67 @@
 <!DOCTYPE HTML>
-<html>
+<html id="client-player">
 	<head>
-		<title>P Test</title>
-		<link rel="stylesheet" href="/styles/style.css"/>
+		<title>Player - [citation needed]</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link rel="stylesheet" href="styles/style.css"/>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.slim.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.slim.min.js"></script>		
 	</head>
 	<body>
 		<div id="view-container">
 			<div id="view-player-registration" class="view">
-				<h1>Test</h1>
-				<form class="submit-player">
-					<input name="roomKey" class="roomKey" placeholder="key"/>
-					<input name="name" class="name" placeholder="name"/>
-					<div class="submit">Submit</div>
+				<h1 class="logo">[&nbsp;<span>citation needed</span>&nbsp;]</h1>
+				<form class="submit-player" autocomplete="off">
+					<label>
+						<span>Room Key</span>
+						<input name="roomKey" type="number" class="roomKey" placeholder="e.g. 1337"/>
+					</label>			
+					<label>
+						<span>Name</span>
+						<input name="name" type="text" class="name" placeholder="e.g. Ozkan"/>
+					</label>
+					<input type="submit" class="submit" value="Join"/>
 				</form>
 			</div>
-			<!--
 			<div id="view-lobby" class="view">
-				<h1>Name</h1>
-				<form class="submit-game-start">
-					<div class="submit">Begin</div>
+				<p class="display-name">[&nbsp;<span>name</span>&nbsp;]</p>
+				<form class="submit-game-start" autocomplete="off">
+					<input type="submit" class="submit" value="Begin"/>					
 				</form>
 			</div>	
-			<div id="view-submit-answer" class="view">
-				<h1>Name</h1>
-				<form class="submit-answer" data-answerId="">
-					<p class="question"></p>
-					<input name="answer" class="answer" placeholder="answer"/>
-					<div class="submit">Next</div>
-				</form>
-				<form class="submit-answer" data-answerId="">
-					<p class="question"></p>
-					<input name="answer" class="answer" placeholder="answer"/>
-					<div class="submit">Next</div>
-				</form>
+			<div id="view-submit-answer-round-1" class="view">
+				<p class="display-name">[&nbsp;<span>name</span>&nbsp;]</p>				
+				<div class="question-wrapper">					
+					<form class="submit-answer final" data-question-id="" autocomplete="off">
+						<p class="question"></p>
+						<input name="answer" class="answer" placeholder="Answer"/>
+						<input type="submit" class="submit" value="Submit"/>
+					</form>
+				</div>	
+			</div>	
+			<div id="view-submit-answer-round-2" class="view">
+				<p class="display-name">[&nbsp;<span>name</span>&nbsp;]</p>
+				<div class="question-wrapper">
+					<form class="submit-answer next" data-question-id="" autocomplete="off">
+						<p class="question"></p>
+						<input name="answer" class="answer" placeholder="Answer"/>
+						<input type="submit" class="submit" value="Next"/>
+					</form>
+					<form class="submit-answer final" data-question-id="" autocomplete="off">
+						<p class="question"></p>
+						<input name="answer" class="answer" placeholder="Answer"/>
+						<input type="submit" class="submit" value="Submit"/>
+					</form>
+				</div>				
 			</div>	
 			<div id="view-submit-vote" class="view">
-				<h1>Name</h1>
-				<form class="submit-vote">
-					<input name="name" class="name" placeholder="name"/>
-					<div class="submit">Begin</div>
-				</form>
-			</div>	
-			-->
+				<p class="display-name">[&nbsp;<span>name</span>&nbsp;]</p>
+				<form class="submit-vote" data-question-id=""></form autocomplete="off">
+			</div>				
 		</div>
-		<script src="/js/player.js"></script>
+		<script id="template-vote" type="text/template">
+			<input type="submit" class="submit vote" data-player-id=""/>
+		</script>
+		<script src="/js/player-dist.js"></script>		
 	</body>
 </html>
