@@ -47,13 +47,7 @@ let responses = {
 $('.submit-player').on('submit', function(e) {
 	e.preventDefault();
 	let form = $(this).serializeArray();
-	player = new Player({ // instantiate the player
-		socketId: `/player#${socket.id}`,
-		roomKey: form[0].value, 
-		name: form[1].value
-	});
-
-	socket.emit('attempt-registration', player); // register the player with the server
+	socket.emit('attempt-registration', { roomKey: form[0].value, name: form[1].value }); // register the player with the server
 })
 
 $('.submit-answer').on('submit', function(e) {
