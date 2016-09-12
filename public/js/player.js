@@ -1,10 +1,8 @@
 let socket; 
 let player;
 
-// window.innerWidth <= 800 ? alert('mobile .rev-1') : null;
-
-// socket = io('http://localhost:8888/player');
-socket = io('http://192.168.0.26:8888/player'); // connect to the socket server
+socket = io('http://localhost:8888/player');
+// socket = io('http://192.168.0.26:8888/player'); // connect to the socket server
 socket.on('connect', () => {
 	console.log('socket connection established');
 })
@@ -12,6 +10,7 @@ socket.on('connect', () => {
 socket.on('player-registered', rk => {
 	console.log('player registered on room with key: %s', rk);
 	$('.display-name span').text(player.name);
+	$('.view').hide().filter('#view-lobby').show(); // go to lobby once player registered
 })
 socket.on('disconnect', () => {
 	console.log('disconnected from server');
@@ -29,6 +28,9 @@ socket.on('relay', message => {
 // response list for server requests
 
 let responses = {
+	displayStartButton: message => {
+		$('.submit-game-start').addClass('ready');
+	},
 	prepareQuestion: message => {
 		// console.log('qid: %s, article: %s ', message.args.qid, message.args.question)
 		let round = message.args.round;
@@ -56,7 +58,7 @@ $('.submit-player').on('submit', function(e) {
 		name: form[1].value
 	});
 
-	socket.emit('register', player); // register the player with the server
+	socket.emit('attempt-registration', player); // register the player with the server
 })
 $('.submit-answer').on('submit', function(e) {
 	e.preventDefault();
@@ -74,10 +76,22 @@ $('.submit-answer').on('submit', function(e) {
 
 	console.log(message);
 	
-	if($(this).is('.final')) $('.view').hide().filter('#view-lobby').show(); // go back to lobby is this last question
+	if($(this).is('.final')) $('.view').hide().filter('#view-lobby').show(); // go back to lobby if this is last question
 	else $(this).hide().next().show(); // otherwise show the next question
 	
 	socket.emit('relay', message);
+})
+$('.submit-game-start').on('submit', function(e) {
+	e.preventDefault();
+	$(this).hide();
+
+	let message = { 
+		to: player.roomKey, 
+		request: 'startTheGame', 		
+	}
+	
+	socket.emit('relay', message);
+
 })
 
 function fragment(htmlStr) {

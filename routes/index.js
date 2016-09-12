@@ -22,12 +22,19 @@ module.exports = io => {
 	// Handle room connection
 	nsp.rooms.on('connection', socket => {
 		let roomKey = genRoomKey(4);
-		socket.join(roomKey); // register this socket to the room with roomKey
-		socket.emit('room-registered', roomKey); // emit room-registered to this room (lobby)
+		socket.join(roomKey); // register this room to the socket room with roomKey
+		socket.emit('room-registered', roomKey);
 
-		console.log(roomKeyStore);
-
-	    socket.on('disconnect', () => {	    	
+		socket.on('registration-accept', player => {
+			let pSocket = io.sockets.connected[player.socketId]; // get player attempting to register
+			pSocket.join(player.roomKey); // register this player to the room with roomKey
+			nsp.players.to(player.socketId).emit('player-registered', player.roomKey); // emit player-registered to this room
+			socket.emit('player-registered', player.roomKey); // emit player-registered to this room			
+	    })
+		socket.on('registration-reject', player => {			
+			nsp.players.to(player.socketId).emit('player-refused'); // emit player-registered to this room
+	    })
+		socket.on('disconnect', () => {
 		
 		})
 		socket.on('relay', message => {
@@ -37,10 +44,8 @@ module.exports = io => {
 
 	// Handle player connection
 	nsp.players.on('connection', socket => {
-		socket.on('register', player => { 
-			socket.join(player.roomKey); // register this socket to the room with roomKey
-			nsp.rooms.to(player.roomKey).emit('player-registered', player); // emit player-registered to this room
-			socket.emit('player-registered', player.roomKey); // emit player-registered to this player
+		socket.on('attempt-registration', player => {
+			nsp.rooms.to(player.roomKey).emit('register-player', player);
 	    })
 	    socket.on('disconnect', () => {
 

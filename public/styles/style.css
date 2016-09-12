@@ -20,6 +20,10 @@ a { color: #00B7FF; }
 
 #client-player .display-name span { font-style: italic; color: blue; }
 
+#client-player .submit-game-start { display: none; }
+
+#client-player .submit-game-start.ready { display: block; }
+
 #client-player .question { font-size: 1.3em; border-left: 3px solid lightgrey; padding: 10px 0 10px 10px; }
 
 #client-player form { width: 100%; }
