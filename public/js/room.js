@@ -5,7 +5,7 @@ socket = io('http://localhost:8888/room'); // connect to the socket server
 // socket = io('http://cn.jonathan-brooks.co.uk/room'); // connect to the socket server
 socket.on('connect', () => {
 	console.log('socket connection established');	
-	$('#view-lobby .players').html('')
+	$('.players, .questions').html('')
 })
 socket.on('room-registered', r => {
 	console.log('room registered with key: %s', r.roomKey);
@@ -14,15 +14,11 @@ socket.on('room-registered', r => {
 })
 socket.on('player-registered', player => {
 	console.log('new player has connected: %s', JSON.stringify(player));
-	let frag = fragment($('#template-player').html());
 
 	room.players[player.socketId] = player; // register this player on the local copy
+	addPlayerToPage(player);
 
-	$(frag).find('.player .name').text(player.name);
-	$(frag).find('.player .id').text(player.socketId);
-	$('#view-lobby .players').append(frag);	
-
-	if(Object.keys(room.players).length === room.maxPlayers) {
+	if(Object.keys(room.players).length === room.minPlayers) {
 		socket.emit('relay', {
 			from: room.roomKey,
 			to: Object.keys(room.players)[0],
@@ -45,7 +41,15 @@ let responses = {
 		roundOne();
 	},
 	acceptQuestionSubmission: message => {
-		console.log(message.args);
+		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
+		room.players[message.from].submissionsComplete[message.args.qid] = true;
+		
+		$(`.question[data-question-id="${message.args.qid}"]`)
+			.find(`.answer[data-player-id="${message.from}"]`)
+			.find('.content').text(message.args.answer);
+
+		if(allComplete(room.players[message.from])) console.log('%s is finished!', message.from);
+
 	}	
 }
 
@@ -73,10 +77,15 @@ function roundOne () {
 	let questions = questionPool.roundOne; // get this rounds question pool
 	let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
 	room.questions[q.id] = { article: q.article, submissions: {} };
+
+	addQuestionToPage(q);
+
 	for(let pid in room.players) {
 		room.questions[q.id].submissions[pid] = null;
 		room.players[pid].submissionsComplete[q.id] = false;
+		addAnswerToQuestion(q, room.players[pid]);
 	}
+
 	socket.emit('relay', { // relay the question to everyone in the room
 		from: room.roomKey, to: room.roomKey, request: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 	})	
@@ -102,7 +111,33 @@ function roundTwo () {
 		socket.emit('relay', {
 			from: room.roomKey, to: p2, request: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
 		})
+		addQuestionToPage(q);
+		addAnswerToQuestion(q, room.players[p1]);
+		addAnswerToQuestion(q, room.players[p2]);
 	}
+}
+
+function addPlayerToPage(player) {
+	let frag = fragment($('#template-player').html());
+	$(frag).find('.player').attr('data-player-id', player.socketId);
+	$(frag).find('.player .name').text(player.name);
+	$('#view-lobby .players').append(frag);	
+}
+
+function addQuestionToPage(question) {
+	let frag = fragment($('#template-question').html());
+	$(frag).find('.question').attr('data-question-id', question.id);
+	$(frag).find('.question .id').text(question.id);
+	$(frag).find('.question .answer').text(question.socketId);
+	$('#view-lobby .questions').append(frag);	
+}
+
+function addAnswerToQuestion(q, player) {
+	let frag = fragment($('#template-answer').html());
+	$(frag).find('.answer').attr('data-player-id', player.socketId);
+	$(frag).find('.answer .player').text(player.name);
+	$(frag).find('.answer .content').text('Pending');
+	$(`.question[data-question-id="${q.id}"] .answers`).append(frag);
 }
 
 function fragment(htmlStr) {
@@ -111,6 +146,13 @@ function fragment(htmlStr) {
 	temp.innerHTML = htmlStr;
 	while (temp.firstChild) { frag.appendChild(temp.firstChild);}
 	return frag;
+}
+
+function allComplete(p) {
+	for(let i in p.submissionsComplete) {
+		if(!p.submissionsComplete[i]) return false;
+	}
+	return true;
 }
 
 function shuffle(array) {

@@ -9,16 +9,14 @@ socket.on('connect', () => {
 
 socket.on('player-registered', p => {
 	// console.log('player registered on room with key: %s', rk);
-
-	player = p;
+	player = p;	
 
 	$('.display-name span').text(player.name);
 	$('.view').hide().filter('#view-lobby').show(); // go to lobby once player registered
 })
+
 socket.on('player-refused', () => {
-	// console.log('player registered on room with key: %s', rk);
-	$('.display-name span').text(player.name);
-	$('.view').hide().filter('#view-lobby').show(); // go to lobby once player registered
+	alert('Room is full!');	
 })
 
 socket.on('relay', message => {
@@ -37,6 +35,9 @@ let responses = {
 		// console.log('qid: %s, article: %s ', message.args.qid, message.args.question)
 		let round = message.args.round;
 		let view = `#view-submit-answer-round-${round}`;
+
+		player.submissionsComplete[message.args.qid] = false;
+
 		$(view).find('.submit-answer[data-question-id=""]').eq(0)
 			.attr('data-question-id', message.args.qid)
 			.find('.question').text(message.args.question);
@@ -64,11 +65,10 @@ $('.submit-answer').on('submit', function(e) {
 		}
 	}
 
-	console.log(message);
-	
 	if($(this).is('.final')) $('.view').hide().filter('#view-lobby').show(); // go back to lobby if this is last question
 	else $(this).hide().next().show(); // otherwise show the next question
 	
+	player.submissionsComplete[$(this).attr('data-question-id')] = true;
 	socket.emit('relay', message);
 })
 

@@ -27,7 +27,7 @@ module.exports = io => {
 			socketId: socket.id,
 			roomKey: genRoomKey(4),			
 			minPlayers: 1,
-			maxPlayers: 1
+			maxPlayers: 2
 		});
 
 		rooms[socket.id] = room;

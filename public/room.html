@@ -11,6 +11,7 @@
 			<div id="view-lobby" class="view">
 				<h1 class="key"></h1>
 				<div class="players"></div>
+				<div class="questions"></div>
 			</div>
 			<!--
 			<div id="view-video-transition" class="view">
@@ -38,10 +39,21 @@
 		</script>		
 		-->		
 		<script id="template-player" type="text/template">
-			<div class="player">
+			<div class="player" data-player-id="">
 				<h2 class="name"></h2>
-				<p class="id"></p>
-				<p class="status"></p>
+				<p class="status">Ready</p>
+			</div>
+		</script>
+		<script id="template-question" type="text/template">
+			<div class="question" data-question-id="">
+				<h2 class="id"></h2>
+				<div class="answers"></div>
+			</div>
+		</script>
+		<script id="template-answer" type="text/template">
+			<div class="answer" data-player-id="">
+				<h3 class="player"></h3>
+				<p class="content"></p>
 			</div>
 		</script>
 		<script src="/js/room-dist.js"></script>

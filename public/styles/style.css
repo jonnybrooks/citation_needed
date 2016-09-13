@@ -12,6 +12,10 @@ a { color: #00B7FF; }
 
 .logo span { color: blue; font-style: italic; }
 
+#client-room #view-lobby { padding: 20px; }
+
+#client-room .players, #client-room .questions { display: inline-block; vertical-align: top; width: 45%; }
+
 #client-player #view-player-registration { padding: 40px 15%; }
 
 #client-player .view:not(#view-player-registration) { display: block; min-height: 100%; padding: 15px; display: none; }
