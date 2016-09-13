@@ -71,7 +71,7 @@ a {
 	}
 	.submit-game-start {
 		display: none;
-		&.ready {
+		&.show {
 			display: block;
 		}
 	}

@@ -15,7 +15,7 @@ socket.on('player-registered', p => {
 })
 
 socket.on('player-refused', () => {
-	alert('Room is full!');	
+	alert('Unable to join this room, it is probably full.');	
 })
 
 socket.on('relay', message => {
@@ -28,7 +28,7 @@ socket.on('relay', message => {
 
 let responses = {
 	displayStartButton: message => {
-		$('.submit-game-start').addClass('ready');
+		$('.submit-game-start').addClass('show');
 	},
 	prepareQuestion: message => {
 		// console.log('qid: %s, article: %s ', message.args.qid, message.args.question)

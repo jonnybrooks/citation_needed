@@ -17,7 +17,7 @@ socket.on('player-registered', function (p) {
 });
 
 socket.on('player-refused', function () {
-	alert('Room is full!');
+	alert('Unable to join this room, it is probably full.');
 });
 
 socket.on('relay', function (message) {
@@ -28,7 +28,7 @@ socket.on('relay', function (message) {
 
 var responses = {
 	displayStartButton: function displayStartButton(message) {
-		$('.submit-game-start').addClass('ready');
+		$('.submit-game-start').addClass('show');
 	},
 	prepareQuestion: function prepareQuestion(message) {
 		// console.log('qid: %s, article: %s ', message.args.qid, message.args.question)

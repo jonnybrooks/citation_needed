@@ -3,6 +3,8 @@
 var socket = undefined;
 var room = undefined;
 
+var round = 0;
+
 socket = io('http://' + location.host + '/room');
 socket.on('connect', function () {
 	console.log('socket connection established');
@@ -20,6 +22,7 @@ socket.on('player-registered', function (player) {
 	addPlayerToPage(player);
 
 	if (Object.keys(room.players).length === room.minPlayers) {
+		console.log('display start');
 		socket.emit('relay', {
 			from: room.roomKey,
 			to: Object.keys(room.players)[0],
@@ -36,7 +39,8 @@ socket.on('relay', function (message) {
 
 var responses = {
 	startTheGame: function startTheGame(message) {
-		roundTwo();
+		round = 1;
+		roundOne(); // start round one
 	},
 	acceptQuestionSubmission: function acceptQuestionSubmission(message) {
 		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
@@ -44,7 +48,9 @@ var responses = {
 
 		$('.question[data-question-id="' + message.args.qid + '"]').find('.answer[data-player-id="' + message.from + '"]').find('.content').text(message.args.answer);
 
-		if (allComplete(room.players[message.from])) console.log('%s is finished!', message.from);
+		checkRoundStatus(message);
+
+		// if(allComplete(room.players[message.from])) console.log('%s is finished!', message.from);
 	}
 };
 
@@ -100,6 +106,29 @@ function roundTwo() {
 	}
 }
 
+function checkRoundStatus(m) {
+	var playerDone = true;
+	var questionsComplete = true;
+	for (var i in room.players[m.from].submissionsComplete) {
+		if (!room.players[m.from].submissionsComplete[i]) playerDone = false;
+	}
+	if (playerDone) {
+		// if the player has finished their questions
+		console.log('player (%s) has completed their questions', m.from); // notify the client
+		for (var i in room.questions) {
+			// then iterate through the room questions
+			for (var j in room.questions[i].submissions) {
+				// making sure they're all done
+				if (room.questions[i].submissions[j] === null) questionsComplete = false;
+			}
+		}
+	}
+	if (questionsComplete) {
+		// if all questions are complete
+		round === 1 ? roundTwo() : alert('demo finished for now :)'); // start round two
+	}
+}
+
 function addPlayerToPage(player) {
 	var frag = fragment($('#template-player').html());
 	$(frag).find('.player').attr('data-player-id', player.socketId);
@@ -131,13 +160,6 @@ function fragment(htmlStr) {
 		frag.appendChild(temp.firstChild);
 	}
 	return frag;
-}
-
-function allComplete(p) {
-	for (var i in p.submissionsComplete) {
-		if (!p.submissionsComplete[i]) return false;
-	}
-	return true;
 }
 
 function shuffle(array) {
