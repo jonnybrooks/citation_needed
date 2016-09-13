@@ -37,7 +37,7 @@ socket.on('relay', message => {
 
 let responses = {
 	startTheGame: message => {
-		roundOne();
+		roundTwo();
 	},
 	acceptQuestionSubmission: message => {
 		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
@@ -92,6 +92,7 @@ function roundOne () {
 
 // in round two, everyone submits two excerpts
 function roundTwo () {
+	$('.questions').html(''); // clear questions
 	let players = shuffle(Object.keys(room.players)); // get player ids and randomize
 	let questions = questionPool.roundTwo; // get this rounds question pool
 	for(let i = 0; i < players.length; i++) {
