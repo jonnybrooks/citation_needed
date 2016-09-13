@@ -1,8 +1,7 @@
 let socket;
 let room;
 
-socket = io('http://localhost:8888/room'); // connect to the socket server
-// socket = io('http://cn.jonathan-brooks.co.uk/room'); // connect to the socket server
+socket = io(`http://${location.host}/room`);
 socket.on('connect', () => {
 	console.log('socket connection established');	
 	$('.players, .questions').html('')

@@ -3,8 +3,7 @@
 var socket = undefined;
 var player = undefined;
 
-socket = io('http://localhost:8888/player');
-// socket = io('http://cn.jonathan-brooks.co.uk/player'); // connect to the socket server
+socket = io('http://' + location.host + '/player');
 socket.on('connect', function () {
 	console.log('socket connection established');
 });

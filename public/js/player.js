@@ -1,8 +1,7 @@
 let socket; 
 let player;
 
-socket = io('http://localhost:8888/player');
-// socket = io('http://cn.jonathan-brooks.co.uk/player'); // connect to the socket server
+socket = io(`http://${location.host}/player`);
 socket.on('connect', () => {
 	console.log('socket connection established');
 })
