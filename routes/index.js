@@ -58,7 +58,7 @@ module.exports = io => {
 
 				socket.join(player.roomKey); // register this player to the room with roomKey
 				socket.emit(player.roomKey).emit('player-registered', player); // notify the player client it's been registered
-				nsp.rooms.to(player.roomKey).emit('player-registered', player); // notify the room client it's been registered
+				nsp.rooms.to(player.roomKey).emit('player-registered', player); // notify the room client a new player registered
 			}
 			else {
 				socket.emit('player-refused'); // emit player-registered to this room

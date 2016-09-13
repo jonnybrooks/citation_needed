@@ -18,11 +18,19 @@ socket.on('player-registered', function (player) {
 	console.log('new player has connected: %s', JSON.stringify(player));
 	var frag = fragment($('#template-player').html());
 
-	room.players[player.socket.id] = player; // register this player on the local copy
+	room.players[player.socketId] = player; // register this player on the local copy
 
 	$(frag).find('.player .name').text(player.name);
 	$(frag).find('.player .id').text(player.socketId);
 	$('#view-lobby .players').append(frag);
+
+	if (Object.keys(room.players).length === room.maxPlayers) {
+		socket.emit('relay', {
+			from: room.roomKey,
+			to: Object.keys(room.players)[0],
+			request: 'displayStartButton'
+		});
+	}
 });
 
 socket.on('relay', function (message) {
