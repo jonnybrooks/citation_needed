@@ -1,8 +1,6 @@
 let socket;
 let room;
 
-let round = 0;
-
 socket = io(`http://${location.host}/room`);
 socket.on('connect', () => {
 	console.log('socket connection established');	
@@ -40,8 +38,7 @@ socket.on('relay', message => {
 
 let responses = {
 	startTheGame: message => {
-		round = 1;
-		roundOne(); // start round one
+		roundHandlers[++room.round.current](); // start round one
 	},
 	acceptQuestionSubmission: message => {
 		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
@@ -76,51 +73,59 @@ let questionPool  = {
 	]
 }
 
-// in round one, everyone submits one article title
-function roundOne () {
-	let players = Object.keys(room.players); // get player ids
-	let questions = questionPool.roundOne; // get this rounds question pool
-	let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
-	room.questions[q.id] = { article: q.article, submissions: {} };
+let roundHandlers = {
+	1: function() {
+		let players = Object.keys(room.players); // get player ids
+		let questions = questionPool.roundOne; // get this rounds question pool
+		let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
+		room.questions[q.id] = { article: q.article, submissions: {} };
 
-	addQuestionToPage(q);
+		addQuestionToPage(q);
 
-	for(let pid in room.players) {
-		room.questions[q.id].submissions[pid] = null;
-		room.players[pid].submissionsComplete[q.id] = false;
-		addAnswerToQuestion(q, room.players[pid]);
+		for(let pid in room.players) {
+			room.questions[q.id].submissions[pid] = null;
+			room.players[pid].submissionsComplete[q.id] = false;
+			addAnswerToQuestion(q, room.players[pid]);
+		}
+
+		socket.emit('relay', { // relay the question to everyone in the room
+			from: room.roomKey, to: room.roomKey, request: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
+		})
+	},
+	2: function() {
+		round = 2;
+		$('.questions').html(''); // clear questions
+		let players = shuffle(Object.keys(room.players)); // get player ids and randomize
+		let questions = questionPool.roundTwo; // get this rounds question pool
+		for(let i = 0; i < players.length; i++) {
+			let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
+			let p1 = players[i];
+			let p2 = players[i+1] || players[0];
+			room.questions[q.id] = { question: q.article, submissions: {} };
+			room.questions[q.id].submissions[p1] = null;
+			room.questions[q.id].submissions[p2] = null;
+			room.players[p1].submissionsComplete[q.id] = false;
+			room.players[p1].submissionsComplete[q.id] = false;
+
+			socket.emit('relay', {
+				from: room.roomKey, to: p1, request: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
+			})
+			socket.emit('relay', {
+				from: room.roomKey, to: p2, request: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
+			})
+			addQuestionToPage(q);
+			addAnswerToQuestion(q, room.players[p1]);
+			addAnswerToQuestion(q, room.players[p2]);
+		}
+	},
+	3: function() {
+		alert('demo is over :)');
 	}
-
-	socket.emit('relay', { // relay the question to everyone in the room
-		from: room.roomKey, to: room.roomKey, request: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
-	})	
 }
 
-// in round two, everyone submits two excerpts
-function roundTwo () {
-	$('.questions').html(''); // clear questions
-	let players = shuffle(Object.keys(room.players)); // get player ids and randomize
-	let questions = questionPool.roundTwo; // get this rounds question pool
-	for(let i = 0; i < players.length; i++) {
-		let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
-		let p1 = players[i];
-		let p2 = players[i+1] || players[0];
-		room.questions[q.id] = { question: q.article, submissions: {} };
-		room.questions[q.id].submissions[p1] = null;
-		room.questions[q.id].submissions[p2] = null;
-		room.players[p1].submissionsComplete[q.id] = false;
-		room.players[p1].submissionsComplete[q.id] = false;
-
-		socket.emit('relay', {
-			from: room.roomKey, to: p1, request: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
-		})
-		socket.emit('relay', {
-			from: room.roomKey, to: p2, request: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
-		})
-		addQuestionToPage(q);
-		addAnswerToQuestion(q, room.players[p1]);
-		addAnswerToQuestion(q, room.players[p2]);
-	}
+function startTimer(t) {
+	if(t <= 0) console.log('time has round out!'); // do something here which halts progress
+	else setTimeout(--startTimer);
 }
 
 function checkRoundStatus(m){
@@ -138,7 +143,7 @@ function checkRoundStatus(m){
 		}
 	}
 	if(questionsComplete) { // if all questions are complete
-		round === 1 ? roundTwo() : alert('demo finished for now :)'); // start round two
+		roundHandlers[++room.round.current](); // start next round
 	}	
 }
 
