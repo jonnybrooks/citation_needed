@@ -24,6 +24,8 @@ a { color: #00B7FF; }
 
 #client-player .display-name span { font-style: italic; color: blue; }
 
+#client-player h3 { text-align: center; font-size: 14px; color: #bbb; }
+
 #client-player .submit-game-start { display: none; }
 
 #client-player .submit-game-start.ready { display: block; }
