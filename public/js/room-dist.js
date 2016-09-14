@@ -37,7 +37,7 @@ socket.on('relay', function (message) {
 
 var responses = {
 	startTheGame: function startTheGame(message) {
-		roundHandlers[++room.round.current](); // start round one
+		processSequence.advance(); // start round one
 	},
 	acceptQuestionSubmission: function acceptQuestionSubmission(message) {
 		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
@@ -46,8 +46,6 @@ var responses = {
 		$('.question[data-question-id="' + message.args.qid + '"]').find('.answer[data-player-id="' + message.from + '"]').find('.content').text(message.args.answer);
 
 		checkRoundStatus(message);
-
-		// if(allComplete(room.players[message.from])) console.log('%s is finished!', message.from);
 	}
 };
 
@@ -56,8 +54,8 @@ var questionPool = {
 	roundTwo: [{ id: 0, article: 'dung beetle0' }, { id: 1, article: 'dung beetle1' }, { id: 2, article: 'dung beetle2' }, { id: 3, article: 'dung beetle3' }, { id: 4, article: 'dung beetle4' }]
 };
 
-var roundHandlers = {
-	1: function _() {
+var gamePhases = {
+	roundOne: function roundOne() {
 		var players = Object.keys(room.players); // get player ids
 		var questions = questionPool.roundOne; // get this rounds question pool
 		var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
@@ -77,7 +75,7 @@ var roundHandlers = {
 
 		startTimer(room.round.timer.limit);
 	},
-	2: function _() {
+	roundTwo: function roundTwo() {
 		$('.questions').html(''); // clear questions
 		var players = shuffle(Object.keys(room.players)); // get player ids and randomize
 		var questions = questionPool.roundTwo; // get this rounds question pool
@@ -102,14 +100,24 @@ var roundHandlers = {
 			addAnswerToQuestion(q, room.players[p2]);
 		}
 	},
-	3: function _() {
+	endGame: function endGame() {
 		alert('demo is over :)');
+	}
+};
+
+var processSequence = {
+	current: -1,
+	steps: [gamePhases.roundOne, gamePhases.roundTwo, gamePhases.endGame],
+	advance: function advance() {
+		var args = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+		this.steps[++this.current](args);
 	}
 };
 
 function startTimer(t) {
 	if (t <= 0) console.log('time has round out!'); // do something here which halts progress
-	else setTimeout(startTimer.bind(null, --startTimer), 1000);
+	else setTimeout(startTimer.bind(null, --room.round.timer.limit), 1000);
 }
 
 function checkRoundStatus(m) {
@@ -130,7 +138,7 @@ function checkRoundStatus(m) {
 		}
 		if (questionsComplete) {
 			// if all questions are complete
-			roundHandlers[++room.round.current](); // start next round
+			processSequence.advance(); // move to next phase
 		}
 	}
 }

@@ -91,7 +91,7 @@ function Room(conf) {
 	this.minPlayers = conf.minPlayers;
 	this.round = { 
 		current: 0, 
-		timer: { active: false, limit: 90 } 
+		timer: { active: false, limit: 5 } 
 	};
 	this.players = {};
 	this.questions = {};	

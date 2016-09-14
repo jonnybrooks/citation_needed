@@ -38,7 +38,7 @@ socket.on('relay', message => {
 
 let responses = {
 	startTheGame: message => {
-		roundHandlers[++room.round.current](); // start round one
+		processSequence.advance(); // start round one
 	},
 	acceptQuestionSubmission: message => {
 		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
@@ -49,8 +49,6 @@ let responses = {
 			.find('.content').text(message.args.answer);
 
 		checkRoundStatus(message);
-
-		// if(allComplete(room.players[message.from])) console.log('%s is finished!', message.from);
 
 	}	
 }
@@ -73,8 +71,8 @@ let questionPool  = {
 	]
 }
 
-let roundHandlers = {
-	1: function() {
+let gamePhases = {
+	roundOne: function() {
 		let players = Object.keys(room.players); // get player ids
 		let questions = questionPool.roundOne; // get this rounds question pool
 		let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
@@ -95,7 +93,7 @@ let roundHandlers = {
 		startTimer(room.round.timer.limit);
 
 	},
-	2: function() {
+	roundTwo: function() {
 		$('.questions').html(''); // clear questions
 		let players = shuffle(Object.keys(room.players)); // get player ids and randomize
 		let questions = questionPool.roundTwo; // get this rounds question pool
@@ -120,14 +118,26 @@ let roundHandlers = {
 			addAnswerToQuestion(q, room.players[p2]);
 		}
 	},
-	3: function() {
+	endGame: function() {
 		alert('demo is over :)');
+	}
+}
+
+let processSequence = {
+	current: -1,
+	steps: [
+		gamePhases.roundOne,
+		gamePhases.roundTwo,
+		gamePhases.endGame
+	],
+	advance: function(args = {}){
+		this.steps[++this.current](args);
 	}
 }
 
 function startTimer(t) {
 	if(t <= 0) console.log('time has round out!'); // do something here which halts progress
-	else setTimeout(startTimer.bind(null, --startTimer), 1000);
+	else setTimeout(startTimer.bind(null, --room.round.timer.limit), 1000);
 }
 
 function checkRoundStatus(m){
@@ -144,7 +154,7 @@ function checkRoundStatus(m){
 			}
 		}		
 		if(questionsComplete) { // if all questions are complete
-			roundHandlers[++room.round.current](); // start next round
+			processSequence.advance(); // move to next phase
 		}
 	}	
 }
