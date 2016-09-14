@@ -91,9 +91,11 @@ let roundHandlers = {
 		socket.emit('relay', { // relay the question to everyone in the room
 			from: room.roomKey, to: room.roomKey, request: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 		})
+
+		startTimer(room.round.timer.limit);
+
 	},
 	2: function() {
-		round = 2;
 		$('.questions').html(''); // clear questions
 		let players = shuffle(Object.keys(room.players)); // get player ids and randomize
 		let questions = questionPool.roundTwo; // get this rounds question pool
@@ -125,7 +127,7 @@ let roundHandlers = {
 
 function startTimer(t) {
 	if(t <= 0) console.log('time has round out!'); // do something here which halts progress
-	else setTimeout(--startTimer);
+	else setTimeout(startTimer.bind(null, --startTimer), 1000);
 }
 
 function checkRoundStatus(m){
@@ -140,10 +142,10 @@ function checkRoundStatus(m){
 			for(let j in room.questions[i].submissions) { // making sure they're all done
 				if (room.questions[i].submissions[j] === null) questionsComplete = false;
 			}
+		}		
+		if(questionsComplete) { // if all questions are complete
+			roundHandlers[++room.round.current](); // start next round
 		}
-	}
-	if(questionsComplete) { // if all questions are complete
-		roundHandlers[++room.round.current](); // start next round
 	}	
 }
 
