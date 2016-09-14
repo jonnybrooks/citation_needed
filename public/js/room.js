@@ -22,21 +22,21 @@ socket.on('player-registered', player => {
 		socket.emit('relay', {
 			from: room.roomKey,
 			to: Object.keys(room.players)[0],
-			request: 'displayStartButton'
+			command: 'displayStartButton'
 		})
 	}
 	
 })
 
 socket.on('relay', message => {
-	responses[message.request] ? 
-		responses[message.request](message) : 
-		console.log(`no response handler exists for ${message.request}`);	
+	commands[message.command] ? 
+		commands[message.command](message) : 
+		console.log(`no response handler exists for ${message.command}`);	
 })
 
 // $('body').hide();
 
-let responses = {
+let commands = {
 	startTheGame: message => {
 		processSequence.advance(); // start round one
 	},
@@ -87,10 +87,10 @@ let gamePhases = {
 		}
 
 		socket.emit('relay', { // relay the question to everyone in the room
-			from: room.roomKey, to: room.roomKey, request: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
+			from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 		})
 
-		startTimer(room.round.timer.limit);
+		startTimer(room.timer.limit);
 
 	},
 	roundTwo: function() {
@@ -108,14 +108,16 @@ let gamePhases = {
 			room.players[p1].submissionsComplete[q.id] = false;
 
 			socket.emit('relay', {
-				from: room.roomKey, to: p1, request: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
+				from: room.roomKey, to: p1, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
 			})
 			socket.emit('relay', {
-				from: room.roomKey, to: p2, request: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
+				from: room.roomKey, to: p2, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
 			})
 			addQuestionToPage(q);
 			addAnswerToQuestion(q, room.players[p1]);
 			addAnswerToQuestion(q, room.players[p2]);
+
+			startTimer(room.timer.limit);
 		}
 	},
 	endGame: function() {
@@ -131,22 +133,24 @@ let processSequence = {
 		gamePhases.endGame
 	],
 	advance: function(args = {}){
+		if (args.alert) alert(args.alert);
 		this.steps[++this.current](args);
 	}
 }
 
 function startTimer(t) {
-	if(t <= 0) console.log('time has round out!'); // do something here which halts progress
-	else setTimeout(startTimer.bind(null, --room.round.timer.limit), 1000);
+	if(t === room.timer.limit) room.timer.active = true;
+	if(room.timer.active && t <= 0) return processSequence.advance({alert: 'timeout!'}); // move to next phase
+	else setTimeout(startTimer.bind(null, --room.timer.limit), 1000);
 }
 
 function checkRoundStatus(m){
 	let playerDone = true;
-	let questionsComplete = true;
 	for(let i in room.players[m.from].submissionsComplete) {
 		if(!room.players[m.from].submissionsComplete[i]) playerDone = false;
 	}
 	if(playerDone) { // if the player has finished their questions
+		let questionsComplete = true;
 		console.log('player (%s) has completed their questions', m.from); // notify the client
 		for(let i in room.questions) { // then iterate through the room questions
 			for(let j in room.questions[i].submissions) { // making sure they're all done

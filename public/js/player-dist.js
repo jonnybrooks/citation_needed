@@ -21,12 +21,12 @@ socket.on('player-refused', function () {
 });
 
 socket.on('relay', function (message) {
-	responses[message.request] ? responses[message.request](message) : console.log('no response handler exists for ' + message.request);
+	commands[message.command] ? commands[message.command](message) : console.log('no response handler exists for ' + message.command);
 });
 
-// response list for server requests
+// response list for server commands
 
-var responses = {
+var commands = {
 	displayStartButton: function displayStartButton(message) {
 		$('.submit-game-start').addClass('show');
 	},
@@ -55,7 +55,7 @@ $('.submit-answer').on('submit', function (e) {
 	var message = {
 		from: player.socketId,
 		to: player.roomKey,
-		request: 'acceptQuestionSubmission',
+		command: 'acceptQuestionSubmission',
 		args: {
 			qid: $(this).attr('data-question-id'),
 			answer: form[0].value
@@ -75,7 +75,7 @@ $('.submit-game-start').on('submit', function (e) {
 
 	var message = {
 		to: player.roomKey,
-		request: 'startTheGame'
+		command: 'startTheGame'
 	};
 
 	socket.emit('relay', message);
