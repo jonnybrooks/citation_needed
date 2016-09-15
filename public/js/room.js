@@ -28,14 +28,14 @@ socket.on('player-registered', player => {
 socket.on('relay', message => {
 	commands[message.command] ? 
 		commands[message.command](message) : 
-		console.log(`no response handler exists for ${message.command}`);	
+		console.log(`no response handler exists for ${message.command}`);
 })
 
 // $('body').hide();
 
 let commands = {
 	startTheGame: message => {
-		processSequence.advance(); // start round one
+		processSequence.next(); // start round one
 	},
 	acceptQuestionSubmission: message => {
 		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
@@ -124,8 +124,10 @@ let gamePhases = {
 				console.log('    answer from %s: %s', j, room.questions[i].submissions[j]);
 			}
 		}
+		processSequence.next();
 	},
 	clearQuestions: function() {
+		console.log('clearing questions');
 		room.questions = {};
 		socket.emit('relay', { 
 			from: room.roomKey, to: room.roomKey, command: 'displayLobby'
@@ -146,20 +148,27 @@ let processSequence = {
 		gamePhases.voting,
 		gamePhases.clearQuestions,
 		gamePhases.roundTwo,
+		gamePhases.voting,
 		gamePhases.clearQuestions,
 		gamePhases.endGame
 	],
-	advance: function(args = {}){
+	next: function(args = {}){
+		console.log('moving to process: %s', this.current + 1);
 		this.steps[++this.current](args);
 	}
 }
 
 function startTimer(t) {
 	$('.timer').text(t); // set the timer
-	if(t === room.timer.limit) room.timer.active = true; // when first called
+	if(t === room.timer.limit) {
+		room.timer.active = true; // when first called
+	}
 	if(!room.timer.active) return; // return if tne timer has been cancelled
- 	if(t === 0) return processSequence.advance(); // move to next phase
-	setTimeout(startTimer.bind(null, --t), 1000); // decrement the timer
+ 	else if(t === 0) {
+ 		console.log('timeout!');
+ 		return processSequence.next(); // move to next phase
+ 	}
+	else setTimeout(startTimer.bind(null, --t), 1000); // decrement the timer
 }
 
 function checkRoundStatus(m){
@@ -178,7 +187,7 @@ function checkRoundStatus(m){
 		if(questionsComplete) { // if all questions are complete
 			console.log('should disabled timer');
 			room.timer.active = false; // disable the timer
-			processSequence.advance(); // move to next phase
+			processSequence.next(); // move to next phase
 		}
 	}	
 }
