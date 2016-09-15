@@ -3,26 +3,23 @@ let room;
 
 socket = io(`http://${location.host}/room`);
 socket.on('connect', () => {
-	console.log('socket connection established');	
+	// console.log('socket connection established');	
 	$('.players, .questions').html('')
 })
 socket.on('room-registered', r => {
-	console.log('room registered with key: %s', r.roomKey);
+	// console.log('room registered with key: %s', r.roomKey);
 	room = r; // set local copy of room to remote copy
 	$('#view-lobby .key').text(r.roomKey); // display this room's key
 })
 socket.on('player-registered', player => {
-	console.log('new player has connected: %s', JSON.stringify(player));
+	// console.log('new player has connected: %s', JSON.stringify(player));
 
 	room.players[player.socketId] = player; // register this player on the local copy
 	addPlayerToPage(player);
 
 	if(Object.keys(room.players).length === room.minPlayers) {
-		console.log('display start');
-		socket.emit('relay', {
-			from: room.roomKey,
-			to: Object.keys(room.players)[0],
-			command: 'displayStartButton'
+		socket.emit('relay', { 
+			from: room.roomKey, to: Object.keys(room.players)[0], command: 'displayStartButton'
 		})
 	}
 	
@@ -76,7 +73,7 @@ let gamePhases = {
 		let players = Object.keys(room.players); // get player ids
 		let questions = questionPool.roundOne; // get this rounds question pool
 		let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
-		room.questions[q.id] = { article: q.article, submissions: {} };
+		room.questions[q.id] = { question: q.article, submissions: {} };
 
 		addQuestionToPage(q);
 
@@ -94,6 +91,7 @@ let gamePhases = {
 
 	},
 	roundTwo: function() {
+		console.log('round two');
 		$('.questions').html(''); // clear questions
 		let players = shuffle(Object.keys(room.players)); // get player ids and randomize
 		let questions = questionPool.roundTwo; // get this rounds question pool
@@ -116,9 +114,25 @@ let gamePhases = {
 			addQuestionToPage(q);
 			addAnswerToQuestion(q, room.players[p1]);
 			addAnswerToQuestion(q, room.players[p2]);
-
-			startTimer(room.timer.limit);
 		}
+		startTimer(room.timer.limit);
+	},
+	voting: function() {
+		for(let i in room.questions) {
+			console.log('question %s: %s', i, room.questions[i].question);
+			for(let j in room.questions[i].submissions) {
+				console.log('    answer from %s: %s', j, room.questions[i].submissions[j]);
+			}
+		}
+	},
+	clearQuestions: function() {
+		room.questions = {};
+		socket.emit('relay', { 
+			from: room.roomKey, to: room.roomKey, command: 'displayLobby'
+		})
+		socket.emit('relay', { 
+			from: room.roomKey, to: Object.keys(room.players)[0], command: 'displayStartButton'
+		})
 	},
 	endGame: function() {
 		alert('demo is over :)');
@@ -129,19 +143,23 @@ let processSequence = {
 	current: -1,
 	steps: [
 		gamePhases.roundOne,
+		gamePhases.voting,
+		gamePhases.clearQuestions,
 		gamePhases.roundTwo,
+		gamePhases.clearQuestions,
 		gamePhases.endGame
 	],
 	advance: function(args = {}){
-		if (args.alert) alert(args.alert);
 		this.steps[++this.current](args);
 	}
 }
 
 function startTimer(t) {
-	if(t === room.timer.limit) room.timer.active = true;
-	if(room.timer.active && t <= 0) return processSequence.advance({alert: 'timeout!'}); // move to next phase
-	else setTimeout(startTimer.bind(null, --room.timer.limit), 1000);
+	$('.timer').text(t); // set the timer
+	if(t === room.timer.limit) room.timer.active = true; // when first called
+	if(!room.timer.active) return; // return if tne timer has been cancelled
+ 	if(t === 0) return processSequence.advance(); // move to next phase
+	setTimeout(startTimer.bind(null, --t), 1000); // decrement the timer
 }
 
 function checkRoundStatus(m){
@@ -151,13 +169,15 @@ function checkRoundStatus(m){
 	}
 	if(playerDone) { // if the player has finished their questions
 		let questionsComplete = true;
-		console.log('player (%s) has completed their questions', m.from); // notify the client
+		// sconsole.log('player (%s) has completed their questions', m.from); // notify the client
 		for(let i in room.questions) { // then iterate through the room questions
 			for(let j in room.questions[i].submissions) { // making sure they're all done
 				if (room.questions[i].submissions[j] === null) questionsComplete = false;
 			}
 		}		
 		if(questionsComplete) { // if all questions are complete
+			console.log('should disabled timer');
+			room.timer.active = false; // disable the timer
 			processSequence.advance(); // move to next phase
 		}
 	}	

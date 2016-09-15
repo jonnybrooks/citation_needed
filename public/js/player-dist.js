@@ -27,6 +27,9 @@ socket.on('relay', function (message) {
 // response list for server commands
 
 var commands = {
+	displayLobby: function displayLobby(message) {
+		$('.view').hide().filter('#view-lobby').show(); // go to lobby
+	},
 	displayStartButton: function displayStartButton(message) {
 		$('.submit-game-start').addClass('show');
 	},
@@ -71,7 +74,7 @@ $('.submit-answer').on('submit', function (e) {
 
 $('.submit-game-start').on('submit', function (e) {
 	e.preventDefault();
-	$(this).hide();
+	$(this).removeClass('show');
 
 	var message = {
 		to: player.roomKey,

@@ -14,6 +14,8 @@ a { color: #00B7FF; }
 
 #client-room #view-lobby { padding: 20px; }
 
+#client-room .timer { position: fixed; right: 50px; top: 50px; }
+
 #client-room .players, #client-room .questions { display: inline-block; vertical-align: top; width: 45%; }
 
 #client-player #view-player-registration { padding: 40px 15%; }
