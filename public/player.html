@@ -57,11 +57,13 @@
 			</div>	
 			<div id="view-submit-vote" class="view">
 				<p class="display-name">[&nbsp;<span>name</span>&nbsp;]</p>
-				<form class="submit-vote" data-question-id=""></form autocomplete="off">
+				<form class="submit-vote" data-question-id="">
+					<input name="decision" class="decision" type="hidden" value=""/>
+				</form autocomplete="off">
 			</div>				
 		</div>
 		<script id="template-vote" type="text/template">
-			<input type="submit" class="submit vote" data-player-id=""/>
+			<div class="submit vote" data-player-id=""/></div>
 		</script>
 		<script src="/js/player-dist.js"></script>		
 	</body>

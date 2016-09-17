@@ -42,6 +42,17 @@ var commands = {
 
 		$(view).find('.submit-answer[data-question-id=""]').eq(0).attr('data-question-id', message.args.qid).find('.question').text(message.args.question);
 		$('.view').hide().filter(view).show(); // show only the correct view
+	},
+	prepareVote: function prepareVote(message) {
+		var answers = message.args.answers;
+		for (var i in answers) {
+			if (i === player.socketId) continue;
+			var frag = fragment($('#template-vote').html());
+			$(frag).find('.vote').attr('data-player-id', i).text(answers[i]);
+			$('#view-submit-vote .submit-vote').append(frag);
+		}
+
+		$('.view').hide().filter('#view-submit-vote').show();
 	}
 };
 
@@ -49,6 +60,18 @@ $('.submit-player').on('submit', function (e) {
 	e.preventDefault();
 	var form = $(this).serializeArray();
 	socket.emit('attempt-registration', { roomKey: form[0].value, name: form[1].value }); // register the player with the server
+});
+
+$('.submit-game-start').on('submit', function (e) {
+	e.preventDefault();
+	$(this).removeClass('show');
+
+	var message = {
+		to: player.roomKey,
+		command: 'startTheGame'
+	};
+
+	socket.emit('relay', message);
 });
 
 $('.submit-answer').on('submit', function (e) {
@@ -72,16 +95,25 @@ $('.submit-answer').on('submit', function (e) {
 	socket.emit('relay', message);
 });
 
-$('.submit-game-start').on('submit', function (e) {
+$('.submit-vote').on('click', '.submit', function (e) {
 	e.preventDefault();
-	$(this).removeClass('show');
+	$(this).siblings('.decision').val($(this).attr('data-player-id'));
+	$(this).parent().submit();
+});
+
+$('.submit-vote').on('submit', function (e) {
+	e.preventDefault();
+	var form = $(this).serializeArray();
 
 	var message = {
+		from: player.socketId,
 		to: player.roomKey,
-		command: 'startTheGame'
+		command: 'acceptVoteSubmission',
+		args: { vote: form[0].value }
 	};
 
 	socket.emit('relay', message);
+	$('.view').hide().filter('#view-lobby').show(); // go back to lobby if this is last question
 });
 
 function fragment(htmlStr) {

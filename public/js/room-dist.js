@@ -42,7 +42,11 @@ var commands = {
 
 		$('.question[data-question-id="' + message.args.qid + '"]').find('.answer[data-player-id="' + message.from + '"]').find('.content').text(message.args.answer);
 
-		checkRoundStatus(message);
+		checkQuestionPhaseStatus(message);
+	},
+	acceptVoteSubmission: function acceptVoteSubmission(message) {
+		room.votes[message.from] = message.args.vote;
+		checkVotePhaseStatus(message);
 	}
 };
 
@@ -100,16 +104,34 @@ var gamePhases = {
 		startTimer(room.timer.limit);
 	},
 	voting: function voting() {
-		for (var i in room.questions) {
-			console.log('question %s: %s', i, room.questions[i].question);
-			for (var j in room.questions[i].submissions) {
-				console.log('    answer from %s: %s', j, room.questions[i].submissions[j]);
+		var qid = Object.keys(room.questions)[0];
+		var q = room.questions[qid]; // get question at top of queue
+
+		room.votes[qid] = {};
+
+		if (Object.keys(room.questions).length === 1) {
+			for (var i in room.players) {
+				room.votes[i] = null; // set every player's vote to null
 			}
+			socket.emit('relay', {
+				from: room.roomKey, to: room.roomKey, command: 'prepareVote', args: { answers: q.submissions }
+			});
+		}
+		startTimer(room.timer.limit);
+	},
+	scoring: function scoring() {
+		for (var i in room.players) {
+			var votes = 0;
+			for (var j in room.votes) {
+				if (room.votes[j] === i) votes++;
+			}
+			room.players[i].score += votes * 100;
+			console.log('player %s now has a score of: %d points', room.players[i].score);
 		}
 		processSequence.next();
 	},
 	clearQuestions: function clearQuestions() {
-		console.log('clearing questions');
+		// console.log('clearing questions');
 		room.questions = {};
 		socket.emit('relay', {
 			from: room.roomKey, to: room.roomKey, command: 'displayLobby'
@@ -125,12 +147,18 @@ var gamePhases = {
 
 var processSequence = {
 	current: -1,
-	steps: [gamePhases.roundOne, gamePhases.voting, gamePhases.clearQuestions, gamePhases.roundTwo, gamePhases.voting, gamePhases.clearQuestions, gamePhases.endGame],
+	steps: [gamePhases.roundOne, gamePhases.voting, gamePhases.scoring, gamePhases.clearQuestions,
+	// gamePhases.roundTwo,
+	// gamePhases.voting,
+	//gamePhases.clearQuestions,
+	gamePhases.endGame],
 	next: function next() {
 		var args = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
 		console.log('moving to process: %s', this.current + 1);
-		this.steps[++this.current](args);
+		setTimeout((function () {
+			this.steps[++this.current](args);
+		}).bind(this), 1100);
 	}
 };
 
@@ -146,7 +174,7 @@ function startTimer(t) {
 	} else setTimeout(startTimer.bind(null, --t), 1000); // decrement the timer
 }
 
-function checkRoundStatus(m) {
+function checkQuestionPhaseStatus(m) {
 	var playerDone = true;
 	for (var i in room.players[m.from].submissionsComplete) {
 		if (!room.players[m.from].submissionsComplete[i]) playerDone = false;
@@ -164,10 +192,20 @@ function checkRoundStatus(m) {
 		}
 		if (questionsComplete) {
 			// if all questions are complete
-			console.log('should disabled timer');
 			room.timer.active = false; // disable the timer
 			processSequence.next(); // move to next phase
 		}
+	}
+}
+
+function checkVotePhaseStatus(m) {
+	var votingDone = true;
+	for (var i in room.votes) {
+		if (room.votes[i] === null) votingDone = false;
+	}
+	if (votingDone) {
+		room.timer.active = false; // disable the timer
+		processSequence.next(); // move to next phase
 	}
 }
 

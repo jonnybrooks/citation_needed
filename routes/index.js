@@ -27,7 +27,7 @@ module.exports = io => {
 			socketId: socket.id,
 			roomKey: genRoomKey(4),			
 			minPlayers: 2,
-			maxPlayers: 2
+			maxPlayers: 4
 		});
 
 		rooms[socket.id] = room;
@@ -89,14 +89,16 @@ function Room(conf) {
 	this.roomKey = conf.roomKey;
 	this.maxPlayers = conf.maxPlayers;
 	this.minPlayers = conf.minPlayers;
-	this.timer = { active: false, limit: 10 };
+	this.timer = {active: false, limit: 20};
 	this.players = {};
-	this.questions = {};	
+	this.questions = {};
+	this.votes = {};
 }
 
 function Player(conf) {	
 	this.socketId = conf.socketId;
 	this.roomKey = conf.roomKey;
 	this.name = conf.name;
-	this.submissionsComplete = {};
+	this.score = 0;
+	this.submissionsComplete = {};	
 }
