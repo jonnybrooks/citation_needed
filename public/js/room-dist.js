@@ -62,10 +62,12 @@ var gamePhases = {
 		var questions = questionPool.roundOne; // get this rounds question pool
 		var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
 
-		room.questions[q.id] = { question: q.article, submissions: {} };
+		room.questions[q.id] = { question: q.excerpt, submissions: {} };
 		room.round = 1;
 
 		addQuestionToPage(q);
+
+		room.questions[q.id].submissions[room.roomKey] = q.article;
 
 		for (var pid in room.players) {
 			room.questions[q.id].submissions[pid] = null;
@@ -109,8 +111,6 @@ var gamePhases = {
 		var qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
 		var q = room.questions[qid]; // get question in the final position
 
-		room.votes[qid] = {};
-
 		if (room.round === 1) {
 			for (var i in room.players) {
 				room.votes[i] = null; // set every player's vote to null
@@ -138,17 +138,16 @@ var gamePhases = {
 		var qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
 		delete room.questions[qid]; // delete question in the final position
 
+		for (var i in room.votes) {
+			if (room.votes[i] === room.roomKey) room.players[i].score += 100;
+			if (room.players[room.votes[i]]) room.players[room.votes[i]].score += 100;
+		}
 		for (var i in room.players) {
-			var votes = 0;
-			for (var j in room.votes) {
-				if (room.votes[j] === i) votes++;
-			}
-			room.players[i].score += votes * 100;
 			console.log('player %s now has a score of: %d points', room.players[i].name, room.players[i].score);
 		}
 		gameSequence.next();
 	},
-	sendBeginPrompt: function sendBeginPrompt() {
+	sendTriggerPrompt: function sendTriggerPrompt() {
 		$('.questions').html(''); // clear questions
 		socket.emit('relay', {
 			from: room.roomKey, to: room.roomKey, command: 'displayLobby'
@@ -179,13 +178,15 @@ function generateGameSequence() {
 	gameSequence.steps.push(gamePhases.roundOne);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
-	gameSequence.steps.push(gamePhases.sendBeginPrompt);
-	gameSequence.steps.push(gamePhases.roundTwo);
-	for (var i in room.players) {
-		gameSequence.steps.push(gamePhases.voting);
-		gameSequence.steps.push(gamePhases.scoring);
-	}
-	gameSequence.steps.push(gamePhases.sendBeginPrompt);
+	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
+	/*
+ gameSequence.steps.push(gamePhases.roundTwo);
+ for(let i in room.players) {
+ 	gameSequence.steps.push(gamePhases.voting);
+ 	gameSequence.steps.push(gamePhases.scoring);
+ }
+ gameSequence.steps.push(gamePhases.sendTriggerPrompt);
+ */
 	gameSequence.steps.push(gamePhases.endGame);
 }
 
