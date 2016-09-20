@@ -26,7 +26,7 @@ module.exports = io => {
 		let room = new Room({
 			socketId: socket.id,
 			roomKey: genRoomKey(4),			
-			minPlayers: 2,
+			minPlayers: 3,
 			maxPlayers: 4
 		});
 

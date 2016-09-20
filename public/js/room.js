@@ -163,7 +163,7 @@ let gamePhases = {
 			if(room.players[room.votes[i]]) room.players[room.votes[i]].score += 100;
 		}
 		for(let i in room.players) {
-			console.log("player %s now has a score of: %d points", room.players[i].name, room.players[i].score);			
+			$('.questions').html('').append("<div><p> player ${room.players[i].name} now has a score of: ${room.players[i].score} points </p></div>");
 		}
 		gameSequence.next();
 	},
@@ -195,14 +195,12 @@ function generateGameSequence() {
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
 	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
-	/*
 	gameSequence.steps.push(gamePhases.roundTwo);
 	for(let i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
 		gameSequence.steps.push(gamePhases.scoring);
 	}
-	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
-	*/
+	gameSequence.steps.push(gamePhases.sendTriggerPrompt);	
 	gameSequence.steps.push(gamePhases.endGame);
 }
 

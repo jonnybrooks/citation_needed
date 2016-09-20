@@ -47,7 +47,6 @@ let commands = {
 	},
 	prepareVote: message => {
 		let answers = message.args.answers;
-		console.log(message.args.answers);
 		for(let i in answers) {
 			if(i === player.socketId) continue;
 			let frag = fragment($('#template-vote').html());
