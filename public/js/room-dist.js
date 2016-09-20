@@ -33,8 +33,9 @@ socket.on('relay', function (message) {
 // $('body').hide();
 
 var commands = {
-	startTheGame: function startTheGame(message) {
-		processSequence.next(); // start round one
+	triggerNextStep: function triggerNextStep(message) {
+		generateGameSequence();
+		gameSequence.next();
 	},
 	acceptQuestionSubmission: function acceptQuestionSubmission(message) {
 		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
@@ -52,7 +53,7 @@ var commands = {
 
 var questionPool = {
 	roundOne: [{ id: 0, excerpt: 'they hunt in packs0', article: 'grannies' }, { id: 1, excerpt: 'they hunt in packs1', article: 'grannies' }, { id: 2, excerpt: 'they hunt in packs2', article: 'grannies' }, { id: 3, excerpt: 'they hunt in packs3', article: 'grannies' }, { id: 4, excerpt: 'they hunt in packs4', article: 'grannies' }, { id: 5, excerpt: 'they hunt in packs5', article: 'grannies' }],
-	roundTwo: [{ id: 0, article: 'dung beetle0' }, { id: 1, article: 'dung beetle1' }, { id: 2, article: 'dung beetle2' }, { id: 3, article: 'dung beetle3' }, { id: 4, article: 'dung beetle4' }]
+	roundTwo: [{ id: 0, article: 'dung beetle0' }, { id: 1, article: 'dung beetle1' }, { id: 2, article: 'dung beetle2' }, { id: 3, article: 'dung beetle3' }, { id: 4, article: 'dung beetle4' }, { id: 5, article: 'dung beetle5' }]
 };
 
 var gamePhases = {
@@ -60,7 +61,9 @@ var gamePhases = {
 		var players = Object.keys(room.players); // get player ids
 		var questions = questionPool.roundOne; // get this rounds question pool
 		var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
+
 		room.questions[q.id] = { question: q.article, submissions: {} };
+		room.round = 1;
 
 		addQuestionToPage(q);
 
@@ -77,10 +80,9 @@ var gamePhases = {
 		startTimer(room.timer.limit);
 	},
 	roundTwo: function roundTwo() {
-		console.log('round two');
-		$('.questions').html(''); // clear questions
 		var players = shuffle(Object.keys(room.players)); // get player ids and randomize
 		var questions = questionPool.roundTwo; // get this rounds question pool
+		room.round = 2;
 		for (var i = 0; i < players.length; i++) {
 			var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
 			var p1 = players[i];
@@ -104,35 +106,50 @@ var gamePhases = {
 		startTimer(room.timer.limit);
 	},
 	voting: function voting() {
-		var qid = Object.keys(room.questions)[0];
-		var q = room.questions[qid]; // get question at top of queue
+		var qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
+		var q = room.questions[qid]; // get question in the final position
 
 		room.votes[qid] = {};
 
-		if (Object.keys(room.questions).length === 1) {
+		if (room.round === 1) {
 			for (var i in room.players) {
 				room.votes[i] = null; // set every player's vote to null
 			}
 			socket.emit('relay', {
 				from: room.roomKey, to: room.roomKey, command: 'prepareVote', args: { answers: q.submissions }
 			});
+		} else if (room.round === 2) {
+			for (var i in room.players) {
+				var send = true;
+				for (var j in q.submissions) {
+					if (i === j) send = false;
+				}
+				if (send) {
+					room.votes[i] = null; // set every player's vote to null
+					socket.emit('relay', {
+						from: room.roomKey, to: i, command: 'prepareVote', args: { answers: q.submissions }
+					});
+				}
+			}
 		}
 		startTimer(room.timer.limit);
 	},
 	scoring: function scoring() {
+		var qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
+		delete room.questions[qid]; // delete question in the final position
+
 		for (var i in room.players) {
 			var votes = 0;
 			for (var j in room.votes) {
 				if (room.votes[j] === i) votes++;
 			}
 			room.players[i].score += votes * 100;
-			console.log('player %s now has a score of: %d points', room.players[i].score);
+			console.log('player %s now has a score of: %d points', room.players[i].name, room.players[i].score);
 		}
-		processSequence.next();
+		gameSequence.next();
 	},
-	clearQuestions: function clearQuestions() {
-		// console.log('clearing questions');
-		room.questions = {};
+	sendBeginPrompt: function sendBeginPrompt() {
+		$('.questions').html(''); // clear questions
 		socket.emit('relay', {
 			from: room.roomKey, to: room.roomKey, command: 'displayLobby'
 		});
@@ -145,22 +162,32 @@ var gamePhases = {
 	}
 };
 
-var processSequence = {
+var gameSequence = {
 	current: -1,
-	steps: [gamePhases.roundOne, gamePhases.voting, gamePhases.scoring, gamePhases.clearQuestions,
-	// gamePhases.roundTwo,
-	// gamePhases.voting,
-	//gamePhases.clearQuestions,
-	gamePhases.endGame],
+	steps: [],
 	next: function next() {
 		var args = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-		console.log('moving to process: %s', this.current + 1);
+		// console.log('moving to process: %s', this.current + 1);
 		setTimeout((function () {
 			this.steps[++this.current](args);
 		}).bind(this), 1100);
 	}
 };
+
+function generateGameSequence() {
+	gameSequence.steps.push(gamePhases.roundOne);
+	gameSequence.steps.push(gamePhases.voting);
+	gameSequence.steps.push(gamePhases.scoring);
+	gameSequence.steps.push(gamePhases.sendBeginPrompt);
+	gameSequence.steps.push(gamePhases.roundTwo);
+	for (var i in room.players) {
+		gameSequence.steps.push(gamePhases.voting);
+		gameSequence.steps.push(gamePhases.scoring);
+	}
+	gameSequence.steps.push(gamePhases.sendBeginPrompt);
+	gameSequence.steps.push(gamePhases.endGame);
+}
 
 function startTimer(t) {
 	$('.timer').text(t); // set the timer
@@ -169,8 +196,8 @@ function startTimer(t) {
 	}
 	if (!room.timer.active) return; // return if tne timer has been cancelled
 	else if (t === 0) {
-		console.log('timeout!');
-		return processSequence.next(); // move to next phase
+		// console.log('timeout!');
+		return gameSequence.next(); // move to next phase
 	} else setTimeout(startTimer.bind(null, --t), 1000); // decrement the timer
 }
 
@@ -193,7 +220,7 @@ function checkQuestionPhaseStatus(m) {
 		if (questionsComplete) {
 			// if all questions are complete
 			room.timer.active = false; // disable the timer
-			processSequence.next(); // move to next phase
+			gameSequence.next(); // move to next phase
 		}
 	}
 }
@@ -205,7 +232,7 @@ function checkVotePhaseStatus(m) {
 	}
 	if (votingDone) {
 		room.timer.active = false; // disable the timer
-		processSequence.next(); // move to next phase
+		gameSequence.next(); // move to next phase
 	}
 }
 

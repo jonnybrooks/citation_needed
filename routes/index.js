@@ -93,6 +93,7 @@ function Room(conf) {
 	this.players = {};
 	this.questions = {};
 	this.votes = {};
+	this.round = 0;
 }
 
 function Player(conf) {	

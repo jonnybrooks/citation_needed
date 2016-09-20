@@ -43,10 +43,11 @@ let commands = {
 		$(view).find('.submit-answer[data-question-id=""]').eq(0)
 			.attr('data-question-id', message.args.qid)
 			.find('.question').text(message.args.question);
-		$('.view').hide().filter(view).show(); // show only the correct view
+		$('.view').hide().filter(view).show(); // show only the correct view		
 	},
 	prepareVote: message => {
 		let answers = message.args.answers;
+		console.log(message.args.answers);
 		for(let i in answers) {
 			if(i === player.socketId) continue;
 			let frag = fragment($('#template-vote').html());
@@ -54,14 +55,14 @@ let commands = {
 			$('#view-submit-vote .submit-vote').append(frag);
 		}
 
-		$('.view').hide().filter('#view-submit-vote').show();		
+		$('.view').hide().filter('#view-submit-vote').show();
 	}
 }
 
 $('.submit-player').on('submit', function(e) {
 	e.preventDefault();
 	let form = $(this).serializeArray();
-	socket.emit('attempt-registration', { roomKey: form[0].value, name: form[1].value }); // register the player with the server
+	socket.emit('attempt-registration', { roomKey: form[0].value, name: form[1].value }); // register the player with the server	
 })
 
 $('.submit-game-start').on('submit', function(e) {
@@ -70,11 +71,10 @@ $('.submit-game-start').on('submit', function(e) {
 
 	let message = { 
 		to: player.roomKey, 
-		command: 'startTheGame', 		
+		command: 'triggerNextStep', 		 
 	}
 	
-	socket.emit('relay', message);
-
+	socket.emit('relay', message);	
 })
 
 $('.submit-answer').on('submit', function(e) {
@@ -96,12 +96,13 @@ $('.submit-answer').on('submit', function(e) {
 	
 	player.submissionsComplete[$(this).attr('data-question-id')] = true;
 	socket.emit('relay', message);
+	$(this).find('input:not(.submit)').val(''); // clear input values for next time
 })
 
 $('.submit-vote').on('click', '.submit', function(e) {
 	e.preventDefault();
 	$(this).siblings('.decision').val($(this).attr('data-player-id'));
-	$(this).parent().submit();
+	$(this).parent().submit();	
 })
 
 $('.submit-vote').on('submit', function(e) {
@@ -117,7 +118,7 @@ $('.submit-vote').on('submit', function(e) {
 	
 	socket.emit('relay', message);
 	$('.view').hide().filter('#view-lobby').show(); // go back to lobby if this is last question
-
+	$('.vote').remove(); // remove the old votes
 })
 
 function fragment(htmlStr) {
