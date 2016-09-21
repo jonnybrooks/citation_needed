@@ -34,7 +34,8 @@ socket.on('relay', function (message) {
 
 var commands = {
 	triggerNextStep: function triggerNextStep(message) {
-		generateGameSequence();
+		if (room.round === 0) generateGameSequence();
+		$('.questions').html(''); // clear questions
 		gameSequence.next();
 	},
 	acceptQuestionSubmission: function acceptQuestionSubmission(message) {
@@ -142,13 +143,13 @@ var gamePhases = {
 			if (room.votes[i] === room.roomKey) room.players[i].score += 100;
 			if (room.players[room.votes[i]]) room.players[room.votes[i]].score += 100;
 		}
+		$('.questions').html('');
 		for (var i in room.players) {
-			$('.questions').html('').append('<div><p> player ${room.players[i].name} now has a score of: ${room.players[i].score} points </p></div>');
+			$('.questions').append('<div><p> player ' + room.players[i].name + ' now has a score of: ' + room.players[i].score + ' points </p></div>');
 		}
 		gameSequence.next();
 	},
 	sendTriggerPrompt: function sendTriggerPrompt() {
-		$('.questions').html(''); // clear questions
 		socket.emit('relay', {
 			from: room.roomKey, to: room.roomKey, command: 'displayLobby'
 		});

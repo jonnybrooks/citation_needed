@@ -1,3 +1,7 @@
+// colours
+
+$wikiblue: blue;
+
 * {
 	box-sizing: border-box;
 }
@@ -28,7 +32,7 @@ a {
 	text-align: center;
 	margin-bottom: 40px;
 	span {
-		color: blue;
+		color: $wikiblue;
 		font-style: italic;
 	}
 }
@@ -66,7 +70,7 @@ a {
 	    padding: 10px 20px;
 	    span {
     	    font-style: italic;
-		    color: blue;
+		    color: $wikiblue;
 	    }
 	}	
 	h3 {
@@ -109,7 +113,7 @@ a {
 	    width: 50%;
 	    text-align: center;
 	    background-color: white;
-	    color: blue;
+	    color: $wikiblue;
 	    border: 2px solid;
 	    box-shadow: 0px 3px 6px 0px rgba(0,0,255,0.2);
 	}
