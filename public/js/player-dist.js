@@ -40,7 +40,7 @@ var commands = {
 
 		player.submissionsComplete[message.args.qid] = false;
 
-		$(view).find('.submit-answer[data-question-id=""]').eq(0).attr('data-question-id', message.args.qid).find('.question').text(message.args.question);
+		$(view).find('form[data-question-id=""]').eq(0).attr('data-question-id', message.args.qid).find('.question').text(message.args.question);
 		$('.view').hide().filter(view).show(); // show only the correct view		
 	},
 	prepareVote: function prepareVote(message) {
@@ -96,9 +96,15 @@ $('.submit-answer').on('submit', function (e) {
 	$(this).find('input:not(.submit)').val(''); // clear input values for next time
 });
 
-$('.submit-vote').on('click', '.submit', function (e) {
+$('.submit-vote').on('click', '.submit.vote', function (e) {
 	e.preventDefault();
 	$(this).siblings('.decision').val($(this).attr('data-player-id'));
+	$(this).parent().submit();
+});
+
+$('.submit-vote').on('click', '.submit.citation-needed', function (e) {
+	e.preventDefault();
+	$(this).siblings('.decision').val('[CITATION NEEDED]');
 	$(this).parent().submit();
 });
 
@@ -116,6 +122,7 @@ $('.submit-vote').on('submit', function (e) {
 	socket.emit('relay', message);
 	$('.view').hide().filter('#view-lobby').show(); // go back to lobby if this is last question
 	$('.vote').remove(); // remove the old votes
+	$(this).find('input:not(.submit)').val(''); // clear input values for next time
 });
 
 function fragment(htmlStr) {

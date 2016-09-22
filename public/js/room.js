@@ -40,6 +40,7 @@ let commands = {
 		gameSequence.next();
 	},
 	acceptQuestionSubmission: message => {
+
 		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
 		room.players[message.from].submissionsComplete[message.args.qid] = true;
 		
@@ -58,20 +59,28 @@ let commands = {
 
 let questionPool  = {
 	roundOne: [
-		{id: 0, excerpt: 'they hunt in packs0', article: 'grannies'},
-		{id: 1, excerpt: 'they hunt in packs1', article: 'grannies'},
-		{id: 2, excerpt: 'they hunt in packs2', article: 'grannies'},
-		{id: 3, excerpt: 'they hunt in packs3', article: 'grannies'},
-		{id: 4, excerpt: 'they hunt in packs4', article: 'grannies'},
-		{id: 5, excerpt: 'they hunt in packs5', article: 'grannies'}
+		{id: 0, excerpt: 'roundOne 0', article: 'computer0'},
+		{id: 1, excerpt: 'roundOne 1', article: 'computer1'},
+		{id: 2, excerpt: 'roundOne 2', article: 'computer2'},
+		{id: 3, excerpt: 'roundOne 3', article: 'computer3'},
+		{id: 4, excerpt: 'roundOne 4', article: 'computer4'},
+		{id: 5, excerpt: 'roundOne 5', article: 'computer5'}
 	],
 	roundTwo: [
-		{id: 0, article: 'dung beetle0'},
-		{id: 1, article: 'dung beetle1'},
-		{id: 2, article: 'dung beetle2'},
-		{id: 3, article: 'dung beetle3'},
-		{id: 4, article: 'dung beetle4'},
-		{id: 5, article: 'dung beetle5'}
+		{id: 0, article: 'roundTwo 0'},
+		{id: 1, article: 'roundTwo 1'},
+		{id: 2, article: 'roundTwo 2'},
+		{id: 3, article: 'roundTwo 3'},
+		{id: 4, article: 'roundTwo 4'},
+		{id: 5, article: 'roundTwo 5'}
+	],
+	roundThree: [
+		{id: 0, article: 'roundThree 0'},
+		{id: 1, article: 'roundThree 1'},
+		{id: 2, article: 'roundThree 2'},
+		{id: 3, article: 'roundThree 3'},
+		{id: 4, article: 'roundThree 4'},
+		{id: 5, article: 'roundThree 5'}
 	]
 }
 
@@ -127,6 +136,26 @@ let gamePhases = {
 		}
 		startTimer(room.timer.limit);
 	},
+	roundThree: function() {
+		let players = Object.keys(room.players); // get player ids
+		let questions = questionPool.roundThree; // get this rounds question pool
+		room.round = 3;
+
+		for(let pid in room.players) {
+			let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random		
+			room.questions[q.id] = { question: q.article, submissions: {} };
+			addQuestionToPage(q);
+
+			room.questions[q.id].submissions[pid] = null;
+			room.players[pid].submissionsComplete[q.id] = false;
+			addAnswerToQuestion(q, room.players[pid]);
+
+			socket.emit('relay', { // relay the question to everyone in the room
+				from: room.roomKey, to: pid, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 1 }
+			})
+		}
+		startTimer(room.timer.limit);
+	},
 	voting: function() {
 		let qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
 		let q = room.questions[qid]; // get question in the final position
@@ -153,20 +182,35 @@ let gamePhases = {
 				}
 			}
 		}
+		else if(room.round === 3) {
+			let pid = Object.keys(q.submissions)[0];
+			for(let i in room.players) {
+				if(pid === i) continue;
+				room.votes[i] = null; // set every player's vote to null
+				socket.emit('relay', { 
+					from: room.roomKey, to: i, command: 'prepareQuestion', args: { qid: q.id, question: q.submissions[pid], round: 3 }
+				})				
+			}			
+		}
 		startTimer(room.timer.limit);
 	},
 	scoring: function(){
 		let qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
-		delete room.questions[qid]; // delete question in the final position
-
+		let citations = 0;
 		for(let i in room.votes) {
+			if(room.round === 3) {
+				if
+			}
 			if(room.votes[i] === room.roomKey) room.players[i].score += 100;
 			if(room.players[room.votes[i]]) room.players[room.votes[i]].score += 100;
+
 		}
 		$('.questions').html('');
 		for(let i in room.players) {
 			$('.questions').append(`<div><p> player ${room.players[i].name} now has a score of: ${room.players[i].score} points </p></div>`);
 		}
+		delete room.questions[qid]; // delete question in the final position
+		room.votes = {}; // clear the votes
 		gameSequence.next();
 	},
 	sendTriggerPrompt: function() {
@@ -192,6 +236,12 @@ let gameSequence = {
 }
 
 function generateGameSequence() {
+	gameSequence.steps.push(gamePhases.roundThree);
+	for(let i in room.players) {
+		gameSequence.steps.push(gamePhases.voting);		
+		gameSequence.steps.push(gamePhases.scoring);
+	}	
+	/*
 	gameSequence.steps.push(gamePhases.roundOne);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
@@ -200,8 +250,9 @@ function generateGameSequence() {
 	for(let i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
 		gameSequence.steps.push(gamePhases.scoring);
-	}
-	gameSequence.steps.push(gamePhases.sendTriggerPrompt);	
+	}	
+	*/
+	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
 	gameSequence.steps.push(gamePhases.endGame);
 }
 

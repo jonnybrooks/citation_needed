@@ -55,6 +55,17 @@
 					</form>
 				</div>				
 			</div>	
+			<div id="view-submit-answer-round-3" class="view">
+				<p class="display-name">[&nbsp;<span>name</span>&nbsp;]</p>
+				<div class="question-wrapper">
+					<form class="submit-vote final" data-question-id="" autocomplete="off">
+						<p class="question"></p>
+						<input name="decision" class="decision" placeholder="Answer"/>
+						<input type="submit" class="submit" value="Submit"/>
+						<div class="submit citation-needed" style="color: red;">[ citation needed ]</div>
+					</form>
+				</div>				
+			</div>	
 			<div id="view-submit-vote" class="view">
 				<p class="display-name">[&nbsp;<span>name</span>&nbsp;]</p>
 				<form class="submit-vote" data-question-id="">
@@ -63,8 +74,8 @@
 			</div>				
 		</div>
 		<script id="template-vote" type="text/template">
-			<div class="submit vote" data-player-id=""/></div>
+			<div class="submit vote" data-player-id=""></div>
 		</script>
-		<script src="/js/player-dist.js"></script>		
+		<script src="/js/player-dist.js"></script>
 	</body>
 </html>
