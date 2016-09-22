@@ -78,12 +78,13 @@ $('.submit-answer').on('submit', function (e) {
 	e.preventDefault();
 	var form = $(this).serializeArray();
 
+	var qid = $(this).attr('data-question-id');
 	var message = {
 		from: player.socketId,
 		to: player.roomKey,
 		command: 'acceptQuestionSubmission',
 		args: {
-			qid: $(this).attr('data-question-id'),
+			qid: qid,
 			answer: form[0].value
 		}
 	};

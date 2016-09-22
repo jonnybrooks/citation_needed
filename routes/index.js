@@ -89,7 +89,7 @@ function Room(conf) {
 	this.roomKey = conf.roomKey;
 	this.maxPlayers = conf.maxPlayers;
 	this.minPlayers = conf.minPlayers;
-	this.timer = {active: false, limit: 20};
+	this.timer = {active: false, limit: 60};
 	this.players = {};
 	this.questions = {};
 	this.votes = {};

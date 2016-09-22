@@ -125,7 +125,7 @@ var gamePhases = {
 			addAnswerToQuestion(q, room.players[pid]);
 
 			socket.emit('relay', { // relay the question to everyone in the room
-				from: room.roomKey, to: pid, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 1 }
+				from: room.roomKey, to: pid, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 3 }
 			});
 		}
 		startTimer(room.timer.limit);
@@ -160,7 +160,10 @@ var gamePhases = {
 				if (pid === i) continue;
 				room.votes[i] = null; // set every player's vote to null
 				socket.emit('relay', {
-					from: room.roomKey, to: i, command: 'prepareQuestion', args: { qid: q.id, question: q.submissions[pid], round: 3 }
+					from: room.roomKey,
+					to: i,
+					command: 'prepareQuestion',
+					args: { qid: q.id, question: q.submissions[pid], round: '3-vote' }
 				});
 			}
 		}
@@ -168,11 +171,26 @@ var gamePhases = {
 	},
 	scoring: function scoring() {
 		var qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
+		var r3Player = room.players[Object.keys(room.questions[qid].submissions)[0]];
 		var citations = 0;
 		for (var i in room.votes) {
-			if (room.round === 3) {}
-			if (room.votes[i] === room.roomKey) room.players[i].score += 100;
-			if (room.players[room.votes[i]]) room.players[room.votes[i]].score += 100;
+			if (room.round === 3 && room.votes[i] === '[CITATION NEEDED]') citations++;else {
+				if (room.votes[i] === room.roomKey) room.players[i].score += 100;
+				if (room.players[room.votes[i]]) room.players[room.votes[i]].score += 100;
+			}
+		}
+		if (room.round === 3) {
+			if (citations >= Math.ceil(Object.keys(room.votes).length / 2)) {
+				r3Player.score -= 100;
+			} else {
+				citations = 0;
+				for (var i in room.votes) {
+					if (room.votes[i] !== room.questions[qid].question) continue;
+					room.players[i].score += 50;
+					citations++;
+				}
+				r3Player.score += 50 * (citations === 0 ? 0 : citations < Object.keys(room.votes).length ? 1 : 2);
+			}
 		}
 		$('.questions').html('');
 		for (var i in room.players) {
@@ -191,7 +209,15 @@ var gamePhases = {
 		});
 	},
 	endGame: function endGame() {
-		alert('demo is over :)');
+		var max = -99999;
+		var winners = [];
+		for (var i in room.players) {
+			max = room.players[i].score > max ? room.players[i].score : max;
+		}
+		for (var i in room.players) {
+			if (room.players[i].score >= max) winners.push(room.players[i].name);
+		}
+		$('.questions').html('Players ' + winners.join(' and ') + ' are victorious!');
 	}
 };
 
@@ -209,23 +235,21 @@ var gameSequence = {
 };
 
 function generateGameSequence() {
+	gameSequence.steps.push(gamePhases.roundOne);
+	gameSequence.steps.push(gamePhases.voting);
+	gameSequence.steps.push(gamePhases.scoring);
+	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
+	gameSequence.steps.push(gamePhases.roundTwo);
+	for (var i in room.players) {
+		gameSequence.steps.push(gamePhases.voting);
+		gameSequence.steps.push(gamePhases.scoring);
+	}
+	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
 	gameSequence.steps.push(gamePhases.roundThree);
 	for (var i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
 		gameSequence.steps.push(gamePhases.scoring);
 	}
-	/*
- gameSequence.steps.push(gamePhases.roundOne);
- gameSequence.steps.push(gamePhases.voting);
- gameSequence.steps.push(gamePhases.scoring);
- gameSequence.steps.push(gamePhases.sendTriggerPrompt);
- gameSequence.steps.push(gamePhases.roundTwo);
- for(let i in room.players) {
- 	gameSequence.steps.push(gamePhases.voting);
- 	gameSequence.steps.push(gamePhases.scoring);
- }	
- */
-	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
 	gameSequence.steps.push(gamePhases.endGame);
 }
 
