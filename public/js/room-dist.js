@@ -30,8 +30,6 @@ socket.on('relay', function (message) {
 	commands[message.command] ? commands[message.command](message) : console.log('no response handler exists for ' + message.command);
 });
 
-// $('body').hide();
-
 var commands = {
 	triggerNextStep: function triggerNextStep(message) {
 		if (room.round === 0) generateGameSequence();
@@ -60,6 +58,25 @@ var questionPool = {
 };
 
 var gamePhases = {
+	lobby: function lobby() {
+		$('.typed').typed({
+			strings: ['The <a>English</a> have terrible teeth due to bad parenting.', '<a>Wasps</a> are in fact just angry little <a>Bees</a>.', '60% of the time it works <em>every</em> time.'],
+			/*
+   strings: [
+   	"Lorem ipsum dolor sit amet, consectetur adipiscing elit.", 
+   	"Curabitur nulla dolor, tempor cursus lorem id, luctus.",
+   	"Duis ut nibh vitae nisl porttitor condimentum sed in mi."
+   ],
+   */
+			typeSpeed: 0,
+			backSpeed: -200,
+			backDelay: 2000,
+			callback: function callback() {
+				$('.typed-cursor').addClass('hide');
+				$('.type-wrapper').addClass('slide-left');
+			}
+		});
+	},
 	roundOne: function roundOne() {
 		var players = Object.keys(room.players); // get player ids
 		var questions = questionPool.roundOne; // get this rounds question pool
@@ -220,6 +237,8 @@ var gamePhases = {
 		$('.questions').html('Players ' + winners.join(' and ') + ' are victorious!');
 	}
 };
+
+gamePhases.lobby();
 
 var gameSequence = {
 	current: -1,

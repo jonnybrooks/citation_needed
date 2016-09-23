@@ -5,14 +5,20 @@
 		<link rel="stylesheet" href="styles/style.css"/>
 		<script src="js/lib/socket.io.min.js"></script>
 		<script src="js/lib/jquery-3.0.0.slim.min.js"></script>	
+		<script src="js/lib/typed.min.js"></script>		
 	</head>
 	<body>
 		<div id="view-container">
+
 			<div id="view-lobby" class="view">
-				<span class="timer"></span>
-				<h1 class="key"></h1>
-				<div class="players"></div>
-				<div class="questions"></div>
+				<p class="type-wrapper">
+					<span class="typed"></span>
+					<span class="logo"><sup>[ <span>citation needed</span> ]</sup></span>
+				</p>				
+				<h1 class="key" style="display: none;"></h1>
+				<div class="players" style="display: none;"></div>
+				<div class="questions" style="display: none;"></div>
+				<span class="timer" style="display: none;"></span>
 			</div>
 			<!--
 			<div id="view-video-transition" class="view">
