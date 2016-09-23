@@ -45,7 +45,7 @@ a {
 	    height: 100%;
 	}
 	.type-wrapper {
-	    font-size: 5.4em;
+	    font-size: 5.5em;
 	    margin: 0;
 	    position: absolute;
 	    bottom: 65%;
@@ -73,16 +73,20 @@ a {
 		    	opacity: 0;  		    	
 		    }
 		}
-	}	
-	.timer {
+	}		
+	.key {
 		position: fixed;
 		right: 50px;
-		top: 50px;
+		top: 20px;
+	}
+	.timer {
+		display: none;
 	}
 	.players, .questions {
-	    display: inline-block;
+		display: inline-block;
 	    vertical-align: top;
 	    width: 45%;
+	    display: none;
 	}
 }
 
