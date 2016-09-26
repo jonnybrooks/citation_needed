@@ -4,10 +4,7 @@ var socket = undefined;
 var room = undefined;
 
 socket = io('http://' + location.host + '/room');
-socket.on('connect', function () {
-	// console.log('socket connection established');	
-	$('.players, .questions').html('');
-});
+socket.on('connect', function () {});
 socket.on('room-registered', function (r) {
 	// console.log('room registered with key: %s', r.roomKey);
 	room = r; // set local copy of room to remote copy
@@ -60,20 +57,21 @@ var questionPool = {
 var gamePhases = {
 	lobby: function lobby() {
 		$('.typed').typed({
-			strings: ['The <a>English</a> have terrible teeth due to bad parenting.', '<a>Wasps</a> are in fact just angry little <a>Bees</a>.', '60% of the time it works <em>every</em> time.'],
 			/*
    strings: [
-   	"Lorem ipsum dolor sit amet, consectetur adipiscing elit.", 
-   	"Curabitur nulla dolor, tempor cursus lorem id, luctus.",
-   	"Duis ut nibh vitae nisl porttitor condimentum sed in mi."
+   	"The <a>English</a> have terrible teeth due to bad parenting.", 
+   	"<a>Wasps</a> are in fact just angry little <a>Bees</a>.",
+   	"60% of the time it works <em>every</em> time."
    ],
    */
+			strings: ['Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 'Curabitur nulla dolor, tempor cursus lorem id, luctus.', 'Duis ut nibh vitae nisl porttitor condimentum sed in mi.'],
 			typeSpeed: 0,
 			backSpeed: -200,
 			backDelay: 2000,
 			callback: function callback() {
 				$('.typed-cursor').addClass('hide');
 				$('.type-wrapper').addClass('slide-left');
+				$('.player').addClass('show');
 			}
 		});
 	},
@@ -319,12 +317,7 @@ function checkVotePhaseStatus(m) {
 	}
 }
 
-function addPlayerToPage(player) {
-	var frag = fragment($('#template-player').html());
-	$(frag).find('.player').attr('data-player-id', player.socketId);
-	$(frag).find('.player .name').text(player.name);
-	$('#view-lobby .players').append(frag);
-}
+function addPlayerToPage(player) {}
 
 function addQuestionToPage(question) {
 	var frag = fragment($('#template-question').html());
@@ -365,3 +358,13 @@ function shuffle(array) {
 	}
 	return array;
 }
+
+// console.log('socket connection established');	
+// $('.players, .questions').html('')
+
+/*
+let frag = fragment($('#template-player').html());
+$(frag).find('.player').attr('data-player-id', player.socketId);
+$(frag).find('.player .name').text(player.name);
+$('#view-lobby .players').append(frag);	
+*/

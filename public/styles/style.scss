@@ -2,6 +2,12 @@
 
 $wikiblue: blue;
 
+// fonts
+
+@import 'https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,700';
+
+//styles
+
 * {
 	box-sizing: border-box;
 }
@@ -12,14 +18,16 @@ html, body {
 	height: 100%;	
 	overflow: hidden;
 }
-body {	
+body, .sans-serif {	
 	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;	
+}
+.serif {	
+	font: 14px "Roboto Slab", Georgia, serif;
 }
 
 #view-container {
 	width: 100%;
 	height: 100%;
-	overflow-y: auto; 
 }
 
 a {
@@ -49,20 +57,22 @@ a {
 	    margin: 0;
 	    position: absolute;
 	    bottom: 65%;
-	    left: 1em;	  
+	    right: 10%;
+	    transform: translateX(0, 50%);
+	    white-space: nowrap;	    
 	    -webkit-backface-visibility: hidden;
-	    -webkit-transform: translateZ(0) scale(1.0, 1.0);
-	    transition: 1.2s all cubic-bezier(0.86, 0, 0.07, 1) 1s;
+	    transform: translateZ(0) scale(1.0, 1.0);
+	    transition: 1.2s right cubic-bezier(0.86, 0, 0.07, 1) 1s;
 	    .logo {
 	    	opacity: 0.1;
-	    	transition: 1.2s all cubic-bezier(0.86, 0, 0.07, 1) 1s;
+	    	transition: 1.2s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s;
 	    }
 	    .typed, .typed-cursor {
 	    	opacity: 1;  
-	    	transition: 1.2s all cubic-bezier(0.86, 0, 0.07, 1) 1s;
+	    	transition: 1.2s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s;
 	    }
 	    &.slide-left {
-	    	left: -50%;
+	    	right: 45%;
 	        .logo {
 		    	opacity: 1;		    	
 		    }
@@ -82,11 +92,50 @@ a {
 	.timer {
 		display: none;
 	}
-	.players, .questions {
+	.players {
+		position: absolute;
+	    bottom: 0;
+	    width: 100%;
+	    display: table;	    
+	    text-align: center;
+	}
+	.player {
+	 	display: table-cell;	 	
+	 	.name, .status { margin: 0; }
+	 	.status {
+	 		@extend .serif;
+	 		font-size: 2em;
+		    padding-bottom: 25px;
+		    opacity: 0.2;
+		    &::after {
+		    	content: '';		    	
+			    position: absolute;			    			    
+			    right: 50%;
+			    transform: translate(50%, -10px);
+		    	height: 10px;
+			    width: 10px;			    
+			    border-radius: 50%;
+			    background: black;
+			}
+	 	}
+    }
+	.questions {
 		display: inline-block;
 	    vertical-align: top;
 	    width: 45%;
 	    display: none;
+	}
+	@for $i from 0 through 7 {
+		.player:nth-of-type(#{$i+1}) {
+			position: relative;
+			opacity: 0;
+			top: 30px;
+			transition: 1s all ease-in-out #{($i * 100) + 1200}ms;
+			&.show {
+				opacity: 1;
+				top: 0px;
+			}
+		}
 	}
 }
 

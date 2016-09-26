@@ -4,7 +4,7 @@ let room;
 socket = io(`http://${location.host}/room`);
 socket.on('connect', () => {
 	// console.log('socket connection established');	
-	$('.players, .questions').html('')
+	// $('.players, .questions').html('')
 })
 socket.on('room-registered', r => {
 	// console.log('room registered with key: %s', r.roomKey);
@@ -85,24 +85,25 @@ let questionPool  = {
 let gamePhases = {
 	lobby: function(){
 		$(".typed").typed({
+			/*
 			strings: [
 				"The <a>English</a> have terrible teeth due to bad parenting.", 
 				"<a>Wasps</a> are in fact just angry little <a>Bees</a>.",
 				"60% of the time it works <em>every</em> time."
 			],
-			/*
+			*/
 			strings: [
 				"Lorem ipsum dolor sit amet, consectetur adipiscing elit.", 
 				"Curabitur nulla dolor, tempor cursus lorem id, luctus.",
 				"Duis ut nibh vitae nisl porttitor condimentum sed in mi."
 			],
-			*/
 			typeSpeed: 0,
 			backSpeed: -200,
 			backDelay: 2000,
 			callback: function() {
 				$('.typed-cursor').addClass('hide');
 				$('.type-wrapper').addClass('slide-left');
+				$('.player').addClass('show');
 			}
 		})
 	},
@@ -347,10 +348,12 @@ function checkVotePhaseStatus(m) {
 }
 
 function addPlayerToPage(player) {
+	/*
 	let frag = fragment($('#template-player').html());
 	$(frag).find('.player').attr('data-player-id', player.socketId);
 	$(frag).find('.player .name').text(player.name);
 	$('#view-lobby .players').append(frag);	
+	*/
 }
 
 function addQuestionToPage(question) {
