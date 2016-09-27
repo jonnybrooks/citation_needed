@@ -74,9 +74,7 @@ var gamePhases = {
 				$('.typed-cursor').addClass('hide');
 				$('.type-wrapper').addClass('slide-left');
 				$('.player').addClass('show');
-				setTimeout(function () {
-					$('.player').addClass('joined');
-				}, 3000);
+				setTimeout(function () {}, 3000);
 			}
 		});
 	},
@@ -371,3 +369,5 @@ function shuffle(array) {
 
 // console.log('socket connection established');	
 // $('.players, .questions').html('')
+
+// $('.player').addClass('joined')
