@@ -107,7 +107,7 @@ let gamePhases = {
 				$('.type-wrapper').addClass('slide-left');
 				$('.player').addClass('show');
 				setTimeout(function(){
-					// $('.player').addClass('joined')
+					$('.player').addClass('joined')
 				}, 3000);
 			}
 		})
