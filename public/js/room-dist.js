@@ -57,14 +57,16 @@ var questionPool = {
 var gamePhases = {
 	lobby: function lobby() {
 		$('.typed').typed({
+
+			strings: ['The <a>English</a> have terrible teeth due to bad parenting.', '<a>Wasps</a> are in fact just angry little <a>Bees</a>.', '60% of the time it works <em>every</em> time.'],
+
 			/*
    strings: [
-   	"The <a>English</a> have terrible teeth due to bad parenting.", 
-   	"<a>Wasps</a> are in fact just angry little <a>Bees</a>.",
-   	"60% of the time it works <em>every</em> time."
+   	"Lorem ipsum dolor sit amet, consectetur adipiscing elit.", 
+   	"Curabitur nulla dolor, tempor cursus lorem id, luctus.",
+   	"Duis ut nibh vitae nisl porttitor condimentum sed in mi."
    ],
    */
-			strings: ['Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 'Curabitur nulla dolor, tempor cursus lorem id, luctus.', 'Duis ut nibh vitae nisl porttitor condimentum sed in mi.'],
 			typeSpeed: 0,
 			backSpeed: -200,
 			backDelay: 2000,
@@ -72,6 +74,7 @@ var gamePhases = {
 				$('.typed-cursor').addClass('hide');
 				$('.type-wrapper').addClass('slide-left');
 				$('.player').addClass('show');
+				setTimeout(function () {}, 3000);
 			}
 		});
 	},
@@ -317,7 +320,12 @@ function checkVotePhaseStatus(m) {
 	}
 }
 
-function addPlayerToPage(player) {}
+function addPlayerToPage(player) {
+	var p = $('div[data-player-id=" "]').eq(0);
+	$(p).attr('data-player-id', player.socketId);
+	$(p).find('.name').text(player.name);
+	$(p).addClass('joined');
+}
 
 function addQuestionToPage(question) {
 	var frag = fragment($('#template-question').html());
@@ -362,9 +370,4 @@ function shuffle(array) {
 // console.log('socket connection established');	
 // $('.players, .questions').html('')
 
-/*
-let frag = fragment($('#template-player').html());
-$(frag).find('.player').attr('data-player-id', player.socketId);
-$(frag).find('.player .name').text(player.name);
-$('#view-lobby .players').append(frag);	
-*/
+// $('.player').addClass('joined')
