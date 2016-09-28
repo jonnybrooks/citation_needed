@@ -84,21 +84,13 @@ let questionPool  = {
 
 let gamePhases = {
 	lobby: function(){
-		$(".typed").typed({
-			
+		$('.host').attr('href', `${location.host}/player`).find('span').text(`${location.host}/player`);
+		$('.typed').typed({			
 			strings: [
 				"The <a>English</a> have terrible teeth due to bad parenting.", 
 				"<a>Wasps</a> are in fact just angry little <a>Bees</a>.",
 				"60% of the time it works <em>every</em> time."
 			],
-			
-			/*
-			strings: [
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit.", 
-				"Curabitur nulla dolor, tempor cursus lorem id, luctus.",
-				"Duis ut nibh vitae nisl porttitor condimentum sed in mi."
-			],
-			*/
 			typeSpeed: 0,
 			backSpeed: -200,
 			backDelay: 2000,
@@ -108,7 +100,9 @@ let gamePhases = {
 				$('.player').addClass('show');
 				setTimeout(function(){
 					// $('.player').addClass('joined')
-				}, 3000);
+					var audio = new Audio('../speech/001-title.mp3');
+					audio.play();
+				}, 1500);
 			}
 		})
 	},

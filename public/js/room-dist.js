@@ -56,17 +56,9 @@ var questionPool = {
 
 var gamePhases = {
 	lobby: function lobby() {
+		$('.host').attr('href', location.host + '/player').find('span').text(location.host + '/player');
 		$('.typed').typed({
-
 			strings: ['The <a>English</a> have terrible teeth due to bad parenting.', '<a>Wasps</a> are in fact just angry little <a>Bees</a>.', '60% of the time it works <em>every</em> time.'],
-
-			/*
-   strings: [
-   	"Lorem ipsum dolor sit amet, consectetur adipiscing elit.", 
-   	"Curabitur nulla dolor, tempor cursus lorem id, luctus.",
-   	"Duis ut nibh vitae nisl porttitor condimentum sed in mi."
-   ],
-   */
 			typeSpeed: 0,
 			backSpeed: -200,
 			backDelay: 2000,
@@ -74,7 +66,11 @@ var gamePhases = {
 				$('.typed-cursor').addClass('hide');
 				$('.type-wrapper').addClass('slide-left');
 				$('.player').addClass('show');
-				setTimeout(function () {}, 3000);
+				setTimeout(function () {
+					// $('.player').addClass('joined')
+					var audio = new Audio('../speech/001-title.mp3');
+					audio.play();
+				}, 1500);
 			}
 		});
 	},
@@ -369,5 +365,3 @@ function shuffle(array) {
 
 // console.log('socket connection established');	
 // $('.players, .questions').html('')
-
-// $('.player').addClass('joined')
