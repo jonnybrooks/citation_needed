@@ -1,7 +1,7 @@
 // colours
 
 $playerColors: red, orange, yellow, green, blue, purple, brown, black;
-$wikiblue: blue;
+$wikiblue: #0645ad;
 
 // fonts
 
@@ -111,6 +111,7 @@ a {
 		position: fixed;
 		right: 50px;
 		top: 20px;
+		color: $wikiblue;
 	}
 	.timer {
 		display: none;

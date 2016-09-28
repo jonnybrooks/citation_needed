@@ -67,10 +67,12 @@ var gamePhases = {
 				$('.type-wrapper').addClass('slide-left');
 				$('.player').addClass('show');
 				setTimeout(function () {
-					// $('.player').addClass('joined')
 					var audio = new Audio('../speech/001-title.mp3');
 					audio.play();
 				}, 1500);
+				setTimeout(function () {
+					$('.player').addClass('joined');
+				}, 3000);
 			}
 		});
 	},

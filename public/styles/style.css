@@ -13,7 +13,7 @@ a { color: #0645ad; text-decoration: none; }
 
 .logo { font-weight: 100; font-family: Arial; text-align: center; margin-bottom: 40px; }
 
-.logo span { color: blue; font-style: italic; }
+.logo span { color: #0645ad; font-style: italic; }
 
 #client-room #view-lobby { position: relative; width: 100%; height: 100%; background: -webkit-gradient(linear, left top, left bottom, from(white), to(#efefef)); background: -webkit-linear-gradient(top, white, #efefef); background: linear-gradient(180deg, white, #efefef); }
 
@@ -35,7 +35,7 @@ a { color: #0645ad; text-decoration: none; }
 
 #client-room .type-wrapper.slide-left .description { opacity: 1; left: 100%; }
 
-#client-room .key { position: fixed; right: 50px; top: 20px; }
+#client-room .key { position: fixed; right: 50px; top: 20px; color: #0645ad; }
 
 #client-room .timer { display: none; }
 
@@ -123,7 +123,7 @@ a { color: #0645ad; text-decoration: none; }
 
 #client-player .display-name { margin: 0; text-align: center; font-size: 2em; padding: 10px 20px; }
 
-#client-player .display-name span { font-style: italic; color: blue; }
+#client-player .display-name span { font-style: italic; color: #0645ad; }
 
 #client-player h3 { text-align: center; font-size: 14px; color: #bbb; }
 
@@ -141,6 +141,6 @@ a { color: #0645ad; text-decoration: none; }
 
 #client-player input:focus, #client-player .submit:focus { outline: none; }
 
-#client-player .submit { margin: 25px auto 10px; width: 50%; text-align: center; background-color: white; color: blue; border: 2px solid; -webkit-box-shadow: 0px 3px 6px 0px rgba(0, 0, 255, 0.2); box-shadow: 0px 3px 6px 0px rgba(0, 0, 255, 0.2); }
+#client-player .submit { margin: 25px auto 10px; width: 50%; text-align: center; background-color: white; color: #0645ad; border: 2px solid; -webkit-box-shadow: 0px 3px 6px 0px rgba(0, 0, 255, 0.2); box-shadow: 0px 3px 6px 0px rgba(0, 0, 255, 0.2); }
 
 #client-player .submit-answer:nth-of-type(2) { display: none; }
