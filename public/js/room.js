@@ -9,7 +9,7 @@ socket.on('connect', () => {
 socket.on('room-registered', r => {
 	// console.log('room registered with key: %s', r.roomKey);
 	room = r; // set local copy of room to remote copy
-	$('#view-lobby .key').text(r.roomKey); // display this room's key
+	$('#room-key .key').text(r.roomKey); // display this room's key
 })
 socket.on('player-registered', player => {
 	// console.log('new player has connected: %s', JSON.stringify(player));
