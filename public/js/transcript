@@ -1,6 +1,6 @@
 say -o "001-title" "citation needed" &&
 
-say -o "002-intro" "Welcome to citation needed, the game of infinite expression and low effort comedy. My name is Gary, and I'll be your host." &&
+say -o "002-intro" "Welcome to citation needed, the game of infinite expression and low effort comedy." &&
 
 say -o "003-round1-intro" "I know you're itching to start, so lets get right into round one." &&
 

@@ -8,8 +8,7 @@
 		<script src="js/lib/typed.min.js"></script>		
 	</head>
 	<body>
-		<div id="view-container">
-
+		<div id="view-container" data-current-view="lobby">
 			<div id="view-lobby" class="view">
 				<div class="type-wrapper">
 					<p class="typed"></p>
@@ -55,16 +54,21 @@
 						<p class="status">Empty</p>
 					</div>
 				</div>
-				<div class="questions"></div>
-				<span class="timer"></span>
 			</div>
+			<div id="view-describe-round-1" class="view">
+				<div class="type-wrapper">
+					<p class="logo"><sup>[ <span>round one</span> ]</sup></p>
+					<ol class="description">
+						<li>An excerpt from a random <a href="http://wikipedia.org">Wikipedia</a> article will appear on the screen</li>
+						<li>Using your smartphone, you must submit the title of an article you think the excerpt could have come from</li>
+						<li>When everyone's finished, the correct answer - along with all with your answers, will appear on the screen</li>
+						<li>You must then use your smartphone to vote for whichever answer you think is the truth</li>
+						<li>You get points for guessing the answer correctly, but also when players vote for your answer</li>
+						<li>So try to make your answer obscure, but remember - keep it believable, or no one will vote for you!</li>
+					</ol>
+				</div>
+			</div>			
 			<!--
-			<div id="view-video-transition" class="view">
-				<video width="480" poster="" controls>
-					<source src="" type="video/mp4">					
-					Your browser does not support the HTML5 video tag.
-				</video>
-			</div>
 			<div id="view-answer-phase" class="view">
 				<div class="players"></div>
 			</div>
@@ -75,7 +79,7 @@
 			<div id="view-scores" class="view">
 				<div class="leaderboard"></div>				
 			</div>				
-		-->		
+			-->		
 		</div>
 		<script id="template-player" type="text/template">
 			<div class="player" data-player-id=" ">

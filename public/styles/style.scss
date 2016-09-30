@@ -59,6 +59,15 @@ body, .sans-serif {
 #view-container {
 	width: 100%;
 	height: 100%;
+	white-space: nowrap;
+	position: relative;
+	transition: 1s right cubic-bezier(0.86, 0, 0.07, 1);
+	&[data-current-view="lobby"] {
+		right: 0;
+	}
+	&[data-current-view="describe-round-1"] {
+		right: 100%;
+	}
 }
 
 a {
@@ -78,14 +87,24 @@ a {
 }
 
 #client-room {
-	#view-lobby {
+	.view {
 		position: relative;
 	    width: 100%;
-	    height: 100%;
+	    height: 100%; 
+	    display: inline-block;  
+	    vertical-align: top;
+	    white-space: normal;
+	    overflow: hidden;
 	    background: linear-gradient(180deg, white, #efefef);
-	}
+	    padding: 0 0 0 5px;
+	    margin: 0 -5px 0 0;
+	}	
+}
+
+#view-lobby {
+	transition: 0s max-height linear 1s;
 	.type-wrapper {
-	    font-size: 7.2em;
+		font-size: 7.2em;
 	    margin: 0;
 	    position: absolute;
 	    bottom: 55%;
@@ -96,6 +115,7 @@ a {
 	    transform: translateZ(0) scale(1.0, 1.0);
 	    transition: 1.2s right cubic-bezier(0.86, 0, 0.07, 1) 1s;
 	    .typed, .typed-cursor {
+	    	min-height: 1em;
 	    	display: inline-block;
 	    	opacity: 1;  
 	    	transition: 1.2s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s;
@@ -156,9 +176,6 @@ a {
 			color: $wikiblue;
 		}		
 	}
-	.timer {
-		display: none;
-	}
 	.players {
 		position: absolute;
 	    bottom: 0;
@@ -192,7 +209,7 @@ a {
 		    text-transform: lowercase;
 		    letter-spacing: 1px;
 		    position: relative;
-		    transition: 0.2s color ease-out;
+		    transition: 0.2s color ease-out 1.2s;
 		    &::after {
 		    	content: '';
 				position: absolute;
@@ -228,12 +245,6 @@ a {
 			}		 	
 	 	}
     }
-	.questions {
-		display: inline-block;
-	    vertical-align: top;
-	    width: 45%;
-	    display: none;
-	}
 	@for $i from 0 through 7 {
 		.player:nth-of-type(#{$i+1}) {
 			position: relative;
@@ -251,6 +262,64 @@ a {
 		 	}
 		}
 	}
+}
+
+#view-describe-round-1 {
+	.type-wrapper {
+		font-size: 7.2em;
+		margin: 0;
+		position: absolute;
+		top: 13%;
+		left: 5%;
+		transform: translateX(0, 50%);
+		white-space: nowrap;
+		-webkit-backface-visibility: hidden;
+		transform: translateZ(0) scale(1, 1);
+		transition: 1.2s right cubic-bezier(0.86, 0, 0.07, 1) 1s;
+	    .typed, .typed-cursor {
+	    	min-height: 1em;
+	    	display: inline-block;
+	    	opacity: 1;  
+	    	transition: 1.2s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s;
+	    }
+	    .logo {
+	    	text-align: left;
+	    	// opacity: 0.05;
+	    	// transition: 1.2s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s;
+	    }
+	    .description {
+	    	// opacity: 0;
+	    	// margin: 0 0 0 -15px;
+	    	margin: 0;
+	    	padding: 0;
+		    font-size: 0.2em;
+		    white-space: normal;
+		    list-style-type: none;
+		    //transition: 
+		    //	1.5s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s,
+		    //	1.5s left cubic-bezier(0.86, 0, 0.07, 1) 1s;
+		    li {
+		    	margin: 0 0 1em 0;
+			    line-height: 1.5em;
+		    }
+	    }
+	    &.slide-left {
+	    	right: 95%;	    	
+		    .typed {
+		    	opacity: 0.05;  		    	
+		    } 
+		    .typed-cursor {
+		    	opacity: 0;  		    	
+		    }
+	        .logo {
+		    	opacity: 1;
+		    }		    
+		    .description {
+		    	opacity: 1;	
+		    	left: 100%;	    	
+		    }
+		}
+	}		
 }
 
 // typed.js typing plugin

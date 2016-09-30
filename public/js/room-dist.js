@@ -63,18 +63,29 @@ var gamePhases = {
 			backSpeed: -200,
 			backDelay: 2000,
 			callback: function callback() {
-				$('.typed-cursor').addClass('hide');
-				$('.type-wrapper').addClass('slide-left');
-				$('.player').addClass('show');
+				$('#view-lobby .typed-cursor').addClass('hide');
+				$('#view-lobby .type-wrapper').addClass('slide-left');
+				$('#view-lobby .player').addClass('show');
 				setTimeout(function () {
 					var audio = new Audio('../speech/001-title.mp3');
 					audio.play();
 				}, 1500);
 				setTimeout(function () {
-					$('.player').addClass('joined');
+					$('#view-lobby .player').addClass('joined');
+					gamePhases.describeRound(1);
 				}, 3000);
 			}
 		});
+	},
+	describeRound: function describeRound(round) {
+		$('#view-container').attr('data-current-view', 'describe-round-' + round);
+		if (round === 1) {
+			waitOnAudio('../speech/002-intro.mp3', 1000).then(function (e) {
+				return waitOnAudio('../speech/003-round1-intro.mp3');
+			}).then(function (e) {
+				return waitOnAudio('../speech/004-round1-desc.mp3');
+			});
+		}
 	},
 	roundOne: function roundOne() {
 		var players = Object.keys(room.players); // get player ids
@@ -363,6 +374,18 @@ function shuffle(array) {
 		array[randomIndex] = temporaryValue;
 	}
 	return array;
+}
+
+function waitOnAudio(path) {
+	var delay = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+
+	return new Promise(function (resolve, reject) {
+		var audio = new Audio(path);
+		$(audio).on('ended', resolve);
+		setTimeout(function (e) {
+			return audio.play();
+		}, delay);
+	});
 }
 
 // console.log('socket connection established');	

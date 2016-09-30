@@ -95,18 +95,27 @@ let gamePhases = {
 			backSpeed: -200,
 			backDelay: 2000,
 			callback: function() {
-				$('.typed-cursor').addClass('hide');
-				$('.type-wrapper').addClass('slide-left');
-				$('.player').addClass('show');
+				$('#view-lobby .typed-cursor').addClass('hide');
+				$('#view-lobby .type-wrapper').addClass('slide-left');
+				$('#view-lobby .player').addClass('show');
 				setTimeout(function(){
 					var audio = new Audio('../speech/001-title.mp3');
 					audio.play();
 				}, 1500);
 				setTimeout(function(){
-					$('.player').addClass('joined');
+					$('#view-lobby .player').addClass('joined');
+					gamePhases.describeRound(1);
 				}, 3000);
 			}
 		})
+	},
+	describeRound: function(round) {
+		$('#view-container').attr('data-current-view', `describe-round-${round}`);
+		if(round === 1){
+			waitOnAudio('../speech/002-intro.mp3', 1000)				
+				.then(e => waitOnAudio('../speech/003-round1-intro.mp3'))
+				.then(e => waitOnAudio('../speech/004-round1-desc.mp3'))
+		}		
 	},
 	roundOne: function() {
 		let players = Object.keys(room.players); // get player ids
@@ -389,4 +398,12 @@ function shuffle(array) {
 		array[randomIndex] = temporaryValue;
 	}
 	return array;
+}
+
+function waitOnAudio(path, delay = 0) {
+	return new Promise(function(resolve, reject){
+		var audio = new Audio(path);
+		$(audio).on('ended', resolve);
+		setTimeout(e => audio.play(), delay);		
+	});
 }
