@@ -65,8 +65,8 @@ var gamePhases = {
 				$('#view-lobby .typed-cursor').addClass('hide');
 				$('#view-lobby .type-wrapper').addClass('slide-left');
 				$('#view-lobby .player').addClass('show');
-				// waitOnAudio('../speech/001-title.mp3', 1500);
-				commands.triggerNextStep();
+				waitOnAudio('../speech/001-title.mp3', 1500);
+				// commands.triggerNextStep();
 			}
 		});
 	},
