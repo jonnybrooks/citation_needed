@@ -30,7 +30,6 @@ socket.on('relay', function (message) {
 var commands = {
 	triggerNextStep: function triggerNextStep(message) {
 		if (room.round === 0) generateGameSequence();
-		$('.questions').html(''); // clear questions
 		gameSequence.next();
 	},
 	acceptQuestionSubmission: function acceptQuestionSubmission(message) {
@@ -66,28 +65,50 @@ var gamePhases = {
 				$('#view-lobby .typed-cursor').addClass('hide');
 				$('#view-lobby .type-wrapper').addClass('slide-left');
 				$('#view-lobby .player').addClass('show');
-				setTimeout(function () {
-					var audio = new Audio('../speech/001-title.mp3');
-					audio.play();
-				}, 1500);
-				setTimeout(function () {
-					$('#view-lobby .player').addClass('joined');
-					gamePhases.describeRound(1);
-				}, 3000);
+				// waitOnAudio('../speech/001-title.mp3', 1500);
+				commands.triggerNextStep();
 			}
 		});
 	},
 	describeRound: function describeRound(round) {
-		$('#view-container').attr('data-current-view', 'describe-round-' + round);
 		if (round === 1) {
-			waitOnAudio('../speech/002-intro.mp3', 1000).then(function (e) {
+			waitOnAudio('../speech/002-intro.mp3').then(function (e) {
 				return waitOnAudio('../speech/003-round1-intro.mp3');
 			}).then(function (e) {
-				return waitOnAudio('../speech/004-round1-desc.mp3');
+				return $('#view-container').attr('data-current-view', 'describe-round-' + round);
+			}).then(function (e) {
+				return $('.description li').eq(0).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/004-round1-desc.mp3', 1000);
+			}).then(function (e) {
+				return $('.description li').eq(1).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/005-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(2).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/006-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(3).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/007-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(4).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/008-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(5).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/009-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(6).addClass('show');
+			}).then(function (e) {
+				return gameSequence.next();
 			});
 		}
 	},
 	roundOne: function roundOne() {
+
 		var players = Object.keys(room.players); // get player ids
 		var questions = questionPool.roundOne; // get this rounds question pool
 		var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
@@ -95,21 +116,26 @@ var gamePhases = {
 		room.questions[q.id] = { question: q.excerpt, submissions: {} };
 		room.round = 1;
 
-		addQuestionToPage(q);
+		// addQuestionToPage(q);
 
+		$('#view-answer-phase .question').text(q.excerpt);
 		room.questions[q.id].submissions[room.roomKey] = q.article;
 
 		for (var pid in room.players) {
 			room.questions[q.id].submissions[pid] = null;
 			room.players[pid].submissionsComplete[q.id] = false;
-			addAnswerToQuestion(q, room.players[pid]);
+			// addAnswerToQuestion(q, room.players[pid]);
 		}
 
-		socket.emit('relay', { // relay the question to everyone in the room
-			from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
-		});
+		$('#view-container').attr('data-current-view', 'answer-phase'); // show the question
 
-		startTimer(room.timer.limit);
+		setTimeout(function () {
+			$('#view-answer-phase .question-anchor').addClass('tuck');
+			socket.emit('relay', { // relay the question to everyone in the room
+				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
+			});
+			startTimer(room.timer.limit);
+		}, 5000);
 	},
 	roundTwo: function roundTwo() {
 		var players = shuffle(Object.keys(room.players)); // get player ids and randomize
@@ -219,7 +245,6 @@ var gamePhases = {
 				r3Player.score += 50 * (citations === 0 ? 0 : citations < Object.keys(room.votes).length ? 1 : 2);
 			}
 		}
-		$('.questions').html('');
 		for (var i in room.players) {
 			$('.questions').append('<div><p> player ' + room.players[i].name + ' now has a score of: ' + room.players[i].score + ' points </p></div>');
 		}
@@ -244,7 +269,7 @@ var gamePhases = {
 		for (var i in room.players) {
 			if (room.players[i].score >= max) winners.push(room.players[i].name);
 		}
-		$('.questions').html('Players ' + winners.join(' and ') + ' are victorious!');
+		console.log('Players ' + winners.join(' and ') + ' are victorious!');
 	}
 };
 
@@ -264,21 +289,24 @@ var gameSequence = {
 };
 
 function generateGameSequence() {
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
 	gameSequence.steps.push(gamePhases.roundOne);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
 	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
-	gameSequence.steps.push(gamePhases.roundTwo);
-	for (var i in room.players) {
-		gameSequence.steps.push(gamePhases.voting);
-		gameSequence.steps.push(gamePhases.scoring);
-	}
-	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
-	gameSequence.steps.push(gamePhases.roundThree);
-	for (var i in room.players) {
-		gameSequence.steps.push(gamePhases.voting);
-		gameSequence.steps.push(gamePhases.scoring);
-	}
+	/*
+ gameSequence.steps.push(gamePhases.roundTwo);
+ for(let i in room.players) {
+ 	gameSequence.steps.push(gamePhases.voting);
+ 	gameSequence.steps.push(gamePhases.scoring);
+ }	
+ gameSequence.steps.push(gamePhases.sendTriggerPrompt);
+ gameSequence.steps.push(gamePhases.roundThree);
+ for(let i in room.players) {
+ 	gameSequence.steps.push(gamePhases.voting);		
+ 	gameSequence.steps.push(gamePhases.scoring);
+ }
+ */
 	gameSequence.steps.push(gamePhases.endGame);
 }
 
@@ -378,6 +406,7 @@ function shuffle(array) {
 
 function waitOnAudio(path) {
 	var delay = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+	var immediate = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
 	return new Promise(function (resolve, reject) {
 		var audio = new Audio(path);
@@ -385,6 +414,13 @@ function waitOnAudio(path) {
 		setTimeout(function (e) {
 			return audio.play();
 		}, delay);
+		if (immediate) resolve();
+	});
+}
+
+function wait(delay) {
+	return new Promise(function (resolve, reject) {
+		setTimeout(resolve, delay);
 	});
 }
 

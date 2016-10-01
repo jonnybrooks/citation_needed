@@ -34,7 +34,6 @@ socket.on('relay', message => {
 let commands = {
 	triggerNextStep: message => {
 		if(room.round === 0) generateGameSequence();
-		$('.questions').html(''); // clear questions
 		gameSequence.next();
 	},
 	acceptQuestionSubmission: message => {
@@ -98,26 +97,34 @@ let gamePhases = {
 				$('#view-lobby .typed-cursor').addClass('hide');
 				$('#view-lobby .type-wrapper').addClass('slide-left');
 				$('#view-lobby .player').addClass('show');
-				setTimeout(function(){
-					var audio = new Audio('../speech/001-title.mp3');
-					audio.play();
-				}, 1500);
-				setTimeout(function(){
-					$('#view-lobby .player').addClass('joined');
-					gamePhases.describeRound(1);
-				}, 3000);
+				// waitOnAudio('../speech/001-title.mp3', 1500);
+				commands.triggerNextStep();
 			}
 		})
 	},
 	describeRound: function(round) {
-		$('#view-container').attr('data-current-view', `describe-round-${round}`);
 		if(round === 1){
-			waitOnAudio('../speech/002-intro.mp3', 1000)				
-				.then(e => waitOnAudio('../speech/003-round1-intro.mp3'))
-				.then(e => waitOnAudio('../speech/004-round1-desc.mp3'))
+			waitOnAudio('../speech/002-intro.mp3')
+			.then(e => waitOnAudio('../speech/003-round1-intro.mp3'))
+			.then(e => $('#view-container').attr('data-current-view', `describe-round-${round}`))
+			.then(e => $('.description li').eq(0).addClass('show'))
+			.then(e => waitOnAudio('../speech/004-round1-desc.mp3', 1000))				
+			.then(e => $('.description li').eq(1).addClass('show'))
+			.then(e => waitOnAudio('../speech/005-round1-desc.mp3'))				
+			.then(e => $('.description li').eq(2).addClass('show'))
+			.then(e => waitOnAudio('../speech/006-round1-desc.mp3'))				
+			.then(e => $('.description li').eq(3).addClass('show'))
+			.then(e => waitOnAudio('../speech/007-round1-desc.mp3'))				
+			.then(e => $('.description li').eq(4).addClass('show'))
+			.then(e => waitOnAudio('../speech/008-round1-desc.mp3'))				
+			.then(e => $('.description li').eq(5).addClass('show'))
+			.then(e => waitOnAudio('../speech/009-round1-desc.mp3'))				
+			.then(e => $('.description li').eq(6).addClass('show'))				
+			.then(e => gameSequence.next())
 		}		
 	},
 	roundOne: function() {
+
 		let players = Object.keys(room.players); // get player ids
 		let questions = questionPool.roundOne; // get this rounds question pool
 		let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
@@ -125,22 +132,26 @@ let gamePhases = {
 		room.questions[q.id] = { question: q.excerpt, submissions: {} };
 		room.round = 1;
 
-		addQuestionToPage(q);
+		// addQuestionToPage(q);
 
+		$('#view-answer-phase .question').text(q.excerpt);
 		room.questions[q.id].submissions[room.roomKey] = q.article;
 
 		for(let pid in room.players) {
 			room.questions[q.id].submissions[pid] = null;
 			room.players[pid].submissionsComplete[q.id] = false;
-			addAnswerToQuestion(q, room.players[pid]);
+			// addAnswerToQuestion(q, room.players[pid]);
 		}
 
-		socket.emit('relay', { // relay the question to everyone in the room
-			from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
-		})
+		$('#view-container').attr('data-current-view', `answer-phase`); // show the question
 
-		startTimer(room.timer.limit);
-
+		setTimeout(() => {
+			$('#view-answer-phase .question-anchor').addClass('tuck');
+			socket.emit('relay', { // relay the question to everyone in the room
+				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
+			})
+			startTimer(room.timer.limit);
+		}, 5000);
 	},
 	roundTwo: function() {
 		let players = shuffle(Object.keys(room.players)); // get player ids and randomize
@@ -254,7 +265,6 @@ let gamePhases = {
 				r3Player.score += 50 * (citations === 0 ? 0 : citations < Object.keys(room.votes).length ? 1 : 2);
 			}
 		}
-		$('.questions').html('');
 		for(let i in room.players) {
 			$('.questions').append(`<div><p> player ${room.players[i].name} now has a score of: ${room.players[i].score} points </p></div>`);
 		}
@@ -279,7 +289,7 @@ let gamePhases = {
 		for(let i in room.players) {
 			if(room.players[i].score >= max) winners.push(room.players[i].name);
 		}
-		$('.questions').html(`Players ${winners.join(' and ')} are victorious!`);
+		console.log(`Players ${winners.join(' and ')} are victorious!`);
 	}
 }
 
@@ -295,10 +305,12 @@ let gameSequence = {
 }
 
 function generateGameSequence() {
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
 	gameSequence.steps.push(gamePhases.roundOne);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
 	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
+	/*
 	gameSequence.steps.push(gamePhases.roundTwo);
 	for(let i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
@@ -310,6 +322,7 @@ function generateGameSequence() {
 		gameSequence.steps.push(gamePhases.voting);		
 		gameSequence.steps.push(gamePhases.scoring);
 	}
+	*/
 	gameSequence.steps.push(gamePhases.endGame);
 }
 
@@ -400,10 +413,17 @@ function shuffle(array) {
 	return array;
 }
 
-function waitOnAudio(path, delay = 0) {
+function waitOnAudio(path, delay = 0, immediate = false) {
 	return new Promise(function(resolve, reject){
 		var audio = new Audio(path);
 		$(audio).on('ended', resolve);
-		setTimeout(e => audio.play(), delay);		
+		setTimeout(e => audio.play(), delay);
+		if(immediate) resolve();		
+	});
+}
+
+function wait(delay) {
+	return new Promise(function(resolve, reject){
+		setTimeout(resolve, delay);		
 	});
 }

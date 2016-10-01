@@ -1,7 +1,0 @@
-say -o "001-title" "citation needed" &&
-
-say -o "002-intro" "Welcome to citation needed, the game of infinite expression and low effort comedy." &&
-
-say -o "003-round1-intro" "I know you're itching to start, so lets get right into round one." &&
-
-say -o "004-round1-desc" "In this round, I will show a sentence on the screen. This sentence has been selected from a wikipedia article, and all you have to do is guess which article you think its from. But theres a twist. The other players will try to deceive you by submitting their own convincing answers using their smartphones. You will be awarded points if you vote for the correct answer, and also when someone votes for your answer. So make your answers believable. You will have ninety seconds to submit your answers. Good luck."
