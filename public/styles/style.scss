@@ -3,38 +3,39 @@
 $wikiblue: #0645ad;
 $keygold: #e0c32b;
 $playerColors: red, orange, $keygold, green, blue, purple, brown, black;
+
 // fonts
 
-@import 'https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,700';
+@import 'https://fonts.googleapis.com/css?family=PT+Serif:400,400i|Roboto:300,400,700';
 
 @font-face {
-  font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?5q993w');
-  src:  url('fonts/icomoon.eot?5q993w#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?5q993w') format('truetype'),
-    url('fonts/icomoon.woff?5q993w') format('woff'),
-    url('fonts/icomoon.svg?5q993w#icomoon') format('svg');
-  font-weight: normal;
-  font-style: normal;
+	font-family: 'icomoon';
+	src:  url('fonts/icomoon.eot?5q993w');
+	src:  url('fonts/icomoon.eot?5q993w#iefix') format('embedded-opentype'),
+		url('fonts/icomoon.ttf?5q993w') format('truetype'),
+		url('fonts/icomoon.woff?5q993w') format('woff'),
+		url('fonts/icomoon.svg?5q993w#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
 }
 
 [class^="icon-"], [class*=" icon-"] {
-  /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'icomoon' !important;
-  speak: none;
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  line-height: 1;
+	/* use !important to prevent issues with browser extensions that change fonts */
+	font-family: 'icomoon' !important;
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
 
-  /* Better Font Rendering =========== */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 .icon-key:before {
-  content: "\e902";
+	content: "\e902";
 }
 
 //styles
@@ -50,19 +51,19 @@ html, body {
 	overflow: hidden;
 }
 body, .sans-serif {	
-	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;	
+	font: 14px "Roboto", Helvetica, Arial, sans-serif;	
 }
 .serif {	
-	font: 14px "Roboto Slab", Georgia, serif;
+	font: 14px "PT Serif", Georgia, serif;
 }
 
 a {
-  color: #0645ad;
-  text-decoration: none;
+	color: #0645ad;
+	text-decoration: none;
 }
 
 .logo {
-	font-weight: 100;
+	font-weight: 300;
 	font-family: Arial;
 	text-align: center;
 	margin-bottom: 40px;
