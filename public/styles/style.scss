@@ -6,7 +6,7 @@ $playerColors: red, orange, $keygold, green, blue, purple, brown, black;
 
 // fonts
 
-@import 'https://fonts.googleapis.com/css?family=PT+Serif:400,400i|Roboto:300,400,700';
+@import 'https://fonts.googleapis.com/css?family=PT+Serif:400,400i|Roboto+Slab|Roboto:300,400,700';
 
 @font-face {
 	font-family: 'icomoon';
@@ -54,7 +54,7 @@ body, .sans-serif {
 	font: 14px "Roboto", Helvetica, Arial, sans-serif;	
 }
 .serif {	
-	font: 14px "PT Serif", Georgia, serif;
+	font: 14px "Roboto Slab", Georgia, serif;
 }
 
 a {
