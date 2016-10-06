@@ -15,7 +15,7 @@ socket.on('player-registered', player => {
 	// console.log('new player has connected: %s', JSON.stringify(player));
 
 	room.players[player.socketId] = player; // register this player on the local copy
-	addPlayerToPage(player);
+	addPlayerToLobby(player);
 
 	if(Object.keys(room.players).length === room.minPlayers) {
 		socket.emit('relay', { 
@@ -84,6 +84,7 @@ let questionPool  = {
 let gamePhases = {
 	lobby: function(){
 		$('.host').attr('href', `${location.host}/player`).find('span').text(`${location.host}/player`);
+		/*
 		$('.typed').typed({			
 			strings: [
 				"The <a>English</a> have terrible teeth due to bad parenting.", 
@@ -101,9 +102,28 @@ let gamePhases = {
 				// commands.triggerNextStep();
 			}
 		})
+		*/
+		// temp
+		$('.typed').text('60% of the time it works <em>every</em> time.');
+		$('#view-lobby .typed-cursor').addClass('hide');
+		$('#view-lobby .type-wrapper').addClass('slide-left');
+		$('#view-lobby .player').addClass('show');
+		waitOnAudio('../speech/001-title.mp3', 1500);
+		setTimeout(commands.triggerNextStep, 2000);
+		// end temp
 	},
 	describeRound: function(round) {
 		if(round === 1){
+			// temp
+			$('.player').each(function(){
+				if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
+			});
+			gameSequence.next()
+			// end temp
+		/*
+			$('.player').each(function(){
+				if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
+			})
 			waitOnAudio('../speech/002-intro.mp3')
 			.then(e => waitOnAudio('../speech/003-round1-intro.mp3'))
 			.then(e => $('#view-container').attr('data-current-view', `describe-round-${round}`))
@@ -119,8 +139,10 @@ let gamePhases = {
 			.then(e => waitOnAudio('../speech/008-round1-desc.mp3'))				
 			.then(e => $('.description li').eq(5).addClass('show'))
 			.then(e => waitOnAudio('../speech/009-round1-desc.mp3'))				
-			.then(e => $('.description li').eq(6).addClass('show'))				
+			.then(e => $('.description li').eq(6).addClass('show'))	
 			.then(e => gameSequence.next())
+		*/				
+			
 		}		
 	},
 	roundOne: function() {
@@ -144,9 +166,11 @@ let gamePhases = {
 		}
 
 		$('#view-container').attr('data-current-view', `answer-phase`); // show the question
+		$('#view-answer-phase .question-anchor').addClass('reveal');
 
-		setTimeout(() => {
+		setTimeout(() => {		
 			$('#view-answer-phase .question-anchor').addClass('tuck');
+
 			socket.emit('relay', { // relay the question to everyone in the room
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			})
@@ -370,8 +394,15 @@ function checkVotePhaseStatus(m) {
 	}
 }
 
-function addPlayerToPage(player) {
-	let p = $('div[data-player-id=" "]').eq(0);
+function addPlayerToLobby(player) {
+	let p = $('div[data-player-id=""]').eq(0);
+	$(p).attr('data-player-id', player.socketId);
+	$(p).find('.name').text(player.name);
+	$(p).addClass('joined');
+}
+
+function addPlayerToQuestionPhase(player) {
+	let p = $('div[data-player-id=""]').eq(0);
 	$(p).attr('data-player-id', player.socketId);
 	$(p).find('.name').text(player.name);
 	$(p).addClass('joined');

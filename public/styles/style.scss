@@ -1,10 +1,16 @@
-// colours
+//colours
 
 $wikiblue: #0645ad;
 $keygold: #e0c32b;
 $playerColors: red, orange, $keygold, green, blue, purple, brown, black;
 
-// fonts
+//easings 
+
+$easeOutQuint: cubic-bezier(0.23, 1, 0.32, 1);
+$easeInOutQuint: cubic-bezier(0.86, 0, 0.07, 1);
+$easeInOutBack: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+//fonts
 
 @import 'https://fonts.googleapis.com/css?family=PT+Serif:400,400i|Roboto+Slab|Roboto:300,400,700';
 
@@ -79,7 +85,7 @@ a {
 		height: 100%;
 		white-space: nowrap;
 		position: relative;
-		transition: 1s right cubic-bezier(0.86, 0, 0.07, 1);
+		transition: 1s right $easeInOutQuint;
 		&[data-current-view="lobby"] {
 			right: 0;
 		}
@@ -114,12 +120,12 @@ a {
 		    white-space: nowrap;	    
 		    -webkit-backface-visibility: hidden;
 		    transform: translateZ(0) scale(1.0, 1.0);
-		    transition: 1.2s right cubic-bezier(0.86, 0, 0.07, 1) 1s;
+		    transition: 1.2s right $easeInOutQuint 1s;
 		    .typed, .typed-cursor {
 		    	min-height: 1em;
 		    	display: inline-block;
 		    	opacity: 1;  
-		    	transition: 1.2s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s;
+		    	transition: 1.2s opacity $easeInOutQuint 1s;
 		    }
 		    .logo {
 		    	display: inline-block;
@@ -127,7 +133,7 @@ a {
 		    	left: 100%;
 		    	top: -0.5em;
 		    	opacity: 0.05;
-		    	transition: 1.2s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s;
+		    	transition: 1.2s opacity $easeInOutQuint 1s;
 		    }
 		    .description {
 		    	position: absolute;
@@ -138,8 +144,8 @@ a {
 			    left: 110%;
 			    width: 50%;
 			    transition: 
-			    	1.5s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s,
-			    	1.5s left cubic-bezier(0.86, 0, 0.07, 1) 1s;
+			    	1.5s opacity $easeInOutQuint 1s,
+			    	1.5s left $easeInOutQuint 1s;
 			    p {
 			    	margin: 0 0 2em 0;
 				    line-height: 1.5em;
@@ -199,7 +205,7 @@ a {
 		 		top: 100px;
 		 		opacity: 0;	 		
 		 		transition: 	 		
-		 			0.6s top cubic-bezier(0.86, 0, 0.07, 1) 1s, // easeInOutQuint
+		 			0.6s top $easeInOutQuint 1s, // easeInOutQuint
 		 			0.6s opacity ease-in-out 1s;
 			}
 		 	.status {
@@ -223,11 +229,11 @@ a {
 					transform: translate(50%, 50%);
 					background-color: black;
 					transition: 
-						1.2s bottom cubic-bezier(0.68, -0.55, 0.265, 1.55), // easeInOutBack
+						1.2s bottom $easeInOutBack, // easeInOutBack
 						1s background-color ease,
 						0.2s border-radius ease-in-out 0.8s,
 						0.2s height ease 1s,
-						0.4s width cubic-bezier(0.86, 0, 0.07, 1) 1s; // easeInOutQuint
+						0.4s width $easeInOutQuint 1s; // easeInOutQuint
 				}
 		 	}
 		 	&.joined {
@@ -275,17 +281,17 @@ a {
 			white-space: nowrap;
 			-webkit-backface-visibility: hidden;
 			transform: translateZ(0) scale(1, 1);
-			transition: 1.2s right cubic-bezier(0.86, 0, 0.07, 1) 1s;
+			transition: 1.2s right $easeInOutQuint 1s;
 		    .typed, .typed-cursor {
 		    	min-height: 1em;
 		    	display: inline-block;
 		    	opacity: 1;  
-		    	transition: 1.2s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s;
+		    	transition: 1.2s opacity $easeInOutQuint 1s;
 		    }
 		    .logo {
 		    	text-align: left;
 		    	// opacity: 0.05;
-		    	// transition: 1.2s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s;
+		    	// transition: 1.2s opacity $easeInOutQuint 1s;
 		    }
 		    .description {
 		    	margin: 0;
@@ -294,8 +300,8 @@ a {
 			    white-space: normal;
 			    list-style-type: none;
 			    //transition: 
-			    //	1.5s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s,
-			    //	1.5s left cubic-bezier(0.86, 0, 0.07, 1) 1s;
+			    //	1.5s opacity $easeInOutQuint 1s,
+			    //	1.5s left $easeInOutQuint 1s;
 			    li {
 			    	margin: 0 0 1em 0;
 				    line-height: 1.5em;
@@ -303,8 +309,8 @@ a {
 				    position: relative;
 				    top: 200px;
 					transition: 
-				    	1s opacity cubic-bezier(0.86, 0, 0.07, 1),
-				    	1s top cubic-bezier(0.86, 0, 0.07, 1);
+				    	1s opacity $easeInOutQuint,
+				    	1s top $easeInOutQuint;
 				    &.show {
 				    	top: 0;
 				    	opacity: 1;
@@ -334,17 +340,32 @@ a {
 			position: absolute;
 			width: 100%;
 			left: 0;
-			top: 40%;
+			opacity: 0;
+			top: 100%;
+			transition: 
+				0.5s opacity $easeInOutQuint 1s,
+		    	0.5s top $easeInOutQuint 1s;
 			.question {
 				font-size: 5em;
 				position: absolute;
 				top: 0%;
 				left: 50%;
 				transform: translate(-50%, 0%);
-				margin: 0;								
+				margin: 0;		
+				transition: 					
+			    	0.6s width $easeOutQuint, // easeOutQuint
+			    	0.6s font-size $easeOutQuint,
+			    	0.6s transform $easeOutQuint,
+			    	0.6s left $easeOutQuint;
+			}
+			&.reveal {
+				opacity: 1;
+				top: 40%;
 			}
 			&.tuck {
 				top: 20px;
+				transition: 					
+			    	0.7s top $easeOutQuint;
 				.question {
 					left: 20px;
 					width: 50%;
