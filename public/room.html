@@ -5,6 +5,7 @@
 		<link rel="stylesheet" href="styles/style.css"/>
 		<script src="js/lib/socket.io.min.js"></script>
 		<script src="js/lib/jquery-3.0.0.slim.min.js"></script>	
+		<script src="js/lib/tweenmax.min.js"></script>
 		<script src="js/lib/typed.min.js"></script>		
 	</head>
 	<body>
@@ -21,11 +22,11 @@
 					</div>
 				</div>								
 				<div class="players">
-					<div class="player" data-player-id="">
+					<div class="player" data-player-id="test1">
 						<h2 class="name">Player 1</h2>
 						<p class="status">Empty</p>
 					</div>
-					<div class="player" data-player-id="">
+					<div class="player" data-player-id="test2">
 						<h2 class="name">Player 2</h2>
 						<p class="status">Empty</p>
 					</div>
@@ -73,6 +74,7 @@
 				<div class="question-anchor">
 					<p class="question"></p>					
 				</div>
+				<div class="players"></div>
 			</div>
 			<!--
 			<div id="view-voting-phase" class="view">
@@ -86,8 +88,13 @@
 		</div>
 		<script id="template-player" type="text/template">
 			<div class="player" data-player-id="">
-				<h2 class="name">&nbsp;</h2>
-				<span class="time-left"></span>
+				<div class="clock-timer">
+					<div class="fill">
+						<span class="cover"></span>
+						<span class="quadrant"></span><span class="quadrant"></span><span class="quadrant"></span><span class="quadrant"></span>
+					</div>
+				</div>
+				<h2 class="name"></h2>
 			</div>
 		</script>
 		<script id="template-question" type="text/template">

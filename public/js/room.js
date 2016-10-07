@@ -2,24 +2,18 @@ let socket;
 let room;
 
 socket = io(`http://${location.host}/room`);
-socket.on('connect', () => {
-	// console.log('socket connection established');	
-	// $('.players, .questions').html('')
-})
+socket.on('connect', () => {}) // on connect callback
 socket.on('room-registered', r => {
-	// console.log('room registered with key: %s', r.roomKey);
 	room = r; // set local copy of room to remote copy
 	$('#room-key .key').text(r.roomKey); // display this room's key
 })
 socket.on('player-registered', player => {
-	// console.log('new player has connected: %s', JSON.stringify(player));
-
 	room.players[player.socketId] = player; // register this player on the local copy
-	addPlayerToLobby(player);
+	addPlayerToLobby(player); // add this player to the lobby
 
 	if(Object.keys(room.players).length === room.minPlayers) {
 		socket.emit('relay', { 
-			from: room.roomKey, to: Object.keys(room.players)[0], command: 'displayStartButton'
+			from: room.roomKey, to: Object.keys(room.players)[0], command: 'displayStartButton' // display the start button on p1
 		})
 	}
 	
@@ -33,18 +27,19 @@ socket.on('relay', message => {
 
 let commands = {
 	triggerNextStep: message => {
-		if(room.round === 0) generateGameSequence();
+		if(room.round === 0) {
+			createDummyPlayers(8);
+			addPlayersToAnswerPhase();
+			generateGameSequence();		
+		}
 		gameSequence.next();
 	},
 	acceptQuestionSubmission: message => {
 
 		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
 		room.players[message.from].submissionsComplete[message.args.qid] = true;
-		
-		$(`.question[data-question-id="${message.args.qid}"]`)
-			.find(`.answer[data-player-id="${message.from}"]`)
-			.find('.content').text(message.args.answer);
 
+		$(`.players .player[data-player-id="${message.from}"] .time-left`).addClass('answered');
 		checkQuestionPhaseStatus(message);
 
 	},	
@@ -109,6 +104,7 @@ let gamePhases = {
 		$('#view-lobby .type-wrapper').addClass('slide-left');
 		$('#view-lobby .player').addClass('show');
 		waitOnAudio('../speech/001-title.mp3', 1500);
+
 		setTimeout(commands.triggerNextStep, 2000);
 		// end temp
 	},
@@ -154,15 +150,12 @@ let gamePhases = {
 		room.questions[q.id] = { question: q.excerpt, submissions: {} };
 		room.round = 1;
 
-		// addQuestionToPage(q);
-
 		$('#view-answer-phase .question').text(q.excerpt);
 		room.questions[q.id].submissions[room.roomKey] = q.article;
 
 		for(let pid in room.players) {
 			room.questions[q.id].submissions[pid] = null;
-			room.players[pid].submissionsComplete[q.id] = false;
-			// addAnswerToQuestion(q, room.players[pid]);
+			room.players[pid].submissionsComplete[q.id] = false;			
 		}
 
 		$('#view-container').attr('data-current-view', `answer-phase`); // show the question
@@ -170,7 +163,7 @@ let gamePhases = {
 
 		setTimeout(() => {		
 			$('#view-answer-phase .question-anchor').addClass('tuck');
-
+			fillClockTimer();
 			socket.emit('relay', { // relay the question to everyone in the room
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			})
@@ -323,7 +316,6 @@ let gameSequence = {
 	current: -1,
 	steps: [],
 	next: function(args = {}){
-		// console.log('moving to process: %s', this.current + 1);
 		setTimeout(function(){ this.steps[++this.current](args) }.bind(this), 1100);
 	}
 }
@@ -352,12 +344,13 @@ function generateGameSequence() {
 
 function startTimer(t) {
 	$('.timer').text(t); // set the timer
+	$('.players .player .time-left').not('.answered').css({ right: `${t / room.timer.limit * 100}%` }); // update the progress bars
+	$('.players .player .time-left').addClass('answered');
 	if(t === room.timer.limit) {
 		room.timer.active = true; // when first called
 	}
 	if(!room.timer.active) return; // return if tne timer has been cancelled
  	else if(t === 0) {
- 		// console.log('timeout!');
  		return gameSequence.next(); // move to next phase
  	}
 	else setTimeout(startTimer.bind(null, --t), 1000); // decrement the timer
@@ -370,7 +363,6 @@ function checkQuestionPhaseStatus(m){
 	}
 	if(playerDone) { // if the player has finished their questions
 		let questionsComplete = true;
-		// sconsole.log('player (%s) has completed their questions', m.from); // notify the client
 		for(let i in room.questions) { // then iterate through the room questions
 			for(let j in room.questions[i].submissions) { // making sure they're all done
 				if (room.questions[i].submissions[j] === null) questionsComplete = false;
@@ -401,11 +393,13 @@ function addPlayerToLobby(player) {
 	$(p).addClass('joined');
 }
 
-function addPlayerToQuestionPhase(player) {
-	let p = $('div[data-player-id=""]').eq(0);
-	$(p).attr('data-player-id', player.socketId);
-	$(p).find('.name').text(player.name);
-	$(p).addClass('joined');
+function addPlayersToAnswerPhase() {
+	for(let p in room.players) {
+		let frag = fragment($('#template-player').html());
+		$(frag).find('.player').attr('data-player-id', room.players[p].socketId);
+		$(frag).find('.player .name').text(room.players[p].name);		
+		$('#view-answer-phase .players').append(frag);	
+	}	
 }
 
 function addQuestionToPage(question) {
@@ -422,6 +416,30 @@ function addAnswerToQuestion(q, player) {
 	$(frag).find('.answer .player').text(player.name);
 	$(frag).find('.answer .content').text('Pending');
 	$(`.question[data-question-id="${q.id}"] .answers`).append(frag);
+}
+
+function createDummyPlayers(amount) {
+	for (let i = 0; i < amount; i++) {
+		let id = Math.random();
+		room.players[id] = new Player({
+			socketId: id,
+			roomKey: room.roomKey,
+			name: 'test'				
+		});
+	}	
+}
+
+function fillClockTimer() {
+	var tl = new TimelineLite();
+	tl.to('.quadrant:nth-child(2)', 1, { rotation: 0, ease: Power0.easeNone })
+		.set('.quadrant:nth-child(3)', { display: 'block' }).to('.quadrant:nth-child(3)', 1, { rotation: 0, ease: Power0.easeNone })
+		.set('.cover', { display: 'none' })
+		.set('.quadrant:nth-child(4)', { display: 'block' }).to('.quadrant:nth-child(4)', 1, { rotation: 0, ease: Power0.easeNone })  
+		.set('.quadrant:nth-child(5)', { display: 'block' }).to('.quadrant:nth-child(5)', 1, { rotation: 0, ease: Power0.easeNone })
+		.set('.clock-timer', { background: 'red' })
+		.set('.quadrant', { display: 'none' })  
+		.to('.clock-timer', 0.5, {scale: 0.1, ease: Power4.easeInOut}).to('.clock-timer', 0.8, {y: -20, ease: Back.easeInOut.config(1.5)}, '-=0.3')
+	return tl;
 }
 
 function fragment(htmlStr) {
@@ -457,4 +475,12 @@ function wait(delay) {
 	return new Promise(function(resolve, reject){
 		setTimeout(resolve, delay);		
 	});
+}
+
+function Player(conf) {	
+	this.socketId = conf.socketId;
+	this.roomKey = conf.roomKey;
+	this.name = conf.name;
+	this.score = 0;
+	this.submissionsComplete = {};	
 }
