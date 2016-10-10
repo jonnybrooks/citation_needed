@@ -406,6 +406,18 @@ a {
 				}
 			}
 		}
+		.pie-timer {
+			svg {
+				display: block;
+				margin: 50px auto;
+			}
+			.fill { 
+				fill: #0088cc
+			}
+			.border {
+				fill: #00517a 
+			}
+		}
 		.timer {
 			color: #ccc;
 			font-size: 3em;

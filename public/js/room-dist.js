@@ -386,9 +386,21 @@ function createDummyPlayers(amount) {
 }
 
 function fillClockTimer() {
-	var tl = new TimelineLite();
-	tl.to('.quadrant:nth-child(2)', 1, { rotation: 0, ease: Power0.easeNone }).set('.quadrant:nth-child(3)', { display: 'block' }).to('.quadrant:nth-child(3)', 1, { rotation: 0, ease: Power0.easeNone }).set('.cover', { display: 'none' }).set('.quadrant:nth-child(4)', { display: 'block' }).to('.quadrant:nth-child(4)', 1, { rotation: 0, ease: Power0.easeNone }).set('.quadrant:nth-child(5)', { display: 'block' }).to('.quadrant:nth-child(5)', 1, { rotation: 0, ease: Power0.easeNone }).set('.clock-timer', { background: 'red' }).set('.quadrant', { display: 'none' }).to('.clock-timer', 0.5, { scale: 0.1, ease: Power4.easeInOut }).to('.clock-timer', 0.8, { y: -20, ease: Back.easeInOut.config(1.5) }, '-=0.3');
-	return tl;
+	var alpha = 0;
+	var t = 30;
+	(function draw() {
+		alpha = (alpha + 1) % 360;
+		var r = alpha * Math.PI / 180;
+		var x = Math.sin(r) * 125;
+		var y = Math.cos(r) * -125;
+		var mid = alpha > 180 ? 1 : 0;
+		var anim = 'M 0 0 v -125 A 125 125 1 ' + mid + ' 1 ' + x + ' ' + y + ' z';
+
+		document.querySelector('.pie-timer .fill').setAttribute('d', anim);
+		document.querySelector('.pie-timer .border').setAttribute('d', anim);
+
+		requestAnimationFrame(draw); // Redraw
+	})();
 }
 
 function fragment(htmlStr) {
