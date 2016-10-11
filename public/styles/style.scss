@@ -400,22 +400,26 @@ a {
 				transition: 
 					1.01s right linear;
 				&.answered {
-					transition: 
-						0.6s right $easeOutQuint;
 					right: 0 !important;
+					transition: 
+						0.6s right $easeOutQuint;					
 				}
 			}
 		}
 		.pie-timer {
+			position: absolute;
+			top: 5%;
+			right: 50%;
+			transform: translateX(50%);
 			svg {
 				display: block;
-				margin: 50px auto;
+				margin: 0px auto;
 			}
 			.fill { 
-				fill: #0088cc
+				fill: #ddd;				
 			}
 			.border {
-				fill: #00517a 
+				fill: #bbb; 
 			}
 		}
 		.timer {
