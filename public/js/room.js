@@ -38,8 +38,10 @@ let commands = {
 
 		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
 		room.players[message.from].submissionsComplete[message.args.qid] = true;
+		let p = `.players .player[data-player-id="${message.from}"]`;
 
-		$(`.players .player[data-player-id="${message.from}"] .time-left`).addClass('answered');
+		$(p).addClass('answered');
+		TweenLite.to(p + ' .name', 0.6, {bottom: `${Math.random() * (150 - 50) + 50}px`, ease: Power4.easeInOut});
 		checkQuestionPhaseStatus(message);
 
 	},	
@@ -146,7 +148,7 @@ let gamePhases = {
 		let players = Object.keys(room.players); // get player ids
 		let questions = questionPool.roundOne; // get this rounds question pool
 		let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
-		
+
 		room.questions[q.id] = { question: q.excerpt, submissions: {} };
 		room.round = 1;
 
@@ -155,15 +157,14 @@ let gamePhases = {
 
 		for(let pid in room.players) {
 			room.questions[q.id].submissions[pid] = null;
-			room.players[pid].submissionsComplete[q.id] = false;			
+			room.players[pid].submissionsComplete[q.id] = false;
 		}
 
 		$('#view-container').attr('data-current-view', `answer-phase`); // show the question
 		$('#view-answer-phase .question-anchor').addClass('reveal');
 
 		setTimeout(() => {		
-			$('#view-answer-phase .question-anchor').addClass('tuck');
-			fillClockTimer();
+			$('#view-answer-phase .question-anchor').addClass('tuck');			
 			socket.emit('relay', { // relay the question to everyone in the room
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			})
@@ -343,15 +344,15 @@ function generateGameSequence() {
 }
 
 function startTimer(t) {
-	$('.timer').text(t); // set the timer
-	$('.players .player .time-left').not('.answered').css({ right: `${t / room.timer.limit * 100}%` }); // update the progress bars
-	$('.players .player .time-left').addClass('answered');
+	$('.countdown .timer').text(t); // set the timer
 	if(t === room.timer.limit) {
+		drawCountdown(); // start filling the countdown timer
 		room.timer.active = true; // when first called
 	}
 	if(!room.timer.active) return; // return if tne timer has been cancelled
  	else if(t === 0) {
- 		return gameSequence.next(); // move to next phase
+ 		drawCountdown(true); // finish the timer
+ 		return // gameSequence.next(); // move to next phase
  	}
 	else setTimeout(startTimer.bind(null, --t), 1000); // decrement the timer
 }
@@ -370,6 +371,7 @@ function checkQuestionPhaseStatus(m){
 		}		
 		if(questionsComplete) { // if all questions are complete
 			room.timer.active = false; // disable the timer
+			drawCountdown(true); // finish the countdown
 			gameSequence.next(); // move to next phase
 		}
 	}	
@@ -429,22 +431,15 @@ function createDummyPlayers(amount) {
 	}	
 }
 
-function fillClockTimer() {
-	var alpha = 0;
-	var t = 30;
-	(function draw() {
-		alpha = (alpha + 1) % 360;
-		var r = (alpha * Math.PI / 180);
-	    var x = Math.sin(r) * 125;
-	    var y = Math.cos(r) * - 125;
-	    var mid = (alpha > 180) ? 1 : 0;
-	    var anim = `M 0 0 v -125 A 125 125 1 ${mid} 1 ${x} ${y} z`;
-	 
-	  document.querySelector('.pie-timer .fill').setAttribute('d', anim);
-	  document.querySelector('.pie-timer .border').setAttribute('d', anim);
-	  
-	  requestAnimationFrame(draw); // Redraw
-	})();
+function drawCountdown(end) {
+	if(!end) return TweenLite.to('.countdown .circle', 60, { strokeDashoffset: 0, ease: Linear.easeNone });
+	var tl = new TimelineMax();
+	tl.to('.countdown .circle', 1, { strokeDashoffset: 0, ease: Power4.easeInOut })
+	  .to('.countdown .timer', 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5')
+  	  .to('.countdown .circle', 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) })
+      .to('.countdown .circle', 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3')      
+      .to('.countdown .white-box', 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3')
+    .from('.countdown .white-box', 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4')
 }
 
 function fragment(htmlStr) {
