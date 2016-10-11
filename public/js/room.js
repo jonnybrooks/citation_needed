@@ -35,10 +35,8 @@ let commands = {
 		gameSequence.next();
 	},
 	acceptQuestionSubmission: message => {
-
 		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
-		room.players[message.from].submissionsComplete[message.args.qid] = true;
-		$(`.players .player[data-player-id="${message.from}"]`).addClass('answered');
+		room.players[message.from].submissionsComplete[message.args.qid] = true;		
 		checkQuestionPhaseStatus(message);
 
 	},	
@@ -162,6 +160,7 @@ let gamePhases = {
 
 		setTimeout(() => {		
 			$('#view-answer-phase .question-anchor').addClass('tuck');			
+			// $(`.players .player`).addClass('answered');
 			socket.emit('relay', { // relay the question to everyone in the room
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			})
@@ -361,6 +360,7 @@ function checkQuestionPhaseStatus(m){
 	}
 	if(playerDone) { // if the player has finished their questions
 		let questionsComplete = true;
+		$(`.players .player[data-player-id="${m.from}"]`).addClass('answered'); // show player as answered in lobby 
 		for(let i in room.questions) { // then iterate through the room questions
 			for(let j in room.questions[i].submissions) { // making sure they're all done
 				if (room.questions[i].submissions[j] === null) questionsComplete = false;

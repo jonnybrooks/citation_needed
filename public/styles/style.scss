@@ -1,8 +1,18 @@
 //colours
 
 $wikiblue: #0645ad;
-$keygold: #e0c32b;
-$playerColors: red, orange, $keygold, green, blue, purple, brown, black;
+$keyGold: #e0c32b;
+$pastelRed: #ED6D79;
+$pastelOrange: #F5A26F;
+$pastelYellow: #FFDC89;
+$pastelBrown: #D4A697;
+$pastelGreen: #71E096;
+$pastelPurple: #DA97E0;
+$pastelBlue: #90D4F7;
+$pastelPink: #FFB3BA;
+
+// $playerColors: $pastelRed, $pastelOrange, $pastelYellow, $pastelBrown, $pastelGreen, $pastelPurple, $pastelBlue, $pastelPink;
+$playerColors: $pastelRed, $pastelBlue, $pastelYellow, $pastelGreen, $pastelOrange, $pastelBrown, $pastelPurple, $pastelPink;
 
 //easings 
 
@@ -174,7 +184,7 @@ a {
 				vertical-align: middle;
 			}		
 			.icon-key {
-			    color: $keygold;
+			    color: $keyGold;
 			    margin-right: 15px;
 			    position: relative;
 			    top: 2px;
@@ -395,20 +405,24 @@ a {
 		 		word-break: break-all;
 		 		bottom: 0;
 		 		color: #bbb;
+		 		background: transparent;
+		 		padding: 5px 0;
 		 		transition: 
 		 			1s bottom $easeInOutQuint,
+		 			0.6s background ease-in-out 0.4s,
 		 			0.6s color ease-in-out 0.4s;
 			}
 			@for $i from 0 through 7 {
 				&.answered:nth-of-type(#{$i+1}) .name {
-					color: nth($playerColors, $i+1);
-					bottom: (150 - random(50)) + px;
+					color: white;
+			 		background: nth($playerColors, $i+1);;
+					bottom: (150 - random(100)) + px;
 				}
 			}
 		 }		 
 		.countdown {
 			position: absolute;
-			top: 45%;
+			top: 40%;
 			right: 50%;
 			transform: translate(50%, -50%);
 			width: calc(20% + 25px);			

@@ -34,10 +34,8 @@ var commands = {
 		gameSequence.next();
 	},
 	acceptQuestionSubmission: function acceptQuestionSubmission(message) {
-
 		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
 		room.players[message.from].submissionsComplete[message.args.qid] = true;
-		$('.players .player[data-player-id="' + message.from + '"]').addClass('answered');
 		checkQuestionPhaseStatus(message);
 	},
 	acceptVoteSubmission: function acceptVoteSubmission(message) {
@@ -115,6 +113,7 @@ var gamePhases = {
 
 		setTimeout(function () {
 			$('#view-answer-phase .question-anchor').addClass('tuck');
+			// $(`.players .player`).addClass('answered');
 			socket.emit('relay', { // relay the question to everyone in the room
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			});
@@ -314,6 +313,7 @@ function checkQuestionPhaseStatus(m) {
 	if (playerDone) {
 		// if the player has finished their questions
 		var questionsComplete = true;
+		$('.players .player[data-player-id="' + m.from + '"]').addClass('answered'); // show player as answered in lobby
 		for (var i in room.questions) {
 			// then iterate through the room questions
 			for (var j in room.questions[i].submissions) {
