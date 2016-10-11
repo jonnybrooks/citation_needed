@@ -38,10 +38,7 @@ let commands = {
 
 		room.questions[message.args.qid].submissions[message.from] = message.args.answer;
 		room.players[message.from].submissionsComplete[message.args.qid] = true;
-		let p = `.players .player[data-player-id="${message.from}"]`;
-
-		$(p).addClass('answered');
-		TweenLite.to(p + ' .name', 0.6, {bottom: `${Math.random() * (150 - 50) + 50}px`, ease: Power4.easeInOut});
+		$(`.players .player[data-player-id="${message.from}"]`).addClass('answered');
 		checkQuestionPhaseStatus(message);
 
 	},	

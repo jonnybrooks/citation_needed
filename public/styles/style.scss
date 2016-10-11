@@ -393,12 +393,16 @@ a {
 		 		margin: 0;
 		 		position: relative;
 		 		word-break: break-all;
+		 		bottom: 0;
 		 		color: #bbb;
-		 		transition: 0.6s color ease-in-out 0.4s;
+		 		transition: 
+		 			1s bottom $easeInOutQuint,
+		 			0.6s color ease-in-out 0.4s;
 			}
 			@for $i from 0 through 7 {
 				&.answered:nth-of-type(#{$i+1}) .name {
-					color: nth($playerColors, $i+1);					
+					color: nth($playerColors, $i+1);
+					bottom: (150 - random(50)) + px;
 				}
 			}
 		 }		 
@@ -527,57 +531,5 @@ a {
 	}
 	.submit-answer:nth-of-type(2) {
 		display: none;
-	}
-}
-
-.clock-timer {
-	border-radius: 50%;
-	overflow: hidden;
-	height: 50px;
-	width: 50px;
-	.fill {
-		width: 100%;
-		height: 100%;
-		position: relative;		
-		.cover {
-			position: absolute;
-			background: white;
-			height: 50%;
-			width: 50%;
-			top: 0;
-			left: 0;
-			display: block;
-			z-index: 10;
-	    }
-		.quadrant {
-			position: absolute;
-			background: red;
-			height: 50%;
-			width: 50%;
-			top: 0;
-			left: 50%;
-			transform-origin: left bottom;
-			transform: rotate(-90deg);
-			display: block;
-			z-index: 5;
-			&:nth-child(3) {
-				transform-origin: left top;
-				top: 50%;
-				left: 50%;
-				display: none;
-			}  
-			&:nth-child(4) {
-		        transform-origin: right top;
-		        top: 50%;
-		        left: 0;
-		        display: none;
-			}
-			&:nth-child(5) {
-				transform-origin: right bottom;
-				top: 0;
-				left: 0;
-				display: none;
-			}
-		}
 	}
 }
