@@ -205,6 +205,33 @@ a {
 		.player {
 		 	display: table-cell;
 		 	vertical-align: bottom;
+		 	position: relative;
+			opacity: 0;
+			top: 30px;
+			width: 100%;
+		    overflow: hidden;		    
+		    &.show {
+				opacity: 1;
+				top: 0px;
+			}
+			&.joined {
+		 		.status {
+		 			color: #ddd;
+		 		}
+		 		.status::after {
+		    	    bottom: 45%;
+					border-radius: 0;
+					height: 3px;
+					width: 60%;
+			    }
+			    .name { 
+			 		top: -10px;
+			 		opacity: 1;
+				}		 	
+		 	}
+		 	&.collapse {
+		 		width: 0px;
+		 	}
 		 	.name { 
 		 		@extend .serif;
 		 		font-size: 1.8em;
@@ -237,7 +264,7 @@ a {
 					bottom: calc(100% + 20px);  
 					left: auto;
 					transform: translate(50%, 50%);
-					background-color: black;
+					background-color: #bbb;
 					transition: 
 						1.2s bottom $easeInOutBack, // easeInOutBack
 						1s background-color ease,
@@ -245,37 +272,16 @@ a {
 						0.2s height ease 1s,
 						0.4s width $easeInOutQuint 1s; // easeInOutQuint
 				}
-		 	}
-		 	&.joined {
-		 		.status {
-		 			color: #ddd;
-		 		}
-		 		.status::after {
-		    	    bottom: 45%;
-					border-radius: 0;
-					height: 3px;
-					width: 60%;
-			    }
-			    .name { 
-			 		top: -10px;
-			 		opacity: 1;
-				}		 	
-		 	}
+		 	}		 	
 		}
 		@for $i from 0 through 7 {
 			.player:nth-of-type(#{$i+1}) {
-				position: relative;
-				opacity: 0;
-				top: 30px;
-				transition: 1s all ease-in-out #{($i * 100) + 1200}ms;
-				&.show {
-					opacity: 1;
-					top: 0px;
-				}
-				&.joined {
-			 		.status::after {
-			    	    background-color: nth($playerColors, $i+1);
-				    }		 	
+				transition: 
+					1s width ease-in-out,
+					1s opacity ease-in-out #{($i * 100) + 1200}ms,
+					1s top ease-in-out #{($i * 100) + 1200}ms;
+				&.joined .status::after {
+		    	    background-color: nth($playerColors, $i+1);
 			 	}
 			}
 		}

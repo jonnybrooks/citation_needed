@@ -95,7 +95,7 @@ let gamePhases = {
 	describeRound: function(round) {
 		if(round === 1){		
 			$('.player').each(function(){
-				if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
+				if ($(this).attr('data-player-id') === "") $(this).addClass('collapse'); // hide the empty player slots
 			})
 			waitOnAudio('../speech/002-intro.mp3')
 			.then(e => waitOnAudio('../speech/003-round1-intro.mp3'))
