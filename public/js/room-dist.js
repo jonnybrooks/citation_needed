@@ -53,42 +53,57 @@ var questionPool = {
 var gamePhases = {
 	lobby: function lobby() {
 		$('.host').attr('href', location.host + '/player').find('span').text(location.host + '/player');
-		/*
-  $('.typed').typed({			
-  	strings: [
-  		"The <a>English</a> have terrible teeth due to bad parenting.", 
-  		"<a>Wasps</a> are in fact just angry little <a>Bees</a>.",
-  		"60% of the time it works <em>every</em> time."
-  	],
-  	typeSpeed: 0,
-  	backSpeed: -200,
-  	backDelay: 2000,
-  	callback: function() {
-  		$('#view-lobby .typed-cursor').addClass('hide');
-  		$('#view-lobby .type-wrapper').addClass('slide-left');
-  		$('#view-lobby .player').addClass('show');
-  		waitOnAudio('../speech/001-title.mp3', 1500);
-  		// commands.triggerNextStep();
-  	}
-  })
-  */
-		// temp
-		$('.typed').text('60% of the time it works <em>every</em> time.');
-		$('#view-lobby .typed-cursor').addClass('hide');
-		$('#view-lobby .type-wrapper').addClass('slide-left');
-		$('#view-lobby .player').addClass('show');
-		waitOnAudio('../speech/001-title.mp3', 1500);
-
-		setTimeout(commands.triggerNextStep, 2000);
-		// end temp
+		$('.typed').typed({
+			strings: ['The <a>English</a> have terrible teeth due to bad parenting.', '<a>Wasps</a> are in fact just angry little <a>Bees</a>.', '60% of the time it works <em>every</em> time.'],
+			typeSpeed: 0,
+			backSpeed: -200,
+			backDelay: 2000,
+			callback: function callback() {
+				$('#view-lobby .typed-cursor').addClass('hide');
+				$('#view-lobby .type-wrapper').addClass('slide-left');
+				$('#view-lobby .player').addClass('show');
+				waitOnAudio('../speech/001-title.mp3', 1500);
+			}
+		});
 	},
 	describeRound: function describeRound(round) {
 		if (round === 1) {
-			// temp
 			$('.player').each(function () {
 				if ($(this).attr('data-player-id') === '') $(this).removeClass('show'); // hide the empty player slots
 			});
-			gameSequence.next();
+			waitOnAudio('../speech/002-intro.mp3').then(function (e) {
+				return waitOnAudio('../speech/003-round1-intro.mp3');
+			}).then(function (e) {
+				return $('#view-container').attr('data-current-view', 'describe-round-' + round);
+			}).then(function (e) {
+				return $('.description li').eq(0).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/004-round1-desc.mp3', 1000);
+			}).then(function (e) {
+				return $('.description li').eq(1).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/005-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(2).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/006-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(3).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/007-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(4).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/008-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(5).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/009-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(6).addClass('show');
+			}).then(function (e) {
+				return gameSequence.next();
+			});
 		}
 	},
 	roundOne: function roundOne() {
@@ -113,7 +128,6 @@ var gamePhases = {
 
 		setTimeout(function () {
 			$('#view-answer-phase .question-anchor').addClass('tuck');
-			// $(`.players .player`).addClass('answered');
 			socket.emit('relay', { // relay the question to everyone in the room
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			});
@@ -229,7 +243,7 @@ var gamePhases = {
 			}
 		}
 		for (var i in room.players) {
-			$('.questions').append('<div><p> player ' + room.players[i].name + ' now has a score of: ' + room.players[i].score + ' points </p></div>');
+			console.log('<div><p> player ' + room.players[i].name + ' now has a score of: ' + room.players[i].score + ' points </p></div>');
 		}
 		delete room.questions[qid]; // delete question in the final position
 		room.votes = {}; // clear the votes
@@ -441,26 +455,3 @@ function Player(conf) {
 	this.score = 0;
 	this.submissionsComplete = {};
 }
-// end temp
-/*
-	$('.player').each(function(){
-		if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
-	})
-	waitOnAudio('../speech/002-intro.mp3')
-	.then(e => waitOnAudio('../speech/003-round1-intro.mp3'))
-	.then(e => $('#view-container').attr('data-current-view', `describe-round-${round}`))
-	.then(e => $('.description li').eq(0).addClass('show'))
-	.then(e => waitOnAudio('../speech/004-round1-desc.mp3', 1000))				
-	.then(e => $('.description li').eq(1).addClass('show'))
-	.then(e => waitOnAudio('../speech/005-round1-desc.mp3'))				
-	.then(e => $('.description li').eq(2).addClass('show'))
-	.then(e => waitOnAudio('../speech/006-round1-desc.mp3'))				
-	.then(e => $('.description li').eq(3).addClass('show'))
-	.then(e => waitOnAudio('../speech/007-round1-desc.mp3'))				
-	.then(e => $('.description li').eq(4).addClass('show'))
-	.then(e => waitOnAudio('../speech/008-round1-desc.mp3'))				
-	.then(e => $('.description li').eq(5).addClass('show'))
-	.then(e => waitOnAudio('../speech/009-round1-desc.mp3'))				
-	.then(e => $('.description li').eq(6).addClass('show'))	
-	.then(e => gameSequence.next())
-*/

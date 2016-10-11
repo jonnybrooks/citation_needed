@@ -76,7 +76,6 @@ let questionPool  = {
 let gamePhases = {
 	lobby: function(){
 		$('.host').attr('href', `${location.host}/player`).find('span').text(`${location.host}/player`);
-		/*
 		$('.typed').typed({			
 			strings: [
 				"The <a>English</a> have terrible teeth due to bad parenting.", 
@@ -90,30 +89,12 @@ let gamePhases = {
 				$('#view-lobby .typed-cursor').addClass('hide');
 				$('#view-lobby .type-wrapper').addClass('slide-left');
 				$('#view-lobby .player').addClass('show');
-				waitOnAudio('../speech/001-title.mp3', 1500);
-				// commands.triggerNextStep();
+				waitOnAudio('../speech/001-title.mp3', 1500);				
 			}
 		})
-		*/
-		// temp
-		$('.typed').text('60% of the time it works <em>every</em> time.');
-		$('#view-lobby .typed-cursor').addClass('hide');
-		$('#view-lobby .type-wrapper').addClass('slide-left');
-		$('#view-lobby .player').addClass('show');
-		waitOnAudio('../speech/001-title.mp3', 1500);
-
-		setTimeout(commands.triggerNextStep, 2000);
-		// end temp
 	},
 	describeRound: function(round) {
-		if(round === 1){
-			// temp
-			$('.player').each(function(){
-				if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
-			});
-			gameSequence.next()
-			// end temp
-		/*
+		if(round === 1){		
 			$('.player').each(function(){
 				if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
 			})
@@ -134,8 +115,6 @@ let gamePhases = {
 			.then(e => waitOnAudio('../speech/009-round1-desc.mp3'))				
 			.then(e => $('.description li').eq(6).addClass('show'))	
 			.then(e => gameSequence.next())
-		*/				
-			
 		}		
 	},
 	roundOne: function() {
@@ -160,7 +139,6 @@ let gamePhases = {
 
 		setTimeout(() => {		
 			$('#view-answer-phase .question-anchor').addClass('tuck');			
-			// $(`.players .player`).addClass('answered');
 			socket.emit('relay', { // relay the question to everyone in the room
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			})
@@ -280,7 +258,7 @@ let gamePhases = {
 			}
 		}
 		for(let i in room.players) {
-			$('.questions').append(`<div><p> player ${room.players[i].name} now has a score of: ${room.players[i].score} points </p></div>`);
+			console.log(`<div><p> player ${room.players[i].name} now has a score of: ${room.players[i].score} points </p></div>`);
 		}
 		delete room.questions[qid]; // delete question in the final position
 		room.votes = {}; // clear the votes
