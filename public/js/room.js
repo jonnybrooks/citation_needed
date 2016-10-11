@@ -28,7 +28,6 @@ socket.on('relay', message => {
 let commands = {
 	triggerNextStep: message => {
 		if(room.round === 0) {
-			createDummyPlayers(8);
 			addPlayersToAnswerPhase();
 			generateGameSequence();		
 		}
