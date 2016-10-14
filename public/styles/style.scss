@@ -105,6 +105,9 @@ a {
 		&[data-current-view="answer-phase"] {
 			right: 200%;
 		}
+		&[data-current-view="voting-phase"] {
+			right: 300%;
+		}
 	}
 	.view {
 		position: relative;
@@ -230,8 +233,8 @@ a {
 			    &::after {
 			    	content: '';
 					position: absolute;
-					height: 5px;
-					width: 5px;
+					height: 8px;
+					width: 8px;
 					border-radius: 50%;
 					right: 50%;
 					bottom: calc(100% + 20px);  
@@ -242,7 +245,7 @@ a {
 						1.2s bottom $easeInOutBack, // easeInOutBack
 						1s background-color ease,
 						0.2s border-radius ease-in-out 0.8s,
-						0.2s height ease 1s,
+						0.2s height ease-out 1s,
 						0.4s width $easeInOutQuint 1s; // easeInOutQuint
 				}
 		 	}
@@ -271,12 +274,10 @@ a {
 				&.show {
 					opacity: 1;
 					top: 0px;
-				}
-				&.joined {
-			 		.status::after {
-			    	    background-color: nth($playerColors, $i+1);
-				    }		 	
-			 	}
+				}				
+		 		.status::after {
+		    	    background-color: nth($playerColors, $i+1);
+			    }			 	
 			}
 		}
 	}
@@ -440,6 +441,106 @@ a {
 				transform: translate(50%, 50%);
 				color: #ccc;
 				font-size: 4em;
+				letter-spacing: 5px;			
+				margin: 0;
+			}
+		}
+	}
+	#view-voting-phase {
+		.question-anchor {
+			position: absolute;
+			width: 100%;
+			left: 0;
+			opacity: 0;
+			top: 100%;
+			transition: 
+				0.5s opacity $easeInOutQuint 1s,
+		    	0.5s top $easeInOutQuint 1s;
+			.question {
+				font-size: 5em;
+				position: absolute;
+				top: 0%;
+				left: 50%;
+				transform: translate(-50%, 0%);
+				margin: 0;		
+				transition: 					
+			    	0.6s width $easeOutQuint, // easeOutQuint
+			    	0.6s font-size $easeOutQuint,
+			    	0.6s transform $easeOutQuint,
+			    	0.6s left $easeOutQuint;
+			}
+			&.reveal {
+				opacity: 1;
+				top: 40%;
+			}
+			&.tuck {
+				top: 40px;
+				transition: 					
+			    	0.7s top $easeOutQuint;
+				.question {
+					left: 40px;
+					min-width: 50%;
+					transform: translate(0%, 0%);
+					font-size: 3em;
+				}
+			}
+		}
+		.players {
+			position: absolute;
+		    bottom: 0;
+		    width: 100%;
+		    display: table;	   
+		    table-layout: fixed; 
+		    text-align: center;
+		    margin-bottom: 60px;
+		}
+		.player {
+		 	display: table-cell;
+		 	vertical-align: bottom;
+		 	.name { 
+		 		@extend .serif;
+		 		font-size: 1.8em;
+			    font-weight: 300;
+		 		margin: 0;
+		 		position: relative;
+		 		word-break: break-all;
+		 		bottom: 0;
+		 		color: #bbb;
+		 		background: transparent;
+		 		padding: 5px 0;
+		 		transition: 
+		 			1s bottom $easeInOutQuint,
+		 			0.6s background ease-in-out 0.4s,
+		 			0.6s color ease-in-out 0.4s;
+			}
+			@for $i from 0 through 7 {
+				&.answered:nth-of-type(#{$i+1}) .name {
+					color: white;
+			 		background: nth($playerColors, $i+1);;
+					bottom: (150 - random(100)) + px;
+				}
+			}
+		 }		 
+		.countdown {
+			position: absolute;
+			top: 20px;
+			right: 20px;
+			transform: translate(50%, -50%);
+			width: calc(25px);
+			svg {
+				width: 100%;
+			}
+			.circle {
+				stroke-dasharray: 252;
+				stroke-dashoffset: 252;
+			}
+			.timer {
+				position: absolute;
+				right: 50%;
+				bottom: 50%;
+				transform: translate(50%, 50%);
+				color: #ccc;
+				font-size: 2em;
 				letter-spacing: 5px;			
 				margin: 0;
 			}

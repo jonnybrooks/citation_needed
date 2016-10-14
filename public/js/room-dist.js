@@ -79,16 +79,51 @@ var gamePhases = {
 		$('#view-lobby .player').addClass('show');
 		waitOnAudio('../speech/001-title.mp3', 1500);
 
+		setTimeout(function () {
+			$('.player').addClass('joined');
+		}, 5000);
+
 		setTimeout(commands.triggerNextStep, 2000);
 		// end temp
 	},
 	describeRound: function describeRound(round) {
 		if (round === 1) {
-			// temp
 			$('.player').each(function () {
 				if ($(this).attr('data-player-id') === '') $(this).removeClass('show'); // hide the empty player slots
 			});
-			gameSequence.next();
+			waitOnAudio('../speech/002-intro.mp3').then(function (e) {
+				return waitOnAudio('../speech/003-round1-intro.mp3');
+			}).then(function (e) {
+				return $('#view-container').attr('data-current-view', 'describe-round-' + round);
+			}).then(function (e) {
+				return $('.description li').eq(0).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/004-round1-desc.mp3', 1000);
+			}).then(function (e) {
+				return $('.description li').eq(1).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/005-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(2).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/006-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(3).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/007-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(4).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/008-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(5).addClass('show');
+			}).then(function (e) {
+				return waitOnAudio('../speech/009-round1-desc.mp3');
+			}).then(function (e) {
+				return $('.description li').eq(6).addClass('show');
+			}).then(function (e) {
+				return gameSequence.next();
+			});
 		}
 	},
 	roundOne: function roundOne() {
@@ -170,10 +205,11 @@ var gamePhases = {
 		var qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
 		var q = room.questions[qid]; // get question in the final position
 
-		if (room.round === 1) {
+		if (room.round === 1 || room.round === 0) {
 			for (var i in room.players) {
 				room.votes[i] = null; // set every player's vote to null
 			}
+			$('#view-container').attr('data-current-view', 'voting-phase');
 			socket.emit('relay', {
 				from: room.roomKey, to: room.roomKey, command: 'prepareVote', args: { answers: q.submissions }
 			});
@@ -271,8 +307,8 @@ var gameSequence = {
 };
 
 function generateGameSequence() {
-	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
-	gameSequence.steps.push(gamePhases.roundOne);
+	// gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
+	// gameSequence.steps.push(gamePhases.roundOne);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
 	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
@@ -385,9 +421,10 @@ function createDummyPlayers(amount) {
 }
 
 function drawCountdown(end) {
-	if (!end) return TweenLite.to('.countdown .circle', 60, { strokeDashoffset: 0, ease: Linear.easeNone });
+	var countdown = '#view-' + $('#view-container').attr('data-current-view') + ' .countdown';
+	if (!end) return TweenLite.to(countdown + ' .circle', 60, { strokeDashoffset: 0, ease: Linear.easeNone });
 	var tl = new TimelineMax();
-	tl.to('.countdown .circle', 1, { strokeDashoffset: 0, ease: Power4.easeInOut }).to('.countdown .timer', 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5').to('.countdown .circle', 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) }).to('.countdown .circle', 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3').to('.countdown .white-box', 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3').from('.countdown .white-box', 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4');
+	tl.to(countdown + ' .circle', 1, { strokeDashoffset: 0, ease: Power4.easeInOut }).to(countdown + ' .timer', 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5').to(countdown + ' .circle', 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) }).to(countdown + ' .circle', 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3').to(countdown + ' .white-box', 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3').from(countdown + ' .white-box', 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4');
 }
 
 function fragment(htmlStr) {
@@ -441,26 +478,3 @@ function Player(conf) {
 	this.score = 0;
 	this.submissionsComplete = {};
 }
-// end temp
-/*
-	$('.player').each(function(){
-		if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
-	})
-	waitOnAudio('../speech/002-intro.mp3')
-	.then(e => waitOnAudio('../speech/003-round1-intro.mp3'))
-	.then(e => $('#view-container').attr('data-current-view', `describe-round-${round}`))
-	.then(e => $('.description li').eq(0).addClass('show'))
-	.then(e => waitOnAudio('../speech/004-round1-desc.mp3', 1000))				
-	.then(e => $('.description li').eq(1).addClass('show'))
-	.then(e => waitOnAudio('../speech/005-round1-desc.mp3'))				
-	.then(e => $('.description li').eq(2).addClass('show'))
-	.then(e => waitOnAudio('../speech/006-round1-desc.mp3'))				
-	.then(e => $('.description li').eq(3).addClass('show'))
-	.then(e => waitOnAudio('../speech/007-round1-desc.mp3'))				
-	.then(e => $('.description li').eq(4).addClass('show'))
-	.then(e => waitOnAudio('../speech/008-round1-desc.mp3'))				
-	.then(e => $('.description li').eq(5).addClass('show'))
-	.then(e => waitOnAudio('../speech/009-round1-desc.mp3'))				
-	.then(e => $('.description li').eq(6).addClass('show'))	
-	.then(e => gameSequence.next())
-*/

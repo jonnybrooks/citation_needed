@@ -102,18 +102,15 @@ let gamePhases = {
 		$('#view-lobby .player').addClass('show');
 		waitOnAudio('../speech/001-title.mp3', 1500);
 
-		setTimeout(commands.triggerNextStep, 2000);
+		setTimeout(function(){
+			$('.player').addClass('joined');
+		}, 5000);
+
+		setTimeout(commands.triggerNextStep, 2000);		
 		// end temp
 	},
 	describeRound: function(round) {
 		if(round === 1){
-			// temp
-			$('.player').each(function(){
-				if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
-			});
-			gameSequence.next()
-			// end temp
-		/*
 			$('.player').each(function(){
 				if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
 			})
@@ -134,8 +131,6 @@ let gamePhases = {
 			.then(e => waitOnAudio('../speech/009-round1-desc.mp3'))				
 			.then(e => $('.description li').eq(6).addClass('show'))	
 			.then(e => gameSequence.next())
-		*/				
-			
 		}		
 	},
 	roundOne: function() {
@@ -217,10 +212,11 @@ let gamePhases = {
 		let qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
 		let q = room.questions[qid]; // get question in the final position
 
-		if(room.round === 1) {
+		if(room.round === 1 || room.round === 0) {
 			for(let i in room.players) {
 				room.votes[i] = null; // set every player's vote to null
 			}
+			$('#view-container').attr('data-current-view', `voting-phase`);
 			socket.emit('relay', { 
 				from: room.roomKey, to: room.roomKey, command: 'prepareVote', args: { answers: q.submissions }
 			})
@@ -318,8 +314,8 @@ let gameSequence = {
 }
 
 function generateGameSequence() {
-	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
-	gameSequence.steps.push(gamePhases.roundOne);
+	// gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
+	// gameSequence.steps.push(gamePhases.roundOne);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
 	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
@@ -429,14 +425,15 @@ function createDummyPlayers(amount) {
 }
 
 function drawCountdown(end) {
-	if(!end) return TweenLite.to('.countdown .circle', 60, { strokeDashoffset: 0, ease: Linear.easeNone });
+	let countdown = `#view-${$('#view-container').attr('data-current-view')} .countdown`;
+	if(!end) return TweenLite.to(`${countdown} .circle`, 60, { strokeDashoffset: 0, ease: Linear.easeNone });
 	var tl = new TimelineMax();
-	tl.to('.countdown .circle', 1, { strokeDashoffset: 0, ease: Power4.easeInOut })
-	  .to('.countdown .timer', 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5')
-  	  .to('.countdown .circle', 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) })
-      .to('.countdown .circle', 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3')      
-      .to('.countdown .white-box', 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3')
-    .from('.countdown .white-box', 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4')
+	tl.to(`${countdown} .circle`, 1, { strokeDashoffset: 0, ease: Power4.easeInOut })
+	  .to(`${countdown} .timer`, 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5')
+  	  .to(`${countdown} .circle`, 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) })
+      .to(`${countdown} .circle`, 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3')      
+      .to(`${countdown} .white-box`, 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3')
+    .from(`${countdown} .white-box`, 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4')
 }
 
 function fragment(htmlStr) {
