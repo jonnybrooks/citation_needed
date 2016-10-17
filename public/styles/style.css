@@ -11,13 +11,45 @@ html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
 
 body, .sans-serif { font: 14px "Roboto", Helvetica, Arial, sans-serif; }
 
-.serif, #client-room #view-lobby .player .name, #client-room #view-answer-phase .player .name, #client-room #view-voting-phase .player .name { font: 14px "Roboto Slab", Georgia, serif; }
+.serif, #client-room #view-lobby .player .name, #client-room #view-answer-phase .player .name { font: 14px "Roboto Slab", Georgia, serif; }
 
 a { color: #0645ad; text-decoration: none; }
 
 .logo { font-weight: 300; font-family: Arial; text-align: center; margin-bottom: 40px; }
 
 .logo span { color: #0645ad; font-style: italic; }
+
+.player-1-bg { color: black; background-color: transparent; }
+
+.player-1-bg.coloured { color: white; background-color: #ED6D79; }
+
+.player-2-bg { color: black; background-color: transparent; }
+
+.player-2-bg.coloured { color: white; background-color: #90D4F7; }
+
+.player-3-bg { color: black; background-color: transparent; }
+
+.player-3-bg.coloured { color: white; background-color: #FFDC89; }
+
+.player-4-bg { color: black; background-color: transparent; }
+
+.player-4-bg.coloured { color: white; background-color: #71E096; }
+
+.player-5-bg { color: black; background-color: transparent; }
+
+.player-5-bg.coloured { color: white; background-color: #F5A26F; }
+
+.player-6-bg { color: black; background-color: transparent; }
+
+.player-6-bg.coloured { color: white; background-color: #D4A697; }
+
+.player-7-bg { color: black; background-color: transparent; }
+
+.player-7-bg.coloured { color: white; background-color: #DA97E0; }
+
+.player-8-bg { color: black; background-color: transparent; }
+
+.player-8-bg.coloured { color: white; background-color: #FFB3BA; }
 
 #client-room #view-container { width: 100%; height: 100%; white-space: nowrap; position: relative; -webkit-transition: 1s right cubic-bezier(0.86, 0, 0.07, 1); transition: 1s right cubic-bezier(0.86, 0, 0.07, 1); }
 
@@ -163,21 +195,21 @@ a { color: #0645ad; text-decoration: none; }
 
 #client-room #view-answer-phase .player .name { font-size: 1.8em; font-weight: 300; margin: 0; position: relative; word-break: break-all; bottom: 0; color: #bbb; background: transparent; padding: 5px 0; -webkit-transition: 1s bottom cubic-bezier(0.86, 0, 0.07, 1), 0.6s background ease-in-out 0.4s, 0.6s color ease-in-out 0.4s; transition: 1s bottom cubic-bezier(0.86, 0, 0.07, 1), 0.6s background ease-in-out 0.4s, 0.6s color ease-in-out 0.4s; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(1) .name { color: white; background: #ED6D79; bottom: 132px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(1) .name { color: white; background: #ED6D79; bottom: 67px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(2) .name { color: white; background: #90D4F7; bottom: 107px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(2) .name { color: white; background: #90D4F7; bottom: 88px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(3) .name { color: white; background: #FFDC89; bottom: 138px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(3) .name { color: white; background: #FFDC89; bottom: 109px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(4) .name { color: white; background: #71E096; bottom: 138px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(4) .name { color: white; background: #71E096; bottom: 88px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(5) .name { color: white; background: #F5A26F; bottom: 96px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(5) .name { color: white; background: #F5A26F; bottom: 129px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(6) .name { color: white; background: #D4A697; bottom: 144px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(6) .name { color: white; background: #D4A697; bottom: 53px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(7) .name { color: white; background: #DA97E0; bottom: 98px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(7) .name { color: white; background: #DA97E0; bottom: 61px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(8) .name { color: white; background: #FFB3BA; bottom: 107px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(8) .name { color: white; background: #FFB3BA; bottom: 140px; }
 
 #client-room #view-answer-phase .countdown { position: absolute; top: 40%; right: 50%; -webkit-transform: translate(50%, -50%); -ms-transform: translate(50%, -50%); transform: translate(50%, -50%); width: -webkit-calc(20% + 25px); width: calc(20% + 25px); }
 
@@ -187,45 +219,29 @@ a { color: #0645ad; text-decoration: none; }
 
 #client-room #view-answer-phase .countdown .timer { position: absolute; right: 50%; bottom: 50%; -webkit-transform: translate(50%, 50%); -ms-transform: translate(50%, 50%); transform: translate(50%, 50%); color: #ccc; font-size: 4em; letter-spacing: 5px; margin: 0; }
 
-#client-room #view-voting-phase .question-anchor { position: absolute; width: 100%; left: 0; opacity: 0; top: 100%; -webkit-transition: 0.5s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s, 0.5s top cubic-bezier(0.86, 0, 0.07, 1) 1s; transition: 0.5s opacity cubic-bezier(0.86, 0, 0.07, 1) 1s, 0.5s top cubic-bezier(0.86, 0, 0.07, 1) 1s; }
+#client-room #view-voting-phase .question { max-width: 60%; margin: 0; font-size: 5em; position: absolute; top: 40px; right: 50%; -webkit-transform: translateX(50%); -ms-transform: translateX(50%); transform: translateX(50%); }
 
-#client-room #view-voting-phase .question-anchor .question { font-size: 5em; position: absolute; top: 0%; left: 50%; -webkit-transform: translate(-50%, 0%); -ms-transform: translate(-50%, 0%); transform: translate(-50%, 0%); margin: 0; -webkit-transition: 0.6s width cubic-bezier(0.23, 1, 0.32, 1), 0.6s font-size cubic-bezier(0.23, 1, 0.32, 1), 0.6s transform cubic-bezier(0.23, 1, 0.32, 1), 0.6s left cubic-bezier(0.23, 1, 0.32, 1); transition: 0.6s width cubic-bezier(0.23, 1, 0.32, 1), 0.6s font-size cubic-bezier(0.23, 1, 0.32, 1), 0.6s transform cubic-bezier(0.23, 1, 0.32, 1), 0.6s left cubic-bezier(0.23, 1, 0.32, 1); }
-
-#client-room #view-voting-phase .question-anchor.reveal { opacity: 1; top: 40%; }
-
-#client-room #view-voting-phase .question-anchor.tuck { top: 40px; -webkit-transition: 0.7s top cubic-bezier(0.23, 1, 0.32, 1); transition: 0.7s top cubic-bezier(0.23, 1, 0.32, 1); }
-
-#client-room #view-voting-phase .question-anchor.tuck .question { left: 40px; min-width: 50%; -webkit-transform: translate(0%, 0%); -ms-transform: translate(0%, 0%); transform: translate(0%, 0%); font-size: 3em; }
-
-#client-room #view-voting-phase .players { position: absolute; bottom: 0; width: 100%; display: table; table-layout: fixed; text-align: center; margin-bottom: 60px; }
-
-#client-room #view-voting-phase .player { display: table-cell; vertical-align: bottom; }
-
-#client-room #view-voting-phase .player .name { font-size: 1.8em; font-weight: 300; margin: 0; position: relative; word-break: break-all; bottom: 0; color: #bbb; background: transparent; padding: 5px 0; -webkit-transition: 1s bottom cubic-bezier(0.86, 0, 0.07, 1), 0.6s background ease-in-out 0.4s, 0.6s color ease-in-out 0.4s; transition: 1s bottom cubic-bezier(0.86, 0, 0.07, 1), 0.6s background ease-in-out 0.4s, 0.6s color ease-in-out 0.4s; }
-
-#client-room #view-voting-phase .player.answered:nth-of-type(1) .name { color: white; background: #ED6D79; bottom: 57px; }
-
-#client-room #view-voting-phase .player.answered:nth-of-type(2) .name { color: white; background: #90D4F7; bottom: 129px; }
-
-#client-room #view-voting-phase .player.answered:nth-of-type(3) .name { color: white; background: #FFDC89; bottom: 124px; }
-
-#client-room #view-voting-phase .player.answered:nth-of-type(4) .name { color: white; background: #71E096; bottom: 77px; }
-
-#client-room #view-voting-phase .player.answered:nth-of-type(5) .name { color: white; background: #F5A26F; bottom: 97px; }
-
-#client-room #view-voting-phase .player.answered:nth-of-type(6) .name { color: white; background: #D4A697; bottom: 101px; }
-
-#client-room #view-voting-phase .player.answered:nth-of-type(7) .name { color: white; background: #DA97E0; bottom: 119px; }
-
-#client-room #view-voting-phase .player.answered:nth-of-type(8) .name { color: white; background: #FFB3BA; bottom: 89px; }
-
-#client-room #view-voting-phase .countdown { position: absolute; top: 20px; right: 20px; -webkit-transform: translate(50%, -50%); -ms-transform: translate(50%, -50%); transform: translate(50%, -50%); width: -webkit-calc(25px); width: calc(25px); }
+#client-room #view-voting-phase .countdown { position: absolute; top: 20px; right: 20px; width: -webkit-calc(10% + 25px); width: calc(10% + 25px); }
 
 #client-room #view-voting-phase .countdown svg { width: 100%; }
 
 #client-room #view-voting-phase .countdown .circle { stroke-dasharray: 252; stroke-dashoffset: 252; }
 
 #client-room #view-voting-phase .countdown .timer { position: absolute; right: 50%; bottom: 50%; -webkit-transform: translate(50%, 50%); -ms-transform: translate(50%, 50%); transform: translate(50%, 50%); color: #ccc; font-size: 2em; letter-spacing: 5px; margin: 0; }
+
+#client-room #view-voting-phase .answers { display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-pack: justify; -webkit-justify-content: space-between; -ms-flex-pack: justify; justify-content: space-between; -webkit-box-align: start; -webkit-align-items: flex-start; -ms-flex-align: start; align-items: flex-start; width: 100%; position: absolute; top: -webkit-calc(25% + 50px); top: calc(25% + 50px); right: 50%; -webkit-transform: translateX(50%); -ms-transform: translateX(50%); transform: translateX(50%); padding: 40px; }
+
+#client-room #view-voting-phase .answer { background: #222; color: white; padding: 40px 40px -webkit-calc(5% + 25px); padding: 40px 40px calc(5% + 25px); -webkit-box-flex: 1; -webkit-flex-grow: 1; -ms-flex-positive: 1; flex-grow: 1; margin: 0 3px; position: relative; }
+
+#client-room #view-voting-phase .answer .content { margin: 0; font-size: 2em; font-weight: 300; }
+
+#client-room #view-voting-phase .votes { position: absolute; left: 0; top: 100%; width: 100%; }
+
+#client-room #view-voting-phase .votes .vote { overflow: hidden; font-size: 1.3em; font-weight: 500; position: relative; top: 100px; opacity: 0; -webkit-transition: 0.4s top cubic-bezier(0.645, 0.045, 0.355, 1), 0.4s opacity ease-in-out; transition: 0.4s top cubic-bezier(0.645, 0.045, 0.355, 1), 0.4s opacity ease-in-out; }
+
+#client-room #view-voting-phase .votes .vote.reveal { top: 0; opacity: 1; }
+
+#client-room #view-voting-phase .votes .vote p { margin: 0; padding: 5px 20px; }
 
 .typed-cursor { opacity: 1; -webkit-animation: blink 1.1s infinite; animation: blink 1.1s infinite; position: relative; bottom: 0.15em; font-size: 1.4em; font-weight: 100; margin-left: 0.1em; -webkit-transition: 0.5s opacity ease-in-out; transition: 0.5s opacity ease-in-out; }
 

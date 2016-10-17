@@ -80,9 +80,8 @@ var gamePhases = {
 		waitOnAudio('../speech/001-title.mp3', 1500);
 
 		setTimeout(function () {
-			$('.player').addClass('joined');
+			return $('.player').addClass('joined');
 		}, 5000);
-
 		setTimeout(commands.triggerNextStep, 2000);
 		// end temp
 	},
@@ -152,6 +151,7 @@ var gamePhases = {
 			socket.emit('relay', { // relay the question to everyone in the room
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			});
+			room.timer.limit = 60; // set the time limit to 60 seconds
 			startTimer(room.timer.limit);
 		}, 5000);
 	},
@@ -206,10 +206,37 @@ var gamePhases = {
 		var q = room.questions[qid]; // get question in the final position
 
 		if (room.round === 1 || room.round === 0) {
-			for (var i in room.players) {
-				room.votes[i] = null; // set every player's vote to null
+			// temp
+			q = { excerpt: 'testing', submissions: {} };
+			var subs = ['Archipelago', 'Dances with Wolves (film)', 'Acid reflux', 'Quantum Leap', 'Gone with the wind', 'OMG (Abbreviation)', 'Christmas', 'Expanding magazine file', 'Minced oath'];
+			var sub_i = 0;
+			var p1 = null;
+			//end temp
+
+			for (var pid in room.players) {
+				room.votes[pid] = null; // set every player's vote to null
+
+				// temp
+				p1 = p1 === null ? pid : p1;
+				q.submissions[pid] = subs[sub_i++];
+				room.votes[pid] = p1;
+				// end temp
 			}
+
+			addAnswersToVotingPhase(q.submissions);
+
+			// temp
+			addVotesToVotingPhase(room.votes);
+
+			setTimeout(function () {
+				return $('.vote').addClass('reveal');
+			}, 1000);
+
+			// end temp
+
+			$('#view-voting-phase .question').text(q.excerpt);
 			$('#view-container').attr('data-current-view', 'voting-phase');
+
 			socket.emit('relay', {
 				from: room.roomKey, to: room.roomKey, command: 'prepareVote', args: { answers: q.submissions }
 			});
@@ -239,6 +266,7 @@ var gamePhases = {
 				});
 			}
 		}
+		room.timer.limit = 30; // set the time limit to 30 seconds
 		startTimer(room.timer.limit);
 	},
 	scoring: function scoring() {
@@ -372,7 +400,9 @@ function checkVotePhaseStatus(m) {
 		if (room.votes[i] === null) votingDone = false;
 	}
 	if (votingDone) {
+		addVotesToVotingPhase(room.votes); // add the votes to the view
 		room.timer.active = false; // disable the timer
+		drawCountdown(true); // finish the countdown
 		gameSequence.next(); // move to next phase
 	}
 }
@@ -409,20 +439,41 @@ function addAnswerToQuestion(q, player) {
 	$('.question[data-question-id="' + q.id + '"] .answers').append(frag);
 }
 
+function addAnswersToVotingPhase(submissions) {
+	for (var pid in submissions) {
+		var frag = fragment($('#template-answer').html());
+		$(frag).find('.answer').attr('data-player-id', pid);
+		$(frag).find('.answer .content').text(submissions[pid]);
+		$('#view-voting-phase .answers').append(frag);
+	}
+}
+function addVotesToVotingPhase(votes) {
+	for (var pid in votes) {
+		var frag = fragment($('#template-vote').html());
+		$(frag).find('.vote').addClass('player-' + room.players[pid].number + '-bg');
+		// $(frag).find('.vote .name').text(room.players[pid].name);
+		// temp
+		$(frag).find('.vote .name').text('');
+		// end temp
+		$('.answer[data-player-id="' + votes[pid] + '"] .votes').append(frag);
+	}
+}
+
 function createDummyPlayers(amount) {
 	for (var i = 0; i < amount; i++) {
 		var id = Math.random();
 		room.players[id] = new Player({
 			socketId: id,
 			roomKey: room.roomKey,
-			name: 'test'
+			name: 'test',
+			number: Object.keys(room.players).length + 1
 		});
 	}
 }
 
 function drawCountdown(end) {
 	var countdown = '#view-' + $('#view-container').attr('data-current-view') + ' .countdown';
-	if (!end) return TweenLite.to(countdown + ' .circle', 60, { strokeDashoffset: 0, ease: Linear.easeNone });
+	if (!end) return TweenLite.to(countdown + ' .circle', room.timer.limit, { strokeDashoffset: 0, ease: Linear.easeNone });
 	var tl = new TimelineMax();
 	tl.to(countdown + ' .circle', 1, { strokeDashoffset: 0, ease: Power4.easeInOut }).to(countdown + ' .timer', 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5').to(countdown + ' .circle', 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) }).to(countdown + ' .circle', 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3').to(countdown + ' .white-box', 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3').from(countdown + ' .white-box', 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4');
 }
@@ -475,6 +526,7 @@ function Player(conf) {
 	this.socketId = conf.socketId;
 	this.roomKey = conf.roomKey;
 	this.name = conf.name;
+	this.number = conf.number;
 	this.score = 0;
 	this.submissionsComplete = {};
 }

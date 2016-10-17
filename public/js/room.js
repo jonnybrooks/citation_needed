@@ -15,8 +15,7 @@ socket.on('player-registered', player => {
 		socket.emit('relay', { 
 			from: room.roomKey, to: Object.keys(room.players)[0], command: 'displayStartButton' // display the start button on p1
 		})
-	}
-	
+	}	
 })
 
 socket.on('relay', message => {
@@ -102,10 +101,7 @@ let gamePhases = {
 		$('#view-lobby .player').addClass('show');
 		waitOnAudio('../speech/001-title.mp3', 1500);
 
-		setTimeout(function(){
-			$('.player').addClass('joined');
-		}, 5000);
-
+		setTimeout(() => $('.player').addClass('joined'), 5000);
 		setTimeout(commands.triggerNextStep, 2000);		
 		// end temp
 	},
@@ -159,6 +155,7 @@ let gamePhases = {
 			socket.emit('relay', { // relay the question to everyone in the room
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			})
+			room.timer.limit = 60; // set the time limit to 60 seconds
 			startTimer(room.timer.limit);
 		}, 5000);
 	},
@@ -213,10 +210,35 @@ let gamePhases = {
 		let q = room.questions[qid]; // get question in the final position
 
 		if(room.round === 1 || room.round === 0) {
-			for(let i in room.players) {
-				room.votes[i] = null; // set every player's vote to null
-			}
-			$('#view-container').attr('data-current-view', `voting-phase`);
+			// temp
+			q = {excerpt: "testing", submissions: {}}
+			let subs = ["Archipelago", "Dances with Wolves (film)", "Acid reflux", "Quantum Leap", "Gone with the wind", "OMG (Abbreviation)", "Christmas", "Expanding magazine file", "Minced oath"]
+			let sub_i = 0;
+			let p1 = null;
+			//end temp
+
+			for(let pid in room.players) {
+				room.votes[pid] = null; // set every player's vote to null
+
+				// temp
+				p1 = p1 === null ? pid : p1;
+				q.submissions[pid] = subs[sub_i++];
+				room.votes[pid] = p1;
+				// end temp
+			}			
+
+			addAnswersToVotingPhase(q.submissions);
+
+			// temp
+			addVotesToVotingPhase(room.votes);
+
+			setTimeout(() => $('.vote').addClass('reveal'), 1000);
+
+			// end temp
+
+			$('#view-voting-phase .question').text(q.excerpt);
+			$('#view-container').attr('data-current-view', `voting-phase`);			
+
 			socket.emit('relay', { 
 				from: room.roomKey, to: room.roomKey, command: 'prepareVote', args: { answers: q.submissions }
 			})
@@ -248,6 +270,7 @@ let gamePhases = {
 				})				
 			}			
 		}
+		room.timer.limit = 30; // set the time limit to 30 seconds
 		startTimer(room.timer.limit);
 	},
 	scoring: function(){
@@ -376,7 +399,9 @@ function checkVotePhaseStatus(m) {
 		if(room.votes[i] === null) votingDone = false;
 	}
 	if(votingDone) {
+		addVotesToVotingPhase(room.votes); // add the votes to the view
 		room.timer.active = false; // disable the timer
+		drawCountdown(true); // finish the countdown
 		gameSequence.next(); // move to next phase
 	}
 }
@@ -413,20 +438,41 @@ function addAnswerToQuestion(q, player) {
 	$(`.question[data-question-id="${q.id}"] .answers`).append(frag);
 }
 
+function addAnswersToVotingPhase(submissions) {
+	for(let pid in submissions) {
+		let frag = fragment($('#template-answer').html());
+		$(frag).find('.answer').attr('data-player-id', pid);		
+		$(frag).find('.answer .content').text(submissions[pid]);
+		$(`#view-voting-phase .answers`).append(frag);
+	}	
+}
+function addVotesToVotingPhase(votes) {
+	for(let pid in votes) {
+		let frag = fragment($('#template-vote').html());
+		$(frag).find('.vote').addClass(`player-${room.players[pid].number}-bg`);
+		// $(frag).find('.vote .name').text(room.players[pid].name);
+		// temp
+		$(frag).find('.vote .name').text("");
+		// end temp
+		$(`.answer[data-player-id="${votes[pid]}"] .votes`).append(frag);
+	}	
+}
+
 function createDummyPlayers(amount) {
 	for (let i = 0; i < amount; i++) {
 		let id = Math.random();
 		room.players[id] = new Player({
 			socketId: id,
 			roomKey: room.roomKey,
-			name: 'test'				
+			name: 'test',
+			number: Object.keys(room.players).length + 1
 		});
 	}	
 }
 
 function drawCountdown(end) {
 	let countdown = `#view-${$('#view-container').attr('data-current-view')} .countdown`;
-	if(!end) return TweenLite.to(`${countdown} .circle`, 60, { strokeDashoffset: 0, ease: Linear.easeNone });
+	if(!end) return TweenLite.to(`${countdown} .circle`, room.timer.limit, { strokeDashoffset: 0, ease: Linear.easeNone });
 	var tl = new TimelineMax();
 	tl.to(`${countdown} .circle`, 1, { strokeDashoffset: 0, ease: Power4.easeInOut })
 	  .to(`${countdown} .timer`, 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5')
@@ -475,6 +521,7 @@ function Player(conf) {
 	this.socketId = conf.socketId;
 	this.roomKey = conf.roomKey;
 	this.name = conf.name;
+	this.number = conf.number;
 	this.score = 0;
 	this.submissionsComplete = {};	
 }

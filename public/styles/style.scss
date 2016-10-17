@@ -11,11 +11,11 @@ $pastelPurple: #DA97E0;
 $pastelBlue: #90D4F7;
 $pastelPink: #FFB3BA;
 
-// $playerColors: $pastelRed, $pastelOrange, $pastelYellow, $pastelBrown, $pastelGreen, $pastelPurple, $pastelBlue, $pastelPink;
 $playerColors: $pastelRed, $pastelBlue, $pastelYellow, $pastelGreen, $pastelOrange, $pastelBrown, $pastelPurple, $pastelPink;
 
 //easings 
 
+$easeInOutCubic: cubic-bezier(0.645, 0.045, 0.355, 1);
 $easeOutQuint: cubic-bezier(0.23, 1, 0.32, 1);
 $easeInOutQuint: cubic-bezier(0.86, 0, 0.07, 1);
 $easeInOutBack: cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -86,6 +86,19 @@ a {
 	span {
 		color: $wikiblue;
 		font-style: italic;
+	}
+}
+
+@for $i from 0 through 7 {
+	.player-#{$i+1} {
+		&-bg {
+			color: black;
+			background-color: transparent;
+			&.coloured {
+				color: white;
+				background-color: nth($playerColors, $i+1);
+			}
+		}					 	
 	}
 }
 
@@ -447,86 +460,20 @@ a {
 		}
 	}
 	#view-voting-phase {
-		.question-anchor {
+		.question {			
+			max-width: 60%;
+			margin: 0;
+			font-size: 5em;
 			position: absolute;
-			width: 100%;
-			left: 0;
-			opacity: 0;
-			top: 100%;
-			transition: 
-				0.5s opacity $easeInOutQuint 1s,
-		    	0.5s top $easeInOutQuint 1s;
-			.question {
-				font-size: 5em;
-				position: absolute;
-				top: 0%;
-				left: 50%;
-				transform: translate(-50%, 0%);
-				margin: 0;		
-				transition: 					
-			    	0.6s width $easeOutQuint, // easeOutQuint
-			    	0.6s font-size $easeOutQuint,
-			    	0.6s transform $easeOutQuint,
-			    	0.6s left $easeOutQuint;
-			}
-			&.reveal {
-				opacity: 1;
-				top: 40%;
-			}
-			&.tuck {
-				top: 40px;
-				transition: 					
-			    	0.7s top $easeOutQuint;
-				.question {
-					left: 40px;
-					min-width: 50%;
-					transform: translate(0%, 0%);
-					font-size: 3em;
-				}
-			}
-		}
-		.players {
-			position: absolute;
-		    bottom: 0;
-		    width: 100%;
-		    display: table;	   
-		    table-layout: fixed; 
-		    text-align: center;
-		    margin-bottom: 60px;
-		}
-		.player {
-		 	display: table-cell;
-		 	vertical-align: bottom;
-		 	.name { 
-		 		@extend .serif;
-		 		font-size: 1.8em;
-			    font-weight: 300;
-		 		margin: 0;
-		 		position: relative;
-		 		word-break: break-all;
-		 		bottom: 0;
-		 		color: #bbb;
-		 		background: transparent;
-		 		padding: 5px 0;
-		 		transition: 
-		 			1s bottom $easeInOutQuint,
-		 			0.6s background ease-in-out 0.4s,
-		 			0.6s color ease-in-out 0.4s;
-			}
-			@for $i from 0 through 7 {
-				&.answered:nth-of-type(#{$i+1}) .name {
-					color: white;
-			 		background: nth($playerColors, $i+1);;
-					bottom: (150 - random(100)) + px;
-				}
-			}
-		 }		 
+			top: 40px;
+			right: 50%;
+			transform: translateX(50%);
+		}		 
 		.countdown {
 			position: absolute;
 			top: 20px;
-			right: 20px;
-			transform: translate(50%, -50%);
-			width: calc(25px);
+			right: 20px;			
+			width: calc(10% + 25px);
 			svg {
 				width: 100%;
 			}
@@ -543,6 +490,56 @@ a {
 				font-size: 2em;
 				letter-spacing: 5px;			
 				margin: 0;
+			}
+		}
+		.answers {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			width: 100%;
+			position: absolute;
+			top: calc(25% + 50px);
+			right: 50%;
+			transform: translateX(50%);		
+			padding: 40px;				
+		}
+		.answer {
+			background: #222;
+			color: white;
+			padding: 40px 40px calc(5% + 25px);
+			flex-grow: 1;
+			margin: 0 3px;
+			// box-shadow: 0px 3px 7px rgba(0,0,0,0.4);
+			position: relative;
+			.content {
+				margin: 0;
+				font-size: 2em;
+				font-weight: 300;
+			}
+		}
+		.votes {
+			position: absolute;
+			left: 0;
+			top: 100%;
+			width: 100%;
+			.vote {
+				overflow: hidden;
+			    font-size: 1.3em;
+			    font-weight: 500;
+			    position: relative;
+			    top: 100px;
+			    opacity: 0;
+			    transition: 
+			    	0.4s top $easeInOutCubic,
+			    	0.4s opacity ease-in-out;
+				&.reveal {
+					top: 0;
+				    opacity: 1;
+				}
+				p {
+					margin: 0;
+					padding: 5px 20px;
+				}
 			}
 		}
 	}
