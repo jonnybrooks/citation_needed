@@ -506,11 +506,17 @@ a {
 		.answer {
 			background: #222;
 			color: white;
-			padding: 40px 40px calc(5% + 25px);
+			padding: 40px 40px calc(5% + 50px);
 			flex-grow: 1;
 			margin: 0 3px;
 			// box-shadow: 0px 3px 7px rgba(0,0,0,0.4);
 			position: relative;
+			opacity: 1;
+			transition: 
+				0.6s opacity ease-out;
+			&.fade {
+				opacity: 0.2;
+			}
 			.content {
 				margin: 0;
 				font-size: 2em;

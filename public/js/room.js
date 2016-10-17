@@ -209,7 +209,7 @@ let gamePhases = {
 		let qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
 		let q = room.questions[qid]; // get question in the final position
 
-		if(room.round === 1 || room.round === 0) {
+		if(room.round <= 1) {
 			// temp
 			q = {excerpt: "testing", submissions: {}}
 			let subs = ["Archipelago", "Dances with Wolves (film)", "Acid reflux", "Quantum Leap", "Gone with the wind", "OMG (Abbreviation)", "Christmas", "Expanding magazine file", "Minced oath"]
@@ -223,7 +223,8 @@ let gamePhases = {
 				// temp
 				p1 = p1 === null ? pid : p1;
 				q.submissions[pid] = subs[sub_i++];
-				room.votes[pid] = p1;
+				// room.votes[pid] = p1;
+				room.votes[pid] = pid;
 				// end temp
 			}			
 
@@ -231,9 +232,7 @@ let gamePhases = {
 
 			// temp
 			addVotesToVotingPhase(room.votes);
-
-			setTimeout(() => $('.vote').addClass('reveal'), 1000);
-
+			//setTimeout(() => $('.vote').addClass('reveal'), 1000);
 			// end temp
 
 			$('#view-voting-phase .question').text(q.excerpt);
@@ -270,13 +269,31 @@ let gamePhases = {
 				})				
 			}			
 		}
-		room.timer.limit = 30; // set the time limit to 30 seconds
+		room.timer.limit = 5; // set the time limit to 30 seconds
 		startTimer(room.timer.limit);
 	},
 	scoring: function(){
 		let qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
-		let r3Player = room.players[Object.keys(room.questions[qid].submissions)[0]];
-		let citations = 0;
+		//let r3Player = room.players[Object.keys(room.questions[qid].submissions)[0]];
+		//let citations = 0;
+
+		if(room.round <= 1) {
+			$('.answer[data-will-score]').each(function(i){
+				if($(this).attr('data-player-id') === room.roomKey) return; // don't reveal the truth until the end
+				return new Promise((resolve, reject) => {
+					wait(0).then(() => {
+						$('.answer').removeClass('fade');
+						$('.answer').not(this).addClass('fade');
+					})
+					.then(() => wait(5000))
+					.then(() => $(this).find('.vote').addClass('reveal'))
+				})
+			});
+			// $(`.answer[data-player-id="${room.roomKey}"]`)
+		} 
+
+
+		/*
 		for(let i in room.votes) {
 			if(room.round === 3 && room.votes[i] === "[CITATION NEEDED]") citations++;
 			else {
@@ -301,6 +318,7 @@ let gamePhases = {
 		for(let i in room.players) {
 			$('.questions').append(`<div><p> player ${room.players[i].name} now has a score of: ${room.players[i].score} points </p></div>`);
 		}
+		*/
 		delete room.questions[qid]; // delete question in the final position
 		room.votes = {}; // clear the votes
 		gameSequence.next();
@@ -367,7 +385,7 @@ function startTimer(t) {
 	if(!room.timer.active) return; // return if tne timer has been cancelled
  	else if(t === 0) {
  		drawCountdown(true); // finish the timer
- 		return // gameSequence.next(); // move to next phase
+ 		return gameSequence.next(); // move to next phase
  	}
 	else setTimeout(startTimer.bind(null, --t), 1000); // decrement the timer
 }
@@ -441,7 +459,7 @@ function addAnswerToQuestion(q, player) {
 function addAnswersToVotingPhase(submissions) {
 	for(let pid in submissions) {
 		let frag = fragment($('#template-answer').html());
-		$(frag).find('.answer').attr('data-player-id', pid);		
+		$(frag).find('.answer').attr('data-player-id', pid);
 		$(frag).find('.answer .content').text(submissions[pid]);
 		$(`#view-voting-phase .answers`).append(frag);
 	}	
@@ -454,8 +472,17 @@ function addVotesToVotingPhase(votes) {
 		// temp
 		$(frag).find('.vote .name').text("");
 		// end temp
-		$(`.answer[data-player-id="${votes[pid]}"] .votes`).append(frag);
+		$(`.answer[data-player-id="${votes[pid]}"]`).attr('data-will-score', 'true').find('.votes').append(frag);
 	}	
+}
+function revealVotesSequentially (answers){
+	return answers.reduce((p, answer) => {
+		return p.then(() => {
+			return new Promise((resolve, reject) => {
+				resolve();
+			})
+		})
+	})
 }
 
 function createDummyPlayers(amount) {
