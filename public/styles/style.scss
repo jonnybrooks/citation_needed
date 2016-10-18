@@ -121,6 +121,9 @@ a {
 		&[data-current-view="voting-phase"] {
 			right: 300%;
 		}
+		&[data-current-view="endgame"] {
+			right: 400%;
+		}
 	}
 	.view {
 		position: relative;
@@ -552,6 +555,17 @@ a {
 				}
 			}
 		}
+	}
+	#view-endgame {
+		.content {
+			position: absolute;
+		    right: 50%;
+		    bottom: 60%;
+		    transform: translate(50%, 50%);
+		    li {
+		    	margin: 10px 0;
+		    }
+		}		
 	}
 }
 

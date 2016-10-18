@@ -56,12 +56,12 @@ let commands = {
 
 let questionPool  = {
 	roundOne: [
-		{id: 0, excerpt: 'what is your favourite colour?', article: 'blue, no green'},
-		{id: 1, excerpt: 'what is your quest?', article: 'i seek the holy grail'},
-		{id: 2, excerpt: 'what is your name?', article: 'arthur, king of the britains'},
-		{id: 3, excerpt: 'what is the air speed of a european swallow?', article: 'an african or a european swallow?'},
-		{id: 4, excerpt: 'none shall pass', article: 'NONE SHALL PASS'},
-		{id: 5, excerpt: 'a shrubbery!', article: 'nee!'}
+		{id: 0, excerpt: 'What is your favourite colour?', article: 'Blue, no green'},
+		{id: 1, excerpt: 'What is your quest?', article: 'I seek the Holy Grail'},
+		{id: 2, excerpt: 'What is your name?', article: 'Arthur, King of the Britains'},
+		{id: 3, excerpt: 'What is the air speed velocity of a fully laden Swallow?', article: 'An African or a European Swallow?'},
+		{id: 4, excerpt: 'None shall pass', article: 'NONE SHALL PASS'},
+		{id: 5, excerpt: 'We are the knights who say...', article: 'Nee!'}
 	],
 	roundTwo: [
 		{id: 0, article: 'roundTwo 0'},
@@ -121,8 +121,8 @@ let gamePhases = {
 	},
 	describeRound: function(round) {
 		if(round === 1){
-			$('.player').each(function(){
-				if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
+			$('#view-lobby .player').each(function(){
+				// if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
 			})
 			waitOnAudio('../speech/002-intro.mp3')
 			.then(e => waitOnAudio('../speech/003-round1-intro.mp3'))
@@ -252,7 +252,7 @@ let gamePhases = {
 			// end temp
 
 			$('#view-voting-phase .question').text(q.question);
-			$('#view-container').attr('data-current-view', `voting-phase`);			
+			$('#view-container').attr('data-current-view', `voting-phase`);
 
 			socket.emit('relay', { 
 				from: room.roomKey, to: room.roomKey, command: 'prepareVote', args: { answers: q.submissions }
@@ -328,8 +328,7 @@ let gamePhases = {
 		}
 		*/
 		delete room.questions[qid]; // delete question in the final position
-		room.votes = {}; // clear the votes
-		gameSequence.next();
+		room.votes = {}; // clear the votes		
 	},
 	sendTriggerPrompt: function() {
 		socket.emit('relay', { 
@@ -340,6 +339,10 @@ let gamePhases = {
 		})
 	},
 	endGame: function() {
+		console.log('end game');
+		$('#view-container').attr('data-current-view', 'endgame');
+
+		/*
 		let max = -99999;
 		let winners = [];
 		for(let i in room.players) {
@@ -349,6 +352,7 @@ let gamePhases = {
 			if(room.players[i].score >= max) winners.push(room.players[i].name);
 		}
 		console.log(`Players ${winners.join(' and ')} are victorious!`);
+		*/
 	}
 }
 
@@ -377,8 +381,8 @@ function generateGameSequence() {
 	gameSequence.steps.push(gamePhases.roundOne);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
-	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
 	/*
+	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
 	gameSequence.steps.push(gamePhases.roundTwo);
 	for(let i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
@@ -537,14 +541,15 @@ function addVotesToVotingPhase(votes) {
 }
 
 /*
-	revealVotesSequentially: uses a promise reduction sequence to reveal the votes and preserve the
-	dramatic pauses between each one
+	revealVotesSequentially: uses a promise reduction sequence to reveal the votes whilst preserving it's
+	asynchronous behaviour. calls the next step in the game sequence once it's finished	
 */
 
 function revealVotesSequentially (answers){
-	return answers.reduce((p, answer) => {
-		return p.then(() => revealVote(answer));
+	answers.reduce((p, answer) => {
+		return p.then(() => revealVote(answer));		
 	}, Promise.resolve())
+	.then(gameSequence.next);
 }
 
 /*
@@ -566,7 +571,7 @@ function revealVote(answer){
 		.then(() => {
 			let delay = ($(answer).find('.vote').length * 200) + 3000;
 			wait(delay).then(() => {
-				TweenLite.to(answer, 0.6, { y: 0, ease: Power4.easeInOut });
+				TweenLite.to(answer, 0.6, { y: 0, ease: Power4.easeInOut });				
 				resolve();
 			})
 		})

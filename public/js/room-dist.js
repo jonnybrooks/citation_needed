@@ -54,7 +54,7 @@ var commands = {
 */
 
 var questionPool = {
-	roundOne: [{ id: 0, excerpt: 'what is your favourite colour?', article: 'blue, no green' }, { id: 1, excerpt: 'what is your quest?', article: 'i seek the holy grail' }, { id: 2, excerpt: 'what is your name?', article: 'arthur, king of the britains' }, { id: 3, excerpt: 'what is the air speed of a european swallow?', article: 'an african or a european swallow?' }, { id: 4, excerpt: 'none shall pass', article: 'NONE SHALL PASS' }, { id: 5, excerpt: 'a shrubbery!', article: 'nee!' }],
+	roundOne: [{ id: 0, excerpt: 'What is your favourite colour?', article: 'Blue, no green' }, { id: 1, excerpt: 'What is your quest?', article: 'I seek the Holy Grail' }, { id: 2, excerpt: 'What is your name?', article: 'Arthur, King of the Britains' }, { id: 3, excerpt: 'What is the air speed velocity of a fully laden Swallow?', article: 'An African or a European Swallow?' }, { id: 4, excerpt: 'None shall pass', article: 'NONE SHALL PASS' }, { id: 5, excerpt: 'We are the knights who say...', article: 'Nee!' }],
 	roundTwo: [{ id: 0, article: 'roundTwo 0' }, { id: 1, article: 'roundTwo 1' }, { id: 2, article: 'roundTwo 2' }, { id: 3, article: 'roundTwo 3' }, { id: 4, article: 'roundTwo 4' }, { id: 5, article: 'roundTwo 5' }],
 	roundThree: [{ id: 0, article: 'roundThree 0' }, { id: 1, article: 'roundThree 1' }, { id: 2, article: 'roundThree 2' }, { id: 3, article: 'roundThree 3' }, { id: 4, article: 'roundThree 4' }, { id: 5, article: 'roundThree 5' }]
 };
@@ -85,9 +85,7 @@ var gamePhases = {
 	},
 	describeRound: function describeRound(round) {
 		if (round === 1) {
-			$('.player').each(function () {
-				if ($(this).attr('data-player-id') === '') $(this).removeClass('show'); // hide the empty player slots
-			});
+			$('#view-lobby .player').each(function () {});
 			waitOnAudio('../speech/002-intro.mp3').then(function (e) {
 				return waitOnAudio('../speech/003-round1-intro.mp3');
 			}).then(function (e) {
@@ -306,8 +304,7 @@ var gamePhases = {
   }
   */
 		delete room.questions[qid]; // delete question in the final position
-		room.votes = {}; // clear the votes
-		gameSequence.next();
+		room.votes = {}; // clear the votes		
 	},
 	sendTriggerPrompt: function sendTriggerPrompt() {
 		socket.emit('relay', {
@@ -318,15 +315,20 @@ var gamePhases = {
 		});
 	},
 	endGame: function endGame() {
-		var max = -99999;
-		var winners = [];
-		for (var i in room.players) {
-			max = room.players[i].score > max ? room.players[i].score : max;
-		}
-		for (var i in room.players) {
-			if (room.players[i].score >= max) winners.push(room.players[i].name);
-		}
-		console.log('Players ' + winners.join(' and ') + ' are victorious!');
+		console.log('end game');
+		$('#view-container').attr('data-current-view', 'endgame');
+
+		/*
+  let max = -99999;
+  let winners = [];
+  for(let i in room.players) {
+  	max = room.players[i].score > max ? room.players[i].score : max;
+  }
+  for(let i in room.players) {
+  	if(room.players[i].score >= max) winners.push(room.players[i].name);
+  }
+  console.log(`Players ${winners.join(' and ')} are victorious!`);
+  */
 	}
 };
 
@@ -359,8 +361,8 @@ function generateGameSequence() {
 	gameSequence.steps.push(gamePhases.roundOne);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
-	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
 	/*
+ gameSequence.steps.push(gamePhases.sendTriggerPrompt);
  gameSequence.steps.push(gamePhases.roundTwo);
  for(let i in room.players) {
  	gameSequence.steps.push(gamePhases.voting);
@@ -522,16 +524,16 @@ function addVotesToVotingPhase(votes) {
 }
 
 /*
-	revealVotesSequentially: uses a promise reduction sequence to reveal the votes and preserve the
-	dramatic pauses between each one
+	revealVotesSequentially: uses a promise reduction sequence to reveal the votes whilst preserving it's
+	asynchronous behaviour. calls the next step in the game sequence once it's finished	
 */
 
 function revealVotesSequentially(answers) {
-	return answers.reduce(function (p, answer) {
+	answers.reduce(function (p, answer) {
 		return p.then(function () {
 			return revealVote(answer);
 		});
-	}, Promise.resolve());
+	}, Promise.resolve()).then(gameSequence.next);
 }
 
 /*
@@ -673,3 +675,5 @@ waitOnAudio('../speech/001-title.mp3', 1500);
 setTimeout(commands.triggerNextStep, 2000);		
 // end temp
 */
+
+// if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
