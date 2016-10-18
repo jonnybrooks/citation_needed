@@ -575,7 +575,7 @@ function revealVote(answer) {
 			var delay = $(answer).find('.vote').length * 200 + 2000;
 			wait(delay).then(function () {
 				var tl = new TimelineMax();
-				tl.to(answer, 0.6, { y: 0, ease: Power4.easeInOut }).to($(answer).find('.score'), 2.5, { y: '-=200px', ease: Power3.easeOut }, '-=0.6').to($(answer).find('.score'), 1, { opacity: 1, ease: Power3.easeIn }, '-=2.5').to($(answer).find('.score'), 1, { opacity: 0, ease: Power3.easeOut, onComplete: resolve }, '-=1');
+				tl.to(answer, 0.6, { y: 0, ease: Power4.easeInOut }).to($(answer).find('.score'), 2, { y: '-=200px', ease: Power3.easeOut }, '-=0.6').to($(answer).find('.score'), 0.5, { opacity: 1, ease: Power3.easeIn }, '-=2').to($(answer).find('.score'), 1, { opacity: 0, ease: Power3.easeOut, onComplete: resolve }, '-=0.5');
 			});
 		});
 	});
