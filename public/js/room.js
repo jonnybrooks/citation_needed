@@ -116,7 +116,7 @@ let gamePhases = {
 		$('#view-lobby .typed-cursor').addClass('hide');
 		$('#view-lobby .type-wrapper').addClass('slide-left');
 		$('#view-lobby .player').addClass('show');
-		waitOnAudio('../speech/001-title.mp3', 1500);
+		//waitOnAudio('../speech/001-title.mp3', 1500);
 
 		setTimeout(() => $('.player').addClass('joined'), 5000);
 		setTimeout(commands.triggerNextStep, 2000);		
@@ -243,8 +243,8 @@ let gamePhases = {
 				// temp
 				p1 = p1 === null ? pid : p1;
 				q.submissions[pid] = subs[sub_i++];
-				//room.votes[pid] = p1;
-				room.votes[pid] = pid;
+				room.votes[pid] = p1;
+				//room.votes[pid] = pid;
 				// end temp
 			}
 
@@ -302,7 +302,7 @@ let gamePhases = {
 			let sequence = shuffle($(scoringAnswers).toArray()); // shuffle the scoring answers, and convert it to a js array
 			sequence.push($(correctAnswer)[0]); //  and push the correct one to the end of the sequence
 			revealVotesSequentially(sequence); // then reveal them in order
-		} 
+		}
 
 		/*
 		for(let i in room.votes) {
@@ -565,6 +565,9 @@ function revealVote(answer){
 		wait(2000).then(() => {
 			$(answer).find('.vote').each(function(i){
 				setTimeout(() => {
+					let score = $(answer).find('.vote').length;
+					$(answer).find('.score .sign').text(score >= 0 ? '+' : '-');
+					$(answer).find('.score .amount').text(score * 100);
 					$(this).addClass('reveal');
 					TweenLite.to(answer, 0.2, { y: "-=10px", ease: Power3.easeOut });
 				}, i * 200);

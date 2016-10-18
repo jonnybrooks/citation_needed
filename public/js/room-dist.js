@@ -94,7 +94,7 @@ var gamePhases = {
 		$('#view-lobby .typed-cursor').addClass('hide');
 		$('#view-lobby .type-wrapper').addClass('slide-left');
 		$('#view-lobby .player').addClass('show');
-		waitOnAudio('../speech/001-title.mp3', 1500);
+		//waitOnAudio('../speech/001-title.mp3', 1500);
 
 		setTimeout(function () {
 			return $('.player').addClass('joined');
@@ -237,8 +237,8 @@ var gamePhases = {
 				// temp
 				p1 = p1 === null ? pid : p1;
 				q.submissions[pid] = subs[sub_i++];
-				//room.votes[pid] = p1;
-				room.votes[pid] = pid;
+				room.votes[pid] = p1;
+				//room.votes[pid] = pid;
 				// end temp
 			}
 
@@ -567,6 +567,9 @@ function revealVote(answer) {
 				var _this = this;
 
 				setTimeout(function () {
+					var score = $(answer).find('.vote').length;
+					$(answer).find('.score .sign').text(score >= 0 ? '+' : '-');
+					$(answer).find('.score .amount').text(score * 100);
 					$(_this).addClass('reveal');
 					TweenLite.to(answer, 0.2, { y: '-=10px', ease: Power3.easeOut });
 				}, i * 200);
