@@ -54,9 +54,9 @@ var commands = {
 */
 
 var questionPool = {
-	roundOne: [{ id: 0, excerpt: 'What is your favourite colour?', article: 'Blue, no green' }, { id: 1, excerpt: 'What is your quest?', article: 'I seek the Holy Grail' }, { id: 2, excerpt: 'What is your name?', article: 'Arthur, King of the Britains' }, { id: 3, excerpt: 'What is the air speed velocity of a fully laden Swallow?', article: 'An African or a European Swallow?' }, { id: 4, excerpt: 'None shall pass', article: 'NONE SHALL PASS' }, { id: 5, excerpt: 'We are the knights who say...', article: 'Nee!' }],
-	roundTwo: [{ id: 0, article: 'roundTwo 0' }, { id: 1, article: 'roundTwo 1' }, { id: 2, article: 'roundTwo 2' }, { id: 3, article: 'roundTwo 3' }, { id: 4, article: 'roundTwo 4' }, { id: 5, article: 'roundTwo 5' }],
-	roundThree: [{ id: 0, article: 'roundThree 0' }, { id: 1, article: 'roundThree 1' }, { id: 2, article: 'roundThree 2' }, { id: 3, article: 'roundThree 3' }, { id: 4, article: 'roundThree 4' }, { id: 5, article: 'roundThree 5' }]
+	roundOne: [{ id: 0, excerpt: 'What is your favourite colour?', article: 'Blue, no, green!' }, { id: 1, excerpt: 'What is your quest?', article: 'I seek the Holy Grail' }, { id: 2, excerpt: 'What is your name?', article: 'Arthur, King of the Britains' }, { id: 3, excerpt: 'What is the air speed velocity of a fully laden Swallow?', article: 'An African or a European Swallow?' }, { id: 4, excerpt: 'None shall pass', article: 'NONE SHALL PASS' }, { id: 5, excerpt: 'We are the knights who say...', article: 'Nee!' }],
+	roundTwo: [{ id: 0, article: 'Blue, no, green!' }, { id: 1, article: 'I seek the Holy Grail' }, { id: 2, article: 'Arthur, King of the Britains' }, { id: 3, article: 'An African or a European Swallow?' }, { id: 4, article: 'NONE SHALL PASS' }, { id: 5, article: 'Nee!' }],
+	roundThree: [{ id: 0, article: 'Blue, no, green!' }, { id: 1, article: 'I seek the Holy Grail' }, { id: 2, article: 'Arthur, King of the Britains' }, { id: 3, article: 'An African or a European Swallow?' }, { id: 4, article: 'NONE SHALL PASS' }, { id: 5, article: 'Nee!' }]
 };
 
 /*
@@ -66,22 +66,41 @@ var questionPool = {
 var gamePhases = {
 	lobby: function lobby() {
 		$('.host').attr('href', location.host + '/player').find('span').text(location.host + '/player');
-		$('.typed').typed({
-			strings: ['The <a>English</a> have terrible teeth due to bad parenting.', '<a>Wasps</a> are in fact just angry little <a>Bees</a>.', '60% of the time it works <em>every</em> time.'],
-			typeSpeed: 0,
-			backSpeed: -200,
-			backDelay: 2000,
-			callback: function callback() {
-				$('#view-lobby .typed-cursor').addClass('hide');
-				$('#view-lobby .type-wrapper').addClass('slide-left');
-				$('#view-lobby .player').addClass('show');
-				waitOnAudio('../speech/001-title.mp3', 1500);
-				setTimeout(function () {
-					return $('.player').addClass('joined');
-				}, 2000);
-				setTimeout(commands.triggerNextStep, 3000);
-			}
-		});
+		/*
+  $('.typed').typed({			
+  	strings: [
+  		"The <a>English</a> have terrible teeth due to bad parenting.", 
+  		"<a>Wasps</a> are in fact just angry little <a>Bees</a>.",
+  		"60% of the time it works <em>every</em> time."
+  	],
+  	typeSpeed: 0,
+  	backSpeed: -200,
+  	backDelay: 2000,
+  	callback: function() {
+  		$('#view-lobby .typed-cursor').addClass('hide');
+  		$('#view-lobby .type-wrapper').addClass('slide-left');
+  		$('#view-lobby .player').addClass('show');
+  		waitOnAudio('../speech/001-title.mp3', 1500);
+  		// temp
+  		setTimeout(() => $('.player').addClass('joined'), 2000);
+  		setTimeout(commands.triggerNextStep, 3000);
+  		// end temp
+  	}
+  })
+  */
+
+		// temp
+		$('.typed').text('60% of the time it works <em>every</em> time.');
+		$('#view-lobby .typed-cursor').addClass('hide');
+		$('#view-lobby .type-wrapper').addClass('slide-left');
+		$('#view-lobby .player').addClass('show');
+		waitOnAudio('../speech/001-title.mp3', 1500);
+
+		setTimeout(function () {
+			return $('.player').addClass('joined');
+		}, 5000);
+		setTimeout(commands.triggerNextStep, 2000);
+		// end temp		
 	},
 	describeRound: function describeRound(round) {
 		if (round === 1) {
@@ -218,8 +237,8 @@ var gamePhases = {
 				// temp
 				p1 = p1 === null ? pid : p1;
 				q.submissions[pid] = subs[sub_i++];
-				room.votes[pid] = p1;
-				//room.votes[pid] = pid;
+				//room.votes[pid] = p1;
+				room.votes[pid] = pid;
 				// end temp
 			}
 
@@ -315,7 +334,6 @@ var gamePhases = {
 		});
 	},
 	endGame: function endGame() {
-		console.log('end game');
 		$('#view-container').attr('data-current-view', 'endgame');
 
 		/*
@@ -357,7 +375,7 @@ var gameSequence = {
 */
 
 function generateGameSequence() {
-	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
+	// gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
 	gameSequence.steps.push(gamePhases.roundOne);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
@@ -554,10 +572,10 @@ function revealVote(answer) {
 				}, i * 200);
 			});
 		}).then(function () {
-			var delay = $(answer).find('.vote').length * 200 + 3000;
+			var delay = $(answer).find('.vote').length * 200 + 2000;
 			wait(delay).then(function () {
-				TweenLite.to(answer, 0.6, { y: 0, ease: Power4.easeInOut });
-				resolve();
+				var tl = new TimelineMax();
+				tl.to(answer, 0.6, { y: 0, ease: Power4.easeInOut }).to($(answer).find('.score'), 2.5, { y: '-=200px', ease: Power3.easeOut }, '-=0.6').to($(answer).find('.score'), 1, { opacity: 1, ease: Power3.easeIn }, '-=2.5').to($(answer).find('.score'), 1, { opacity: 0, ease: Power3.easeOut, onComplete: resolve }, '-=1');
 			});
 		});
 	});
@@ -664,16 +682,5 @@ function Player(conf) {
 	this.score = 0;
 	this.submissionsComplete = {};
 }
-/*
-// temp
-$('.typed').text('60% of the time it works <em>every</em> time.');
-$('#view-lobby .typed-cursor').addClass('hide');
-$('#view-lobby .type-wrapper').addClass('slide-left');
-$('#view-lobby .player').addClass('show');
-waitOnAudio('../speech/001-title.mp3', 1500);
-		setTimeout(() => $('.player').addClass('joined'), 5000);
-setTimeout(commands.triggerNextStep, 2000);		
-// end temp
-*/
 
 // if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots

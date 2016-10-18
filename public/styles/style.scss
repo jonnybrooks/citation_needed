@@ -1,17 +1,17 @@
 //colours
 
-$wikiblue: #0645ad;
-$keyGold: #e0c32b;
-$pastelRed: #ED6D79;
-$pastelOrange: #F5A26F;
-$pastelYellow: #FFDC89;
-$pastelBrown: #D4A697;
-$pastelGreen: #71E096;
-$pastelPurple: #DA97E0;
-$pastelBlue: #90D4F7;
-$pastelPink: #FFB3BA;
+$colour-wikiblue: #0645ad;
+$colour-keyGold: #e0c32b;
+$colour-playerRed: #ED6D79;
+$colour-playerOrange: #F5A26F;
+$colour-playerYellow: #FFDC89;
+$colour-playerBrown: #D4A697;
+$colour-playerGreen: #71E096;
+$colour-playerPurple: #DA97E0;
+$colour-playerBlue: #90D4F7;
+$colour-playerPink: #FFB3BA;
 
-$playerColors: $pastelRed, $pastelBlue, $pastelYellow, $pastelGreen, $pastelOrange, $pastelBrown, $pastelPurple, $pastelPink;
+$colour-playerColors: $colour-playerRed, $colour-playerBlue, $colour-playerYellow, $colour-playerGreen, $colour-playerOrange, $colour-playerBrown, $colour-playerPurple, $colour-playerPink;
 
 //easings 
 
@@ -54,6 +54,10 @@ $easeInOutBack: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 	content: "\e902";
 }
 
+$ff-roboto: 'Roboto', Helvetica, Arial, sans-serif;
+$ff-robotoSlab: 'Roboto Slab', Georgia, serif;
+$ff-ptSerif: 'PT Serif', $ff-robotoSlab;
+
 //styles
 
 * {
@@ -67,10 +71,12 @@ html, body {
 	overflow: hidden;
 }
 body, .sans-serif {	
-	font: 14px "Roboto", Helvetica, Arial, sans-serif;	
+	font-family: $ff-roboto;
+	font-size: 14px;
 }
 .serif {	
-	font: 14px "Roboto Slab", Georgia, serif;
+	font-family: $ff-robotoSlab;
+	font-size: 14px;
 }
 
 a {
@@ -84,9 +90,12 @@ a {
 	text-align: center;
 	margin-bottom: 40px;
 	span {
-		color: $wikiblue;
+		color: $colour-wikiblue;
 		font-style: italic;
 	}
+}
+.question {
+	font-family: $ff-ptSerif;
 }
 
 @for $i from 0 through 7 {
@@ -96,7 +105,7 @@ a {
 			background-color: transparent;
 			&.coloured {
 				color: white;
-				background-color: nth($playerColors, $i+1);
+				background-color: nth($colour-playerColors, $i+1);
 			}
 		}					 	
 	}
@@ -203,13 +212,13 @@ a {
 				vertical-align: middle;
 			}		
 			.icon-key {
-			    color: $keyGold;
+			    color: $colour-keyGold;
 			    margin-right: 15px;
 			    position: relative;
 			    top: 2px;
 			}
 			.key {			
-				color: $wikiblue;
+				color: $colour-wikiblue;
 			}		
 		}
 		.players {
@@ -219,7 +228,7 @@ a {
 		    display: table;	   
 		    table-layout: fixed; 
 		    text-align: center;
-		    margin-bottom: 30px;
+		    margin-bottom: 50px;
 		}
 		.player {
 		 	display: table-cell;
@@ -273,7 +282,7 @@ a {
 		    	    bottom: 45%;
 					border-radius: 0;
 					height: 3px;
-					width: 60%;
+					width: 20%;
 			    }
 			    .name { 
 			 		top: -10px;
@@ -292,7 +301,7 @@ a {
 					top: 0px;
 				}				
 		 		.status::after {
-		    	    background-color: nth($playerColors, $i+1);
+		    	    background-color: nth($colour-playerColors, $i+1);
 			    }			 	
 			}
 		}
@@ -373,16 +382,20 @@ a {
 				0.5s opacity $easeInOutQuint 1s,
 		    	0.5s top $easeInOutQuint 1s;
 			.question {
-				font-size: 5em;
+				font-size: 5em;				
 				position: absolute;
 				top: 0%;
 				left: 50%;
 				transform: translate(-50%, 0%);
-				margin: 0;		
+				margin: 0;
+				border-left: 7px solid transparent;
+				padding: 0;
 				transition: 					
 			    	0.6s width $easeOutQuint, // easeOutQuint
 			    	0.6s font-size $easeOutQuint,
 			    	0.6s transform $easeOutQuint,
+			    	0.6s padding ease-out,
+			    	0.6s border-left ease-out,
 			    	0.6s left $easeOutQuint;
 			}
 			&.reveal {
@@ -398,6 +411,8 @@ a {
 					min-width: 50%;
 					transform: translate(0%, 0%);
 					font-size: 3em;
+					border-left: 7px solid lightgrey;
+				    padding: 10px 40px;
 				}
 			}
 		}
@@ -432,7 +447,7 @@ a {
 			@for $i from 0 through 7 {
 				&.answered:nth-of-type(#{$i+1}) .name {
 					color: white;
-			 		background: nth($playerColors, $i+1);;
+			 		background: nth($colour-playerColors, $i+1);;
 					bottom: (150 - random(100)) + px;
 				}
 			}
@@ -515,11 +530,12 @@ a {
 			padding: 40px 40px calc(5% + 100px);
 			flex-grow: 1;
 			margin: 0 3px 3px 0px;
-			position: relative;			
+			position: relative;
+			min-width: 15%;
 			&::after {
 				content: '';
 				position: absolute;
-					top: 0;	right: 0; bottom: 0; left: 0;
+					top: -1px;	right: -1px; bottom: -1px; left: -1px;
 				background-color: rgba(255,255,255,0);
 				transition: 
 					0.4s background-color ease-out;
@@ -536,7 +552,6 @@ a {
 		.votes {
 			position: absolute;
 			left: 0;
-			//top: 100%;
 			bottom: 0;
 			width: 100%;
 			.vote {
@@ -554,6 +569,15 @@ a {
 					padding: 5px 20px;
 				}
 			}
+		}
+		.score {
+			position: absolute;
+			color: green;
+			opacity: 0;
+			top: 30%;
+			right: 10%;
+			font-size: 4em;
+			font-weight: bold;
 		}
 	}
 	#view-endgame {
@@ -618,7 +642,7 @@ a {
 	    padding: 10px 20px;
 	    span {
     	    font-style: italic;
-		    color: $wikiblue;
+		    color: $colour-wikiblue;
 	    }
 	}	
 	h3 {
@@ -661,7 +685,7 @@ a {
 	    width: 50%;
 	    text-align: center;
 	    background-color: white;
-	    color: $wikiblue;
+	    color: $colour-wikiblue;
 	    border: 2px solid;
 	    box-shadow: 0px 3px 6px 0px rgba(0,0,255,0.2);
 	}
