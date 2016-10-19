@@ -174,7 +174,7 @@ let gamePhases = {
 			socket.emit('relay', { // relay the question to everyone in the room
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			})
-			room.timer.limit = 5; // set the time limit to 60 seconds
+			room.timer.limit = 1; // set the time limit to 60 seconds
 			startTimer(room.timer.limit);
 		}, 5000);
 	},
@@ -243,8 +243,10 @@ let gamePhases = {
 				// temp
 				p1 = p1 === null ? pid : p1;
 				q.submissions[pid] = subs[sub_i++];
-				room.votes[pid] = p1;
-				//room.votes[pid] = pid;
+				//room.votes[pid] = p1;				
+				//room.votes[pid] = room.roomKey;
+				room.votes[pid] = Object.keys(room.players)[rand(0, Object.keys(room.players).length-1)];
+				room.votes[p1] = room.roomKey;
 				// end temp
 			}
 
@@ -288,7 +290,7 @@ let gamePhases = {
 				})				
 			}			
 		}
-		room.timer.limit = 3; // set the time limit to 30 seconds
+		room.timer.limit = 1; // set the time limit to 30 seconds
 		startTimer(room.timer.limit);
 	},
 	scoring: function(){
@@ -304,7 +306,10 @@ let gamePhases = {
 			revealVotesSequentially(sequence); // then reveal them in order
 		}
 
-		/*
+		for(let pid in room.players) {
+			room.players[pid].previousScore = room.players[pid].score; // set all the previous scores
+		}
+		
 		for(let i in room.votes) {
 			if(room.round === 3 && room.votes[i] === "[CITATION NEEDED]") citations++;
 			else {
@@ -326,12 +331,14 @@ let gamePhases = {
 				r3Player.score += 50 * (citations === 0 ? 0 : citations < Object.keys(room.votes).length ? 1 : 2);
 			}
 		}
-		for(let i in room.players) {
-			$('.questions').append(`<div><p> player ${room.players[i].name} now has a score of: ${room.players[i].score} points </p></div>`);
-		}
-		*/
 		delete room.questions[qid]; // delete question in the final position
 		room.votes = {}; // clear the votes		
+	},
+	leaderboard: function() {
+		addPlayersToLeaderboard(room.players);
+		$('#view-container').attr('data-current-view', 'leaderboard');
+		$('#view-container .player').addClass('coloured');
+		wait(3000).then(gameSequence.next);
 	},
 	sendTriggerPrompt: function() {
 		socket.emit('relay', { 
@@ -343,18 +350,6 @@ let gamePhases = {
 	},
 	endGame: function() {
 		$('#view-container').attr('data-current-view', 'endgame');
-
-		/*
-		let max = -99999;
-		let winners = [];
-		for(let i in room.players) {
-			max = room.players[i].score > max ? room.players[i].score : max;
-		}
-		for(let i in room.players) {
-			if(room.players[i].score >= max) winners.push(room.players[i].name);
-		}
-		console.log(`Players ${winners.join(' and ')} are victorious!`);
-		*/
 	}
 }
 
@@ -383,6 +378,7 @@ function generateGameSequence() {
 	gameSequence.steps.push(gamePhases.roundOne);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
+	gameSequence.steps.push(gamePhases.leaderboard);
 	/*
 	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
 	gameSequence.steps.push(gamePhases.roundTwo);
@@ -518,7 +514,11 @@ function addAnswersToVotingPhase(submissions) {
 	for(let i = 0; i < randomKeys.length; i++){
 		let frag = fragment($('#template-answer').html());
 		let pid = randomKeys[i];
+
 		$(frag).find('.answer').attr('data-player-id', pid);
+		if(pid !== room.roomKey) {
+			$(frag).find('.answer .score').addClass(`player-${room.players[pid].number}-bg coloured`);
+		}		
 		$(frag).find('.answer .content').text(submissions[pid]);
 		$(`#view-voting-phase .answers`).append(frag);
 	}
@@ -535,10 +535,22 @@ function addVotesToVotingPhase(votes) {
 		$(frag).find('.vote').attr('data-player-id', pid);
 		$(frag).find('.vote').addClass(`player-${room.players[pid].number}-bg`);
 		// $(frag).find('.vote .name').text(room.players[pid].name);
-		// temp
-		$(frag).find('.vote .name').text("");
-		// end temp
 		$(`.answer[data-player-id="${votes[pid]}"]`).attr('data-will-score', 'true').find('.votes').append(frag);
+	}	
+}
+
+/*
+	addPlayersToLeaderboard: 
+*/
+
+function addPlayersToLeaderboard(players) {
+	for(let pid in players) {
+		console.log("player %s - previous score: %s, new score: %s", players[pid].number, players[pid].previousScore, players[pid].score);
+		let frag = fragment($('#template-player').html());
+		$(frag).find('.player').attr('data-player-id', pid);
+		$(frag).find('.player').addClass(`player-${room.players[pid].number}-bg`);
+		$(frag).find('.player .name').text(room.players[pid].name);
+		$('#view-leaderboard .players').append(frag);
 	}	
 }
 
@@ -560,29 +572,38 @@ function revealVotesSequentially (answers){
 
 function revealVote(answer){
 	return new Promise((resolve, reject) => {
-		$('.answer').removeClass('fade');
-		$('.answer').not(answer).addClass('fade');
-		wait(2000).then(() => {
-			$(answer).find('.vote').each(function(i){
-				setTimeout(() => {
-					let score = $(answer).find('.vote').length;
-					$(answer).find('.score .sign').text(score >= 0 ? '+' : '-');
-					$(answer).find('.score .amount').text(score * 100);
-					$(this).addClass('reveal');
-					TweenLite.to(answer, 0.2, { y: "-=10px", ease: Power3.easeOut });
-				}, i * 200);
+		let votes = $(answer).find('.vote').length;
+		let offset = 0.25;
+		let staggerDuration = 0.8;
+		let correctFloat = 0;
+		let floatDuration = ((votes-1) * offset) + staggerDuration;		
+		let tl = new TimelineMax();
+
+		$('#view-voting-phase .answer').removeClass('fade').not(answer).addClass('fade'); // isolate the showcased answer
+		$(answer).find('.score .amount').text(votes * 100); // set the score in the view
+
+		
+		tl.staggerTo($(answer).find('.vote'), staggerDuration, { width: '100%', ease: Power4.easeOut, delay: 2 }, (offset * -1)) // reveal the votes
+		  .to(answer, floatDuration, { y: `-=${15 * votes}px`, ease: Power2.easeOut }, `-=${floatDuration}`) // rise the answer proportionately
+		  .to(answer, 0.6, { y: 0, ease: Power4.easeInOut, delay: 1}) // then slam the answer down
+
+		if($(answer).attr('data-player-id') === room.roomKey) {
+			correctFloat = (votes-1) * offset;
+			$(answer).find('.vote').each(function(){
+				let pn = room.players[$(this).attr('data-player-id')].number; // get the player number for the score class
+				let score = $(answer).find('.score').eq(-1); // get the last score element in the answer
+				let clone = $(score).clone().removeClass().addClass(`score player-${pn}-bg coloured`) // clone the score element
+				$(clone).insertAfter($(score)); // and append it to the answer
 			})
-		})
-		.then(() => {
-			let delay = ($(answer).find('.vote').length * 200) + 2000;
-			wait(delay).then(() => {
-				let tl = new TimelineMax();
-				tl.to(answer, 0.6, { y: 0, ease: Power4.easeInOut })
-				  .to($(answer).find('.score'), 2, { y: "-=200px", ease: Power3.easeOut }, "-=0.6")
-				  .to($(answer).find('.score'), 0.5, { opacity: 1, ease: Power3.easeIn}, "-=2")
-				  .to($(answer).find('.score'), 1, { opacity: 0, ease: Power3.easeOut, onComplete: resolve }, "-=0.5")
-			})
-		})
+			$(answer).find('.score').eq(0).remove(); // delete the old score
+			$(answer).find('.score .amount').text('100'); // set them all to +100
+		}	
+
+		let floaty = ((votes-1) * offset)
+
+		tl.staggerTo($(answer).find('.score'), 1.5, { y: "-=200px", ease: Power3.easeOut }, offset, "-=0.6") // float the score up
+		  .staggerTo($(answer).find('.score'), 0.5, { opacity: 1, ease: Power3.easeIn}, offset, `-=${correctFloat + 1.5}`) // with a fade in
+		  .staggerTo($(answer).find('.score'), 1, { opacity: 0, ease: Power2.easeOut }, offset, `-=${correctFloat + 0.5}`, resolve) // after fade out, resolve the promise		
 	})
 }
 
@@ -597,7 +618,7 @@ function createDummyPlayers(amount) {
 		room.players[id] = new Player({
 			socketId: id,
 			roomKey: room.roomKey,
-			name: `Player ${i}`,
+			name: `Player ${i+1}`,
 			number: Object.keys(room.players).length + 1
 		});
 	}	
@@ -649,6 +670,14 @@ function shuffle(array) {
 }
 
 /*
+	rand: get a random number
+*/
+
+function rand(min, max) {
+	return Math.round(min + Math.random() * (max - min));
+}
+
+/*
 	waitOnAudio: wait for the audio clip to finish before continuing
 */
 
@@ -681,5 +710,6 @@ function Player(conf) {
 	this.name = conf.name;
 	this.number = conf.number;
 	this.score = 0;
+	this.previousScore = null;
 	this.submissionsComplete = {};	
 }

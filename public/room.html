@@ -92,13 +92,16 @@
 					<div class="timer"></div>
 				</div>
 				<div class="answers"></div>
+			</div>		
+			<div id="view-leaderboard" class="view">
+				<h1 class="title">Leaderboard</h1>
+				<div class="players"></div>
 			</div>
 			<div id="view-endgame" class="view">
 				<div class="content">
 					<h1>That's the end of the visual demo!</h1>
 					<p>Things left to add:</p>
 					<ul>
-						<li>Little score things at the end of the voting phase</li>
 						<li>Score overview at the end of each round</li>
 						<li>Rounds 2 and 3 finished, just need a front end to display them</li>
 						<li>The endgame sequence</li>
@@ -108,9 +111,9 @@
 			</div>								
 		</div>
 		<script id="template-player" type="text/template">
-			<div class="player" data-player-id="">
-				<div class="time-left"></div>
+			<div class="player" data-player-id="">				
 				<p class="name"></p>
+				<div class="score"></div>
 			</div>
 		</script>
 		<script id="template-answer" type="text/template">

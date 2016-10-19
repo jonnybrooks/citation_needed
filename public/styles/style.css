@@ -25,33 +25,49 @@ a { color: #0645ad; text-decoration: none; }
 
 .player-1-bg.coloured { color: white; background-color: #ED6D79; }
 
+.player-1-colour { color: #ED6D79; }
+
 .player-2-bg { color: black; background-color: transparent; }
 
 .player-2-bg.coloured { color: white; background-color: #90D4F7; }
+
+.player-2-colour { color: #90D4F7; }
 
 .player-3-bg { color: black; background-color: transparent; }
 
 .player-3-bg.coloured { color: white; background-color: #FFDC89; }
 
+.player-3-colour { color: #FFDC89; }
+
 .player-4-bg { color: black; background-color: transparent; }
 
 .player-4-bg.coloured { color: white; background-color: #71E096; }
+
+.player-4-colour { color: #71E096; }
 
 .player-5-bg { color: black; background-color: transparent; }
 
 .player-5-bg.coloured { color: white; background-color: #F5A26F; }
 
+.player-5-colour { color: #F5A26F; }
+
 .player-6-bg { color: black; background-color: transparent; }
 
 .player-6-bg.coloured { color: white; background-color: #D4A697; }
+
+.player-6-colour { color: #D4A697; }
 
 .player-7-bg { color: black; background-color: transparent; }
 
 .player-7-bg.coloured { color: white; background-color: #DA97E0; }
 
+.player-7-colour { color: #DA97E0; }
+
 .player-8-bg { color: black; background-color: transparent; }
 
 .player-8-bg.coloured { color: white; background-color: #FFB3BA; }
+
+.player-8-colour { color: #FFB3BA; }
 
 #client-room #view-container { width: 100%; height: 100%; white-space: nowrap; position: relative; -webkit-transition: 1s right cubic-bezier(0.86, 0, 0.07, 1); transition: 1s right cubic-bezier(0.86, 0, 0.07, 1); }
 
@@ -63,7 +79,9 @@ a { color: #0645ad; text-decoration: none; }
 
 #client-room #view-container[data-current-view="voting-phase"] { right: 300%; }
 
-#client-room #view-container[data-current-view="endgame"] { right: 400%; }
+#client-room #view-container[data-current-view="leaderboard"] { right: 400%; }
+
+#client-room #view-container[data-current-view="endgame"] { right: 500%; }
 
 #client-room .view { position: relative; width: 100%; height: 100%; display: inline-block; vertical-align: top; white-space: normal; overflow: hidden; background: -webkit-gradient(linear, left top, left bottom, from(white), to(#efefef)); background: -webkit-linear-gradient(top, white, #efefef); background: linear-gradient(180deg, white, #efefef); padding: 0 0 0 5px; margin: 0 -5px 0 0; }
 
@@ -201,19 +219,19 @@ a { color: #0645ad; text-decoration: none; }
 
 #client-room #view-answer-phase .player.answered:nth-of-type(1) .name { color: white; background: #ED6D79; bottom: 122px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(2) .name { color: white; background: #90D4F7; bottom: 107px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(2) .name { color: white; background: #90D4F7; bottom: 70px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(3) .name { color: white; background: #FFDC89; bottom: 87px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(3) .name { color: white; background: #FFDC89; bottom: 50px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(4) .name { color: white; background: #71E096; bottom: 133px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(4) .name { color: white; background: #71E096; bottom: 85px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(5) .name { color: white; background: #F5A26F; bottom: 65px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(5) .name { color: white; background: #F5A26F; bottom: 68px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(6) .name { color: white; background: #D4A697; bottom: 72px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(6) .name { color: white; background: #D4A697; bottom: 57px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(7) .name { color: white; background: #DA97E0; bottom: 86px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(7) .name { color: white; background: #DA97E0; bottom: 143px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(8) .name { color: white; background: #FFB3BA; bottom: 88px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(8) .name { color: white; background: #FFB3BA; bottom: 143px; }
 
 #client-room #view-answer-phase .countdown { position: absolute; top: 40%; right: 50%; -webkit-transform: translate(50%, -50%); -ms-transform: translate(50%, -50%); transform: translate(50%, -50%); width: -webkit-calc(20% + 25px); width: calc(20% + 25px); }
 
@@ -245,13 +263,17 @@ a { color: #0645ad; text-decoration: none; }
 
 #client-room #view-voting-phase .votes { position: absolute; left: 0; bottom: 0; width: 100%; }
 
-#client-room #view-voting-phase .votes .vote { overflow: hidden; font-size: 1.3em; font-weight: 500; width: 0; -webkit-transition: 0.8s width cubic-bezier(0.23, 1, 0.32, 1); transition: 0.8s width cubic-bezier(0.23, 1, 0.32, 1); }
-
-#client-room #view-voting-phase .votes .vote.reveal { width: 100%; }
+#client-room #view-voting-phase .votes .vote { overflow: hidden; font-size: 1.3em; font-weight: 500; width: 0; }
 
 #client-room #view-voting-phase .votes .vote p { margin: 0; padding: 5px 20px; }
 
-#client-room #view-voting-phase .score { position: absolute; color: green; opacity: 0; top: 30%; right: 10%; font-size: 4em; font-weight: 100; }
+#client-room #view-voting-phase .score { position: absolute; opacity: 0; top: 30%; right: 5%; font-size: 3.5em; font-weight: 100; padding: 5px 10px; }
+
+#client-room #view-leaderboard { padding: 5% 40%; }
+
+#client-room #view-leaderboard .players { height: 100%; margin: 0; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-direction: column; -ms-flex-direction: column; flex-direction: column; -webkit-box-pack: justify; -webkit-justify-content: space-between; -ms-flex-pack: justify; justify-content: space-between; -webkit-box-align: stretch; -webkit-align-items: stretch; -ms-flex-align: stretch; align-items: stretch; }
+
+#client-room #view-leaderboard .players .player { width: 100%; }
 
 #client-room #view-endgame .content { position: absolute; right: 50%; bottom: 60%; -webkit-transform: translate(50%, 50%); -ms-transform: translate(50%, 50%); transform: translate(50%, 50%); }
 

@@ -107,6 +107,9 @@ a {
 				color: white;
 				background-color: nth($colour-playerColors, $i+1);
 			}
+		}
+		&-colour {
+			color: nth($colour-playerColors, $i+1);
 		}					 	
 	}
 }
@@ -130,8 +133,11 @@ a {
 		&[data-current-view="voting-phase"] {
 			right: 300%;
 		}
-		&[data-current-view="endgame"] {
+		&[data-current-view="leaderboard"] {
 			right: 400%;
+		}
+		&[data-current-view="endgame"] {
+			right: 500%;
 		}
 	}
 	.view {
@@ -559,10 +565,9 @@ a {
 			    font-size: 1.3em;
 			    font-weight: 500;
 			    width: 0;			    
-			    transition: 
-			    	0.8s width $easeOutQuint;
+			    //transition: 0.8s width $easeOutQuint;
 				&.reveal {
-					width: 100%;
+					//width: 100%;
 				}
 				p {
 					margin: 0;
@@ -572,13 +577,28 @@ a {
 		}
 		.score {
 			position: absolute;
-			color: green;
 			opacity: 0;
 			top: 30%;
-			right: 10%;
-			font-size: 4em;
+			right: 5%;
+			font-size: 3.5em;
 			font-weight: 100;
+			//text-shadow: 2px 2px 7px rgba(0,0,0,0.1);
+			padding: 5px 10px;			
 		}
+	}
+	#view-leaderboard {
+		padding: 5% 40%;
+		.players {
+			height: 100%;			
+			margin: 0;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			align-items: stretch;
+			.player {
+				width: 100%;
+			}
+		}		
 	}
 	#view-endgame {
 		.content {
