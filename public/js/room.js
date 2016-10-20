@@ -337,8 +337,11 @@ let gamePhases = {
 	leaderboard: function() {
 		addPlayersToLeaderboard(room.players);
 		$('#view-container').attr('data-current-view', 'leaderboard');
-		$('#view-container .player').addClass('coloured');
-		wait(3000).then(gameSequence.next);
+		updateLeaderboard();
+
+		
+		
+		//wait(3000).then(gameSequence.next);
 	},
 	sendTriggerPrompt: function() {
 		socket.emit('relay', { 
@@ -547,9 +550,9 @@ function addPlayersToLeaderboard(players) {
 	for(let pid in players) {
 		console.log("player %s - previous score: %s, new score: %s", players[pid].number, players[pid].previousScore, players[pid].score);
 		let frag = fragment($('#template-player').html());
-		$(frag).find('.player').attr('data-player-id', pid);
-		$(frag).find('.player').addClass(`player-${room.players[pid].number}-bg`);
+		$(frag).find('.player').attr('data-player-id', pid).addClass(`player-${room.players[pid].number}-bg coloured`);		
 		$(frag).find('.player .name').text(room.players[pid].name);
+		$(frag).find('.player .score').text(room.players[pid].score);
 		$('#view-leaderboard .players').append(frag);
 	}	
 }
@@ -580,14 +583,10 @@ function revealVote(answer){
 		let tl = new TimelineMax();
 
 		$('#view-voting-phase .answer').removeClass('fade').not(answer).addClass('fade'); // isolate the showcased answer
-		$(answer).find('.score .amount').text(votes * 100); // set the score in the view
-
-		
-		tl.staggerTo($(answer).find('.vote'), staggerDuration, { width: '100%', ease: Power4.easeOut, delay: 2 }, (offset * -1)) // reveal the votes
-		  .to(answer, floatDuration, { y: `-=${15 * votes}px`, ease: Power2.easeOut }, `-=${floatDuration}`) // rise the answer proportionately
-		  .to(answer, 0.6, { y: 0, ease: Power4.easeInOut, delay: 1}) // then slam the answer down
+		$(answer).find('.score').text(votes * 100); // set the score in the view		
 
 		if($(answer).attr('data-player-id') === room.roomKey) {
+			if(votes <= 0) return resolve();
 			correctFloat = (votes-1) * offset;
 			$(answer).find('.vote').each(function(){
 				let pn = room.players[$(this).attr('data-player-id')].number; // get the player number for the score class
@@ -596,14 +595,15 @@ function revealVote(answer){
 				$(clone).insertAfter($(score)); // and append it to the answer
 			})
 			$(answer).find('.score').eq(0).remove(); // delete the old score
-			$(answer).find('.score .amount').text('100'); // set them all to +100
-		}	
-
-		let floaty = ((votes-1) * offset)
-
-		tl.staggerTo($(answer).find('.score'), 1.5, { y: "-=200px", ease: Power3.easeOut }, offset, "-=0.6") // float the score up
+			$(answer).find('.score').text('100'); // set them all to +100
+		}
+			
+		tl.staggerTo($(answer).find('.vote'), staggerDuration, { width: '100%', ease: Power4.easeOut, delay: 2 }, (offset * -1)) // reveal the votes
+		  .to(answer, floatDuration, { y: `-=${15 * votes}px`, ease: Power2.easeOut }, `-=${floatDuration}`) // rise the answer proportionately
+		  .to(answer, 0.6, { y: 0, ease: Power4.easeInOut, delay: 1}) // then slam the answer down
+		  .staggerTo($(answer).find('.score'), 1.5, { y: "-=200px", ease: Power3.easeOut }, offset, "-=0.6") // float the score up
 		  .staggerTo($(answer).find('.score'), 0.5, { opacity: 1, ease: Power3.easeIn}, offset, `-=${correctFloat + 1.5}`) // with a fade in
-		  .staggerTo($(answer).find('.score'), 1, { opacity: 0, ease: Power2.easeOut }, offset, `-=${correctFloat + 0.5}`, resolve) // after fade out, resolve the promise		
+		  .staggerTo($(answer).find('.score'), 1, { opacity: 0, ease: Power2.easeOut }, offset, `-=${correctFloat + 0.5}`, () => wait(1000).then(resolve)) // after fade out, resolve the promise
 	})
 }
 
@@ -639,6 +639,34 @@ function drawCountdown(end) {
       .to(`${countdown} .circle`, 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3')      
       .to(`${countdown} .white-box`, 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3')
     .from(`${countdown} .white-box`, 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4')
+}
+
+/*
+	updateLeaderboard: updates the circular leaderboard with a nice size / orientation transition
+*/
+
+function updateLeaderboard() {
+	let totalScore = 0;
+	let averageScore = 0;
+	for(let pid in room.players) {
+		totalScore += room.players[pid].score;
+	}
+	averageScore = totalScore / Object.keys(room.players).length;
+
+	for(var pid in room.players) {
+		let $player = $(`#view-leaderboard .player[data-player-id="${pid}"]`);
+		let offset = ((room.players[pid].score - averageScore) / 2) * -1;
+		let percent = `${Math.round((room.players[pid].score / totalScore) * 100/4)}%`;
+		let tl = new TimelineMax();	
+		let initialWidth = $player.width();
+		let newWidth = initialWidth;
+		tl.set($player, { width: percent, onComplete: () => newWidth = $player.width() })
+		  .set($player, { width: initialWidth })
+		  .to($player, 2, { height: newWidth, width: newWidth, ease: Power4.easeInOut, delay: 0.5 })
+		  .to($player, 2, { y: offset, ease: Power4.easeInOut }, "-=1.5")
+		  .to($player.find('.content-wrapper'), 0.6, { opacity: 1, ease: Power2.easeInOut }, "-=0.5")
+		  .from($player.find('.content-wrapper'), 0.6, { y: 100, ease: Power4.easeInOut }, "-=0.6")
+	}
 }
 
 /*

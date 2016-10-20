@@ -94,8 +94,7 @@
 				<div class="answers"></div>
 			</div>		
 			<div id="view-leaderboard" class="view">
-				<h1 class="title">Leaderboard</h1>
-				<div class="players"></div>
+				<div class="players"></div>				
 			</div>
 			<div id="view-endgame" class="view">
 				<div class="content">
@@ -112,18 +111,17 @@
 		</div>
 		<script id="template-player" type="text/template">
 			<div class="player" data-player-id="">				
-				<p class="name"></p>
-				<div class="score"></div>
+				<div class="content-wrapper">
+					<p class="name"></p>
+					<div class="score"></div>
+				</div>				
 			</div>
 		</script>
 		<script id="template-answer" type="text/template">
 			<div class="answer" data-player-id="">
 				<p class="content"></p>
 				<div class="votes"></div>
-				<div class="score">
-					<span class="sign">+</span>
-					<span class="amount">100</span>
-				</div>
+				<div class="score"></div>
 			</div>
 		</script>
 		<script id="template-vote" type="text/template">
