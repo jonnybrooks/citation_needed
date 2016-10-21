@@ -85,8 +85,6 @@ a { color: #0645ad; text-decoration: none; }
 
 .player-8-border-top { border-top: 10px solid #FFB3BA; }
 
-#client-room { /* #view-leaderboard { .players { position: absolute; bottom: 0; width: 100%; display: table;	    table-layout: fixed;  text-align: center; margin-bottom: 60px; } .player { display: table-cell; vertical-align: bottom; .name {  @extend .serif; font-size: 1.8em; font-weight: 300; margin: 0; position: relative; word-break: break-all; bottom: 0; color: #bbb; background: transparent; padding: 5px 0; } }		 		 } */ }
-
 #client-room #view-container { width: 100%; height: 100%; white-space: nowrap; position: relative; -webkit-transition: 1s right cubic-bezier(0.86, 0, 0.07, 1); transition: 1s right cubic-bezier(0.86, 0, 0.07, 1); }
 
 #client-room #view-container[data-current-view="lobby"] { right: 0; }
@@ -235,21 +233,21 @@ a { color: #0645ad; text-decoration: none; }
 
 #client-room #view-answer-phase .player .name { font-size: 1.8em; font-weight: 300; margin: 0; position: relative; word-break: break-all; bottom: 0; color: #aaa; background: transparent; padding: 5px 0; -webkit-transition: 1s bottom cubic-bezier(0.86, 0, 0.07, 1), 0.6s background ease-in-out 0.4s, 0.6s color ease-in-out 0.4s; transition: 1s bottom cubic-bezier(0.86, 0, 0.07, 1), 0.6s background ease-in-out 0.4s, 0.6s color ease-in-out 0.4s; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(1) .name { color: white; background: #ED6D79; bottom: 70px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(1) .name { color: white; background: #ED6D79; bottom: 67px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(2) .name { color: white; background: #90D4F7; bottom: 95px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(2) .name { color: white; background: #90D4F7; bottom: 84px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(3) .name { color: white; background: #FFDC89; bottom: 128px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(3) .name { color: white; background: #FFDC89; bottom: 148px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(4) .name { color: white; background: #71E096; bottom: 149px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(4) .name { color: white; background: #71E096; bottom: 143px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(5) .name { color: white; background: #F5A26F; bottom: 142px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(5) .name { color: white; background: #F5A26F; bottom: 126px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(6) .name { color: white; background: #D4A697; bottom: 81px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(6) .name { color: white; background: #D4A697; bottom: 110px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(7) .name { color: white; background: #DA97E0; bottom: 108px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(7) .name { color: white; background: #DA97E0; bottom: 115px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(8) .name { color: white; background: #FFB3BA; bottom: 76px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(8) .name { color: white; background: #FFB3BA; bottom: 118px; }
 
 #client-room #view-answer-phase .countdown { position: absolute; top: 40%; right: 50%; -webkit-transform: translate(50%, -50%); -ms-transform: translate(50%, -50%); transform: translate(50%, -50%); width: -webkit-calc(20% + 25px); width: calc(20% + 25px); }
 

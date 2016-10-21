@@ -644,35 +644,7 @@ a {
 			    }
 		    }
 		}
-	}/*
-	#view-leaderboard {
-		.players {
-			position: absolute;
-		    bottom: 0;
-		    width: 100%;
-		    display: table;	   
-		    table-layout: fixed; 
-		    text-align: center;
-		    margin-bottom: 60px;
-		}
-		.player {
-		 	display: table-cell;
-		 	vertical-align: bottom;
-		 	.name { 
-		 		@extend .serif;
-		 		font-size: 1.8em;
-			    font-weight: 300;
-		 		margin: 0;
-		 		position: relative;
-		 		word-break: break-all;
-		 		bottom: 0;
-		 		color: #bbb;
-		 		background: transparent;
-		 		padding: 5px 0;
-			}
-		}		 		
 	}
-	*/
 	#view-endgame {
 		.content {
 			position: absolute;

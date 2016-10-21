@@ -88,7 +88,7 @@ let questionPool  = {
 let gamePhases = {
 	lobby: function(){
 		$('.host').attr('href', `${location.host}/player`).find('span').text(`${location.host}/player`);
-		/*
+		
 		$('.typed').typed({			
 			strings: [
 				"The <a>English</a> have terrible teeth due to bad parenting.", 
@@ -109,18 +109,18 @@ let gamePhases = {
 				// end temp
 			}
 		})
-		*/		
-		
+				
+		/*
 		// temp
 		$('.typed').text('60% of the time it works <em>every</em> time.');
 		$('#view-lobby .typed-cursor').addClass('hide');
 		$('#view-lobby .type-wrapper').addClass('slide-left');
 		$('#view-lobby .player').addClass('show');
 		//waitOnAudio('../speech/001-title.mp3', 1500);
-
 		setTimeout(() => $('.player').addClass('joined'), 5000);
 		setTimeout(commands.triggerNextStep, 2000);		
 		// end temp		
+		*/
 	},
 	describeRound: function(round) {
 		if(round === 1){
@@ -128,22 +128,22 @@ let gamePhases = {
 				// if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
 			})
 			waitOnAudio('../speech/002-intro.mp3')
-			.then(e => waitOnAudio('../speech/003-round1-intro.mp3'))
-			.then(e => $('#view-container').attr('data-current-view', `describe-round-${round}`))
-			.then(e => $('.description li').eq(0).addClass('show'))
-			.then(e => waitOnAudio('../speech/004-round1-desc.mp3', 1000))				
-			.then(e => $('.description li').eq(1).addClass('show'))
-			.then(e => waitOnAudio('../speech/005-round1-desc.mp3'))				
-			.then(e => $('.description li').eq(2).addClass('show'))
-			.then(e => waitOnAudio('../speech/006-round1-desc.mp3'))				
-			.then(e => $('.description li').eq(3).addClass('show'))
-			.then(e => waitOnAudio('../speech/007-round1-desc.mp3'))				
-			.then(e => $('.description li').eq(4).addClass('show'))
-			.then(e => waitOnAudio('../speech/008-round1-desc.mp3'))				
-			.then(e => $('.description li').eq(5).addClass('show'))
-			.then(e => waitOnAudio('../speech/009-round1-desc.mp3'))				
-			.then(e => $('.description li').eq(6).addClass('show'))	
-			.then(e => gameSequence.next())
+				.then(() => waitOnAudio('../speech/003-round1-intro.mp3'))
+				.then(() => $('#view-container').attr('data-current-view', `describe-round-${round}`))
+				.then(() => $('.description li').eq(0).addClass('show'))
+				.then(() => waitOnAudio('../speech/004-round1-desc.mp3', 1000))				
+				.then(() => $('.description li').eq(1).addClass('show'))
+				.then(() => waitOnAudio('../speech/005-round1-desc.mp3'))				
+				.then(() => $('.description li').eq(2).addClass('show'))
+				.then(() => waitOnAudio('../speech/006-round1-desc.mp3'))				
+				.then(() => $('.description li').eq(3).addClass('show'))
+				.then(() => waitOnAudio('../speech/007-round1-desc.mp3'))				
+				.then(() => $('.description li').eq(4).addClass('show'))
+				.then(() => waitOnAudio('../speech/008-round1-desc.mp3'))				
+				.then(() => $('.description li').eq(5).addClass('show'))
+				.then(() => waitOnAudio('../speech/009-round1-desc.mp3'))				
+				.then(() => $('.description li').eq(6).addClass('show'))	
+				.then(gameSequence.next)
 		}		
 	},
 	roundOne: function() {
@@ -174,7 +174,7 @@ let gamePhases = {
 			socket.emit('relay', { // relay the question to everyone in the room
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			})
-			room.timer.limit = 1; // set the time limit to 60 seconds
+			room.timer.limit = 5; // set the time limit to 60 seconds
 			startTimer(room.timer.limit);
 		}, 5000);
 	},
@@ -232,7 +232,7 @@ let gamePhases = {
 
 			// temp
 			//q = {excerpt: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare arcu vel risus interdum mattis. Aliquam semper neque quis maximus efficitur. Sed eget aliquam est, ut aliquam erat.", submissions: {}}
-			let subs = ["Archipelago", "Dances with Wolves (film)", "Acid reflux", "Quantum Leap", "Gone with the wind", "OMG (Abbreviation)", "Christmas", "Expanding magazine file", "Minced oath"]
+			let subs = ["Archipelago", "Dances with Wolves (film)", "Acid reflux", "Quantum Leap", "Gone with the wind", "OMG (Abbreviation)", "Christmas", "Minced oath"]
 			let sub_i = 0;
 			let p1 = null;			
 			//end temp
@@ -246,7 +246,7 @@ let gamePhases = {
 				//room.votes[pid] = p1;				
 				//room.votes[pid] = room.roomKey;
 				room.votes[pid] = Object.keys(room.players)[rand(0, Object.keys(room.players).length-1)];
-				room.votes[p1] = room.roomKey;
+				//room.votes[p1] = room.roomKey;
 				// end temp
 			}
 
@@ -290,13 +290,13 @@ let gamePhases = {
 				})				
 			}			
 		}
-		room.timer.limit = 1; // set the time limit to 30 seconds
+		room.timer.limit = 5; // set the time limit to 30 seconds
 		startTimer(room.timer.limit);
 	},
 	scoring: function(){
 		let qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
-		//let r3Player = room.players[Object.keys(room.questions[qid].submissions)[0]];
-		//let citations = 0;
+		let r3Player = room.players[Object.keys(room.questions[qid].submissions)[0]];
+		let citations = 0;
 
 		if(room.round === 1) {
 			let correctAnswer = `.answer[data-player-id="${room.roomKey}"]`;
@@ -337,11 +337,9 @@ let gamePhases = {
 	leaderboard: function() {
 		addPlayersToLeaderboard(room.players);
 		$('#view-container').attr('data-current-view', 'leaderboard');
-		updateLeaderboard();
-
-		
-		
-		//wait(3000).then(gameSequence.next);
+		updateLeaderboard()
+			.then(() => wait(1000))
+			.then(gameSequence.next);
 	},
 	sendTriggerPrompt: function() {
 		socket.emit('relay', { 
@@ -377,7 +375,7 @@ let gameSequence = {
 */
 
 function generateGameSequence() {
-	// gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
 	gameSequence.steps.push(gamePhases.roundOne);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
@@ -564,7 +562,7 @@ function addPlayersToLeaderboard(players) {
 
 function revealVotesSequentially (answers){
 	answers.reduce((p, answer) => {
-		return p.then(() => revealVote(answer));		
+		return p.then(() => wait(1000).then(() => revealVote(answer)));
 	}, Promise.resolve())
 	.then(gameSequence.next);
 }
@@ -603,7 +601,7 @@ function revealVote(answer){
 		  .to(answer, 0.6, { y: 0, ease: Power4.easeInOut, delay: 1}) // then slam the answer down
 		  .staggerTo($(answer).find('.score'), 1.5, { y: "-=200px", ease: Power3.easeOut }, offset, "-=0.6") // float the score up
 		  .staggerTo($(answer).find('.score'), 0.5, { opacity: 1, ease: Power3.easeIn}, offset, `-=${correctFloat + 1.5}`) // with a fade in
-		  .staggerTo($(answer).find('.score'), 1, { opacity: 0, ease: Power2.easeOut }, offset, `-=${correctFloat + 0.5}`, () => wait(1000).then(resolve)) // after fade out, resolve the promise
+		  .staggerTo($(answer).find('.score'), 1, { opacity: 0, ease: Power2.easeOut }, offset, `-=${correctFloat + 0.5}`, resolve) // after fade out, resolve the promise
 	})
 }
 
@@ -646,27 +644,28 @@ function drawCountdown(end) {
 */
 
 function updateLeaderboard() {
-	let totalScore = 0;
-	let averageScore = 0;
-	for(let pid in room.players) {
-		totalScore += room.players[pid].score;
-	}
-	averageScore = totalScore / Object.keys(room.players).length;
+	return new Promise((resolve, reject) => {
+		let totalScore = 0;
+		let averageScore = 0;
+		for(let pid in room.players) {
+			totalScore += room.players[pid].score;
+		}
+		averageScore = totalScore / Object.keys(room.players).length;
 
-	for(var pid in room.players) {
-		let $player = $(`#view-leaderboard .player[data-player-id="${pid}"]`);
-		let offset = ((room.players[pid].score - averageScore) / 2) * -1;
-		let percent = `${Math.round((room.players[pid].score / totalScore) * 100/4)}%`;
-		let tl = new TimelineMax();	
-		let initialWidth = $player.width();
-		let newWidth = initialWidth;
-		tl.set($player, { width: percent, onComplete: () => newWidth = $player.width() })
-		  .set($player, { width: initialWidth })
-		  .to($player, 2, { height: newWidth, width: newWidth, ease: Power4.easeInOut, delay: 0.5 })
-		  .to($player, 2, { y: offset, ease: Power4.easeInOut }, "-=1.5")
-		  .to($player.find('.content-wrapper'), 0.6, { opacity: 1, ease: Power2.easeInOut }, "-=0.5")
-		  .from($player.find('.content-wrapper'), 0.6, { y: 100, ease: Power4.easeInOut }, "-=0.6")
-	}
+		for(var pid in room.players) {
+			let $player = $(`#view-leaderboard .player[data-player-id="${pid}"]`);
+			let offset = ((room.players[pid].score - averageScore) / 2) * -1;
+			let percent = `${Math.round((room.players[pid].score / totalScore) * 100/4)}%`;
+			let tl = new TimelineMax();	
+			let initialWidth = $player.width();
+			let newWidth = initialWidth;
+			tl.set($player, { width: percent, onComplete: () => newWidth = $player.width() })
+			  .set($player, { width: initialWidth })
+			  .to($player, 4, { height: newWidth, width: newWidth, ease: Power3.easeInOut, delay: 0.5 })
+			  .to($player, 3, { y: offset, ease: Power3.easeInOut }, "-=3")
+			  .staggerTo('#view-leaderboard .content-wrapper', 1.2, { opacity: 1, ease: Power4.easeInOut }, 0.1, 4, resolve)
+		}
+	})		
 }
 
 /*
