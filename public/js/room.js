@@ -31,9 +31,9 @@ socket.on('relay', message => {
 let commands = {
 	triggerNextStep: message => {
 		if(room.round === 0) {
-			createDummyPlayers(8);
+			createDummyPlayers(3);
 			addPlayersToAnswerPhase();
-			generateGameSequence();		
+			generateGameSequence();
 		}
 		gameSequence.next();
 	},
@@ -88,7 +88,7 @@ let questionPool  = {
 let gamePhases = {
 	lobby: function(){
 		$('.host').attr('href', `${location.host}/player`).find('span').text(`${location.host}/player`);
-		
+		/*
 		$('.typed').typed({			
 			strings: [
 				"The <a>English</a> have terrible teeth due to bad parenting.", 
@@ -109,18 +109,18 @@ let gamePhases = {
 				// end temp
 			}
 		})
-				
-		/*
+		*/		
+		
 		// temp
 		$('.typed').text('60% of the time it works <em>every</em> time.');
 		$('#view-lobby .typed-cursor').addClass('hide');
 		$('#view-lobby .type-wrapper').addClass('slide-left');
 		$('#view-lobby .player').addClass('show');
 		//waitOnAudio('../speech/001-title.mp3', 1500);
+
 		setTimeout(() => $('.player').addClass('joined'), 5000);
 		setTimeout(commands.triggerNextStep, 2000);		
 		// end temp		
-		*/
 	},
 	describeRound: function(round) {
 		if(round === 1){
@@ -174,7 +174,7 @@ let gamePhases = {
 			socket.emit('relay', { // relay the question to everyone in the room
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			})
-			room.timer.limit = 5; // set the time limit to 60 seconds
+			room.timer.limit = 1;
 			startTimer(room.timer.limit);
 		}, 5000);
 	},
@@ -182,6 +182,14 @@ let gamePhases = {
 		let players = shuffle(Object.keys(room.players)); // get player ids and randomize
 		let questions = questionPool.roundTwo; // get this rounds question pool
 		room.round = 2;
+
+		$('#view-answer-phase .question-anchor').removeClass('reveal tuck'); // reset
+		$(`#view-answer-phase .player`).removeClass('answered'); // reset
+		$('#view-answer-phase .question').text('Look at your phone to answer your questions');
+
+		$('#view-container').attr('data-current-view', `answer-phase`); // show the question
+		$('#view-answer-phase .question-anchor').addClass('reveal');
+
 		for(let i = 0; i < players.length; i++) {
 			let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
 			let p1 = players[i];
@@ -192,41 +200,55 @@ let gamePhases = {
 			room.players[p1].submissionsComplete[q.id] = false;
 			room.players[p1].submissionsComplete[q.id] = false;
 
-			socket.emit('relay', {
-				from: room.roomKey, to: p1, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
-			})
-			socket.emit('relay', {
-				from: room.roomKey, to: p2, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
-			})
-			addQuestionToPage(q);
-			addAnswerToQuestion(q, room.players[p1]);
-			addAnswerToQuestion(q, room.players[p2]);
-		}
-		startTimer(room.timer.limit);
+			setTimeout(() => {		
+				socket.emit('relay', {
+					from: room.roomKey, to: p1, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
+				})
+				socket.emit('relay', {
+					from: room.roomKey, to: p2, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
+				})				
+			}, 5000);
+		}		
+		setTimeout(() => {		
+			$('#view-answer-phase .question-anchor').addClass('tuck');
+			// temp
+			$(`#view-answer-phase .player`).addClass('answered'); // show player as answered in lobby
+			// end temp
+			room.timer.limit = 1; // set the time limit to 60 seconds
+			startTimer(room.timer.limit);
+		}, 5000);
 	},
 	roundThree: function() {
 		let players = Object.keys(room.players); // get player ids
 		let questions = questionPool.roundThree; // get this rounds question pool
 		room.round = 3;
 
+		$('#view-answer-phase .question-anchor').removeClass('tuck');
+		$('#view-answer-phase .question').text('Look at your phone to answer your questions');
+
 		for(let pid in room.players) {
 			let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random		
-			room.questions[q.id] = { question: q.article, submissions: {} };
-			addQuestionToPage(q);
+			room.questions[q.id] = { question: q.article, submissions: {} };			
 
 			room.questions[q.id].submissions[pid] = null;
-			room.players[pid].submissionsComplete[q.id] = false;
-			addAnswerToQuestion(q, room.players[pid]);
+			room.players[pid].submissionsComplete[q.id] = false;			
 
-			socket.emit('relay', { // relay the question to everyone in the room
-				from: room.roomKey, to: pid, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 3 }
-			})
-		}
-		startTimer(room.timer.limit);
+			setTimeout(() => {		
+				$('#view-answer-phase .question-anchor').addClass('tuck');
+				// temp
+				$(`#view-answer-phase .player`).addClass('answered'); // show player as answered in lobby
+				// end temp
+				socket.emit('relay', { // relay the question to everyone in the room
+					from: room.roomKey, to: pid, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 3 }
+				})
+				room.timer.limit = 1; // set the time limit to 60 seconds
+				startTimer(room.timer.limit);
+			}, 5000);
+		}		
 	},
 	voting: function() {
 		let qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
-		let q = room.questions[qid]; // get question in the final position
+		let q = room.questions[qid]; // get question in the final position	
 
 		if(room.round === 1) {
 
@@ -250,13 +272,12 @@ let gamePhases = {
 				// end temp
 			}
 
-			addAnswersToVotingPhase(q.submissions);
+			addContentToVotingPhase(q);
 
 			// temp			
-			addVotesToVotingPhase(room.votes);			
+			addVotesToVotingPhase(room.votes);
 			// end temp
-
-			$('#view-voting-phase .question').text(q.question);
+			
 			$('#view-container').attr('data-current-view', `voting-phase`);
 
 			socket.emit('relay', { 
@@ -264,18 +285,38 @@ let gamePhases = {
 			})
 		}
 		else if(room.round === 2) {
-			for(let i in room.players) {
+
+			// temp
+			//console.log(JSON.stringify(room, null, '\t'));
+			let subs = ["Archipelago", "Dances with Wolves (film)"]
+			let sub_i = 0;					
+			for(let pid in q.submissions) {
+				q.submissions[pid] = subs[sub_i++];				
+			}
+			// end temp			
+
+			for(let pid in room.players) {
 				let send = true;
-				for(let j in q.submissions) {
-					if(i === j) send = false;
+				for(let subpid in q.submissions) {
+					if(pid === subpid) send = false;
 				}
 				if(send) {
-					room.votes[i] = null; // set every player's vote to null
+					room.votes[pid] = null; // set every player's vote to null
+					//temp
+					room.votes[pid] = Object.keys(q.submissions)[rand(0, Object.keys(q.submissions).length-1)];
+					//end temp
 					socket.emit('relay', { 
-						from: room.roomKey, to: i, command: 'prepareVote', args: { answers: q.submissions }
+						from: room.roomKey, to: pid, command: 'prepareVote', args: { answers: q.submissions }
 					})
 				}
 			}
+			addContentToVotingPhase(q)
+			.then(() => {				
+				// temp
+				addVotesToVotingPhase(room.votes);			
+				// end temp				
+				$('#view-container').attr('data-current-view', `voting-phase`);
+			})
 		}
 		else if(room.round === 3) {
 			let pid = Object.keys(q.submissions)[0];
@@ -290,7 +331,6 @@ let gamePhases = {
 				})				
 			}			
 		}
-		room.timer.limit = 5; // set the time limit to 30 seconds
 		startTimer(room.timer.limit);
 	},
 	scoring: function(){
@@ -303,6 +343,11 @@ let gamePhases = {
 			let scoringAnswers = $('.answer[data-will-score]').not(correctAnswer); // get all scoring answers that aren't correct
 			let sequence = shuffle($(scoringAnswers).toArray()); // shuffle the scoring answers, and convert it to a js array
 			sequence.push($(correctAnswer)[0]); //  and push the correct one to the end of the sequence
+			revealVotesSequentially(sequence); // then reveal them in order
+		}
+		if(room.round === 2) {
+			let scoringAnswers = $('.answer[data-will-score]'); // get all scoring answers that aren't correct
+			let sequence = shuffle($(scoringAnswers).toArray()); // shuffle the scoring answers, and convert it to a js array			
 			revealVotesSequentially(sequence); // then reveal them in order
 		}
 
@@ -375,32 +420,30 @@ let gameSequence = {
 */
 
 function generateGameSequence() {
-	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
+	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
 	gameSequence.steps.push(gamePhases.roundOne);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
 	gameSequence.steps.push(gamePhases.leaderboard);
-	/*
-	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
+	//gameSequence.steps.push(gamePhases.sendTriggerPrompt);
 	gameSequence.steps.push(gamePhases.roundTwo);
 	for(let i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
 		gameSequence.steps.push(gamePhases.scoring);
 	}	
-	gameSequence.steps.push(gamePhases.sendTriggerPrompt);
-	gameSequence.steps.push(gamePhases.roundThree);
+	gameSequence.steps.push(gamePhases.leaderboard);
+	//gameSequence.steps.push(gamePhases.sendTriggerPrompt);
+	//gameSequence.steps.push(gamePhases.roundThree);
 	for(let i in room.players) {
-		gameSequence.steps.push(gamePhases.voting);		
-		gameSequence.steps.push(gamePhases.scoring);
-	}
-	*/
+		//gameSequence.steps.push(gamePhases.voting);		
+		//gameSequence.steps.push(gamePhases.scoring);
+	}	
 	gameSequence.steps.push(gamePhases.endGame);
 }
 
 /*
 	startTimer: starts the timer and initiates/finishes the circular timer
 */
-
 function startTimer(t) {
 	$('.countdown .timer').text(t); // set the timer
 	if(t === room.timer.limit) {
@@ -482,7 +525,7 @@ function addPlayersToAnswerPhase() {
 }
 
 /*
-	shuffle: randomise and array
+	addQuestionToPage: legacy
 */
 
 function addQuestionToPage(question) {
@@ -506,23 +549,34 @@ function addAnswerToQuestion(q, player) {
 }
 
 /*
-	addAnswersToVotingPhase: add the answers randomly (using an object keys shuffle) to the voting phase view
+	addContentToVotingPhase: add the answers randomly (using an object keys shuffle) to the voting phase view
 	this is necessary to obscure the answer's owner
 */
 
-function addAnswersToVotingPhase(submissions) {
-	let randomKeys = shuffle(Object.keys(submissions));
-	for(let i = 0; i < randomKeys.length; i++){
-		let frag = fragment($('#template-answer').html());
-		let pid = randomKeys[i];
+function addContentToVotingPhase(q) {
+	return new Promise((resolve, reject) => {
+		let randomKeys = shuffle(Object.keys(q.submissions));
+		let fragVc = fragment($('#template-voting-content').html()) // create the new content
+		let tl = new TimelineMax();
 
-		$(frag).find('.answer').attr('data-player-id', pid);
-		if(pid !== room.roomKey) {
-			$(frag).find('.answer .score').addClass(`player-${room.players[pid].number}-bg coloured`);
-		}		
-		$(frag).find('.answer .content').text(submissions[pid]);
-		$(`#view-voting-phase .answers`).append(frag);
-	}
+		$(fragVc).find('.voting-content'); // queue the content for reveal
+		$(fragVc).find('.question').text(q.question); // set the quesiton on this view	
+		for(let i = 0; i < randomKeys.length; i++){
+			let fragA = fragment($('#template-answer').html());
+			let pid = randomKeys[i];
+
+			$(fragA).find('.answer').attr('data-player-id', pid);
+			if(pid !== room.roomKey) {
+				$(fragA).find('.answer .score').addClass(`player-${room.players[pid].number}-bg coloured`);
+			}		
+			$(fragA).find('.answer .content').text(q.submissions[pid]);
+			$(fragVc).find('.answers').append(fragA); // append this answer to the answers element
+		}
+
+		$(fragVc).appendTo('#view-voting-phase');
+		tl.to('#view-voting-phase .queued', 1, { top: 0, ease: Power4.easeOut, onComplete: () => $('.voting-content').not('.queued').remove() })
+		  .set('#view-voting-phase .queued', {className: '-=queued', onComplete: resolve})
+	})	
 }
 
 /*
@@ -545,6 +599,7 @@ function addVotesToVotingPhase(votes) {
 */
 
 function addPlayersToLeaderboard(players) {
+	if($('#view-leaderboard .player').length > 0) return;
 	for(let pid in players) {
 		console.log("player %s - previous score: %s, new score: %s", players[pid].number, players[pid].previousScore, players[pid].score);
 		let frag = fragment($('#template-player').html());
@@ -630,8 +685,9 @@ function createDummyPlayers(amount) {
 function drawCountdown(end) {
 	let countdown = `#view-${$('#view-container').attr('data-current-view')} .countdown`;
 	if(!end) return TweenLite.to(`${countdown} .circle`, room.timer.limit, { strokeDashoffset: 0, ease: Linear.easeNone });
-	var tl = new TimelineMax();
-	tl.to(`${countdown} .circle`, 1, { strokeDashoffset: 0, ease: Power4.easeInOut })
+	let tl = new TimelineMax();
+	tl.set('.countdown *', {clearProps: 'all'})
+	  .to(`${countdown} .circle`, 1, { strokeDashoffset: 0, ease: Power4.easeInOut })
 	  .to(`${countdown} .timer`, 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5')
   	  .to(`${countdown} .circle`, 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) })
       .to(`${countdown} .circle`, 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3')      
@@ -652,7 +708,7 @@ function updateLeaderboard() {
 		}
 		averageScore = totalScore / Object.keys(room.players).length;
 
-		for(var pid in room.players) {
+		for(let pid in room.players) {
 			let $player = $(`#view-leaderboard .player[data-player-id="${pid}"]`);
 			let offset = ((room.players[pid].score - averageScore) / 2) * -1;
 			let percent = `${Math.round((room.players[pid].score / totalScore) * 100/4)}%`;
@@ -710,7 +766,7 @@ function rand(min, max) {
 
 function waitOnAudio(path, delay = 0, immediate = false) {
 	return new Promise(function(resolve, reject){
-		var audio = new Audio(path);
+		let audio = new Audio(path);
 		$(audio).on('ended', resolve);
 		setTimeout(e => audio.play(), delay);
 		if(immediate) resolve();		

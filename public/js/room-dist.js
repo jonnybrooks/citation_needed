@@ -31,7 +31,7 @@ socket.on('relay', function (message) {
 var commands = {
 	triggerNextStep: function triggerNextStep(message) {
 		if (room.round === 0) {
-			createDummyPlayers(8);
+			createDummyPlayers(3);
 			addPlayersToAnswerPhase();
 			generateGameSequence();
 		}
@@ -66,25 +66,41 @@ var questionPool = {
 var gamePhases = {
 	lobby: function lobby() {
 		$('.host').attr('href', location.host + '/player').find('span').text(location.host + '/player');
+		/*
+  $('.typed').typed({			
+  	strings: [
+  		"The <a>English</a> have terrible teeth due to bad parenting.", 
+  		"<a>Wasps</a> are in fact just angry little <a>Bees</a>.",
+  		"60% of the time it works <em>every</em> time."
+  	],
+  	typeSpeed: 0,
+  	backSpeed: -200,
+  	backDelay: 2000,
+  	callback: function() {
+  		$('#view-lobby .typed-cursor').addClass('hide');
+  		$('#view-lobby .type-wrapper').addClass('slide-left');
+  		$('#view-lobby .player').addClass('show');
+  		waitOnAudio('../speech/001-title.mp3', 1500);
+  		// temp
+  		setTimeout(() => $('.player').addClass('joined'), 2000);
+  		setTimeout(commands.triggerNextStep, 3000);
+  		// end temp
+  	}
+  })
+  */
 
-		$('.typed').typed({
-			strings: ['The <a>English</a> have terrible teeth due to bad parenting.', '<a>Wasps</a> are in fact just angry little <a>Bees</a>.', '60% of the time it works <em>every</em> time.'],
-			typeSpeed: 0,
-			backSpeed: -200,
-			backDelay: 2000,
-			callback: function callback() {
-				$('#view-lobby .typed-cursor').addClass('hide');
-				$('#view-lobby .type-wrapper').addClass('slide-left');
-				$('#view-lobby .player').addClass('show');
-				waitOnAudio('../speech/001-title.mp3', 1500);
-				// temp
-				setTimeout(function () {
-					return $('.player').addClass('joined');
-				}, 2000);
-				setTimeout(commands.triggerNextStep, 3000);
-				// end temp
-			}
-		});
+		// temp
+		$('.typed').text('60% of the time it works <em>every</em> time.');
+		$('#view-lobby .typed-cursor').addClass('hide');
+		$('#view-lobby .type-wrapper').addClass('slide-left');
+		$('#view-lobby .player').addClass('show');
+		//waitOnAudio('../speech/001-title.mp3', 1500);
+
+		setTimeout(function () {
+			return $('.player').addClass('joined');
+		}, 5000);
+		setTimeout(commands.triggerNextStep, 2000);
+		// end temp		
 	},
 	describeRound: function describeRound(round) {
 		if (round === 1) {
@@ -150,7 +166,7 @@ var gamePhases = {
 			socket.emit('relay', { // relay the question to everyone in the room
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			});
-			room.timer.limit = 5; // set the time limit to 60 seconds
+			room.timer.limit = 1;
 			startTimer(room.timer.limit);
 		}, 5000);
 	},
@@ -158,7 +174,15 @@ var gamePhases = {
 		var players = shuffle(Object.keys(room.players)); // get player ids and randomize
 		var questions = questionPool.roundTwo; // get this rounds question pool
 		room.round = 2;
-		for (var i = 0; i < players.length; i++) {
+
+		$('#view-answer-phase .question-anchor').removeClass('reveal tuck'); // reset
+		$('#view-answer-phase .player').removeClass('answered'); // reset
+		$('#view-answer-phase .question').text('Look at your phone to answer your questions');
+
+		$('#view-container').attr('data-current-view', 'answer-phase'); // show the question
+		$('#view-answer-phase .question-anchor').addClass('reveal');
+
+		var _loop = function (i) {
 			var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
 			var p1 = players[i];
 			var p2 = players[i + 1] || players[0];
@@ -168,41 +192,63 @@ var gamePhases = {
 			room.players[p1].submissionsComplete[q.id] = false;
 			room.players[p1].submissionsComplete[q.id] = false;
 
-			socket.emit('relay', {
-				from: room.roomKey, to: p1, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
-			});
-			socket.emit('relay', {
-				from: room.roomKey, to: p2, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
-			});
-			addQuestionToPage(q);
-			addAnswerToQuestion(q, room.players[p1]);
-			addAnswerToQuestion(q, room.players[p2]);
+			setTimeout(function () {
+				socket.emit('relay', {
+					from: room.roomKey, to: p1, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
+				});
+				socket.emit('relay', {
+					from: room.roomKey, to: p2, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
+				});
+			}, 5000);
+		};
+
+		for (var i = 0; i < players.length; i++) {
+			_loop(i);
 		}
-		startTimer(room.timer.limit);
+		setTimeout(function () {
+			$('#view-answer-phase .question-anchor').addClass('tuck');
+			// temp
+			$('#view-answer-phase .player').addClass('answered'); // show player as answered in lobby
+			// end temp
+			room.timer.limit = 1; // set the time limit to 60 seconds
+			startTimer(room.timer.limit);
+		}, 5000);
 	},
 	roundThree: function roundThree() {
 		var players = Object.keys(room.players); // get player ids
 		var questions = questionPool.roundThree; // get this rounds question pool
 		room.round = 3;
 
-		for (var pid in room.players) {
+		$('#view-answer-phase .question-anchor').removeClass('tuck');
+		$('#view-answer-phase .question').text('Look at your phone to answer your questions');
+
+		var _loop2 = function (pid) {
 			var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random		
 			room.questions[q.id] = { question: q.article, submissions: {} };
-			addQuestionToPage(q);
 
 			room.questions[q.id].submissions[pid] = null;
 			room.players[pid].submissionsComplete[q.id] = false;
-			addAnswerToQuestion(q, room.players[pid]);
 
-			socket.emit('relay', { // relay the question to everyone in the room
-				from: room.roomKey, to: pid, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 3 }
-			});
+			setTimeout(function () {
+				$('#view-answer-phase .question-anchor').addClass('tuck');
+				// temp
+				$('#view-answer-phase .player').addClass('answered'); // show player as answered in lobby
+				// end temp
+				socket.emit('relay', { // relay the question to everyone in the room
+					from: room.roomKey, to: pid, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 3 }
+				});
+				room.timer.limit = 1; // set the time limit to 60 seconds
+				startTimer(room.timer.limit);
+			}, 5000);
+		};
+
+		for (var pid in room.players) {
+			_loop2(pid);
 		}
-		startTimer(room.timer.limit);
 	},
 	voting: function voting() {
 		var qid = Object.keys(room.questions)[Object.keys(room.questions).length - 1];
-		var q = room.questions[qid]; // get question in the final position
+		var q = room.questions[qid]; // get question in the final position	
 
 		if (room.round === 1) {
 
@@ -226,31 +272,49 @@ var gamePhases = {
 				// end temp
 			}
 
-			addAnswersToVotingPhase(q.submissions);
+			addContentToVotingPhase(q);
 
 			// temp			
 			addVotesToVotingPhase(room.votes);
 			// end temp
 
-			$('#view-voting-phase .question').text(q.question);
 			$('#view-container').attr('data-current-view', 'voting-phase');
 
 			socket.emit('relay', {
 				from: room.roomKey, to: room.roomKey, command: 'prepareVote', args: { answers: q.submissions }
 			});
 		} else if (room.round === 2) {
-			for (var i in room.players) {
+
+			// temp
+			//console.log(JSON.stringify(room, null, '\t'));
+			var subs = ['Archipelago', 'Dances with Wolves (film)'];
+			var sub_i = 0;
+			for (var pid in q.submissions) {
+				q.submissions[pid] = subs[sub_i++];
+			}
+			// end temp			
+
+			for (var pid in room.players) {
 				var send = true;
-				for (var j in q.submissions) {
-					if (i === j) send = false;
+				for (var subpid in q.submissions) {
+					if (pid === subpid) send = false;
 				}
 				if (send) {
-					room.votes[i] = null; // set every player's vote to null
+					room.votes[pid] = null; // set every player's vote to null
+					//temp
+					room.votes[pid] = Object.keys(q.submissions)[rand(0, Object.keys(q.submissions).length - 1)];
+					//end temp
 					socket.emit('relay', {
-						from: room.roomKey, to: i, command: 'prepareVote', args: { answers: q.submissions }
+						from: room.roomKey, to: pid, command: 'prepareVote', args: { answers: q.submissions }
 					});
 				}
 			}
+			addContentToVotingPhase(q).then(function () {
+				// temp
+				addVotesToVotingPhase(room.votes);
+				// end temp				
+				$('#view-container').attr('data-current-view', 'voting-phase');
+			});
 		} else if (room.round === 3) {
 			var pid = Object.keys(q.submissions)[0];
 			for (var i in room.players) {
@@ -264,7 +328,6 @@ var gamePhases = {
 				});
 			}
 		}
-		room.timer.limit = 5; // set the time limit to 30 seconds
 		startTimer(room.timer.limit);
 	},
 	scoring: function scoring() {
@@ -277,6 +340,11 @@ var gamePhases = {
 			var scoringAnswers = $('.answer[data-will-score]').not(correctAnswer); // get all scoring answers that aren't correct
 			var sequence = shuffle($(scoringAnswers).toArray()); // shuffle the scoring answers, and convert it to a js array
 			sequence.push($(correctAnswer)[0]); //  and push the correct one to the end of the sequence
+			revealVotesSequentially(sequence); // then reveal them in order
+		}
+		if (room.round === 2) {
+			var scoringAnswers = $('.answer[data-will-score]'); // get all scoring answers that aren't correct
+			var sequence = shuffle($(scoringAnswers).toArray()); // shuffle the scoring answers, and convert it to a js array			
 			revealVotesSequentially(sequence); // then reveal them in order
 		}
 
@@ -351,32 +419,27 @@ var gameSequence = {
 */
 
 function generateGameSequence() {
-	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
+	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
 	gameSequence.steps.push(gamePhases.roundOne);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
 	gameSequence.steps.push(gamePhases.leaderboard);
-	/*
- gameSequence.steps.push(gamePhases.sendTriggerPrompt);
- gameSequence.steps.push(gamePhases.roundTwo);
- for(let i in room.players) {
- 	gameSequence.steps.push(gamePhases.voting);
- 	gameSequence.steps.push(gamePhases.scoring);
- }	
- gameSequence.steps.push(gamePhases.sendTriggerPrompt);
- gameSequence.steps.push(gamePhases.roundThree);
- for(let i in room.players) {
- 	gameSequence.steps.push(gamePhases.voting);		
- 	gameSequence.steps.push(gamePhases.scoring);
- }
- */
+	//gameSequence.steps.push(gamePhases.sendTriggerPrompt);
+	gameSequence.steps.push(gamePhases.roundTwo);
+	for (var i in room.players) {
+		gameSequence.steps.push(gamePhases.voting);
+		gameSequence.steps.push(gamePhases.scoring);
+	}
+	gameSequence.steps.push(gamePhases.leaderboard);
+	//gameSequence.steps.push(gamePhases.sendTriggerPrompt);
+	//gameSequence.steps.push(gamePhases.roundThree);
+	for (var i in room.players) {}
 	gameSequence.steps.push(gamePhases.endGame);
 }
 
 /*
 	startTimer: starts the timer and initiates/finishes the circular timer
 */
-
 function startTimer(t) {
 	$('.countdown .timer').text(t); // set the timer
 	if (t === room.timer.limit) {
@@ -461,7 +524,7 @@ function addPlayersToAnswerPhase() {
 }
 
 /*
-	shuffle: randomise and array
+	addQuestionToPage: legacy
 */
 
 function addQuestionToPage(question) {
@@ -485,23 +548,35 @@ function addAnswerToQuestion(q, player) {
 }
 
 /*
-	addAnswersToVotingPhase: add the answers randomly (using an object keys shuffle) to the voting phase view
+	addContentToVotingPhase: add the answers randomly (using an object keys shuffle) to the voting phase view
 	this is necessary to obscure the answer's owner
 */
 
-function addAnswersToVotingPhase(submissions) {
-	var randomKeys = shuffle(Object.keys(submissions));
-	for (var i = 0; i < randomKeys.length; i++) {
-		var frag = fragment($('#template-answer').html());
-		var pid = randomKeys[i];
+function addContentToVotingPhase(q) {
+	return new Promise(function (resolve, reject) {
+		var randomKeys = shuffle(Object.keys(q.submissions));
+		var fragVc = fragment($('#template-voting-content').html()); // create the new content
+		var tl = new TimelineMax();
 
-		$(frag).find('.answer').attr('data-player-id', pid);
-		if (pid !== room.roomKey) {
-			$(frag).find('.answer .score').addClass('player-' + room.players[pid].number + '-bg coloured');
+		$(fragVc).find('.voting-content'); // queue the content for reveal
+		$(fragVc).find('.question').text(q.question); // set the quesiton on this view	
+		for (var i = 0; i < randomKeys.length; i++) {
+			var fragA = fragment($('#template-answer').html());
+			var pid = randomKeys[i];
+
+			$(fragA).find('.answer').attr('data-player-id', pid);
+			if (pid !== room.roomKey) {
+				$(fragA).find('.answer .score').addClass('player-' + room.players[pid].number + '-bg coloured');
+			}
+			$(fragA).find('.answer .content').text(q.submissions[pid]);
+			$(fragVc).find('.answers').append(fragA); // append this answer to the answers element
 		}
-		$(frag).find('.answer .content').text(submissions[pid]);
-		$('#view-voting-phase .answers').append(frag);
-	}
+
+		$(fragVc).appendTo('#view-voting-phase');
+		tl.to('#view-voting-phase .queued', 1, { top: 0, ease: Power4.easeOut, onComplete: function onComplete() {
+				return $('.voting-content').not('.queued').remove();
+			} }).set('#view-voting-phase .queued', { className: '-=queued', onComplete: resolve });
+	});
 }
 
 /*
@@ -524,6 +599,7 @@ function addVotesToVotingPhase(votes) {
 */
 
 function addPlayersToLeaderboard(players) {
+	if ($('#view-leaderboard .player').length > 0) return;
 	for (var pid in players) {
 		console.log('player %s - previous score: %s, new score: %s', players[pid].number, players[pid].previousScore, players[pid].score);
 		var frag = fragment($('#template-player').html());
@@ -613,7 +689,7 @@ function drawCountdown(end) {
 	var countdown = '#view-' + $('#view-container').attr('data-current-view') + ' .countdown';
 	if (!end) return TweenLite.to(countdown + ' .circle', room.timer.limit, { strokeDashoffset: 0, ease: Linear.easeNone });
 	var tl = new TimelineMax();
-	tl.to(countdown + ' .circle', 1, { strokeDashoffset: 0, ease: Power4.easeInOut }).to(countdown + ' .timer', 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5').to(countdown + ' .circle', 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) }).to(countdown + ' .circle', 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3').to(countdown + ' .white-box', 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3').from(countdown + ' .white-box', 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4');
+	tl.set('.countdown *', { clearProps: 'all' }).to(countdown + ' .circle', 1, { strokeDashoffset: 0, ease: Power4.easeInOut }).to(countdown + ' .timer', 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5').to(countdown + ' .circle', 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) }).to(countdown + ' .circle', 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3').to(countdown + ' .white-box', 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3').from(countdown + ' .white-box', 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4');
 }
 
 /*
@@ -624,12 +700,12 @@ function updateLeaderboard() {
 	return new Promise(function (resolve, reject) {
 		var totalScore = 0;
 		var averageScore = 0;
-		for (var _pid in room.players) {
-			totalScore += room.players[_pid].score;
+		for (var pid in room.players) {
+			totalScore += room.players[pid].score;
 		}
 		averageScore = totalScore / Object.keys(room.players).length;
 
-		var _loop = function () {
+		var _loop3 = function (pid) {
 			var $player = $('#view-leaderboard .player[data-player-id="' + pid + '"]');
 			var offset = (room.players[pid].score - averageScore) / 2 * -1;
 			var percent = Math.round(room.players[pid].score / totalScore * 100 / 4) + '%';
@@ -642,7 +718,7 @@ function updateLeaderboard() {
 		};
 
 		for (var pid in room.players) {
-			_loop();
+			_loop3(pid);
 		}
 	});
 }
@@ -728,17 +804,9 @@ function Player(conf) {
 	this.previousScore = null;
 	this.submissionsComplete = {};
 }
-/*
-// temp
-$('.typed').text('60% of the time it works <em>every</em> time.');
-$('#view-lobby .typed-cursor').addClass('hide');
-$('#view-lobby .type-wrapper').addClass('slide-left');
-$('#view-lobby .player').addClass('show');
-//waitOnAudio('../speech/001-title.mp3', 1500);
-setTimeout(() => $('.player').addClass('joined'), 5000);
-setTimeout(commands.triggerNextStep, 2000);		
-// end temp		
-*/
 
 // if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
+
+//gameSequence.steps.push(gamePhases.voting);		
+//gameSequence.steps.push(gamePhases.scoring);
 // after fade out, resolve the promise
