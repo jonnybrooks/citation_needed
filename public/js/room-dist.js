@@ -65,41 +65,25 @@ var questionPool = {
 var gamePhases = {
 	lobby: function lobby() {
 		$('.host').attr('href', location.host + '/player').find('span').text(location.host + '/player');
-		/*
-  $('.typed').typed({			
-  	strings: [
-  		"The <a>English</a> have terrible teeth due to bad parenting.", 
-  		"<a>Wasps</a> are in fact just angry little <a>Bees</a>.",
-  		"60% of the time it works <em>every</em> time."
-  	],
-  	typeSpeed: 0,
-  	backSpeed: -200,
-  	backDelay: 2000,
-  	callback: function() {
-  		$('#view-lobby .typed-cursor').addClass('hide');
-  		$('#view-lobby .type-wrapper').addClass('slide-left');
-  		$('#view-lobby .player').addClass('show');
-  		waitOnAudio('../speech/001-title.mp3', 1500);
-  		// temp
-  		setTimeout(() => $('.player').addClass('joined'), 2000);
-  		setTimeout(commands.triggerNextStep, 3000);
-  		// end temp
-  	}
-  })
-  */
 
-		// temp
-		$('.typed').text('60% of the time it works <em>every</em> time.');
-		$('#view-lobby .typed-cursor').addClass('hide');
-		$('#view-lobby .type-wrapper').addClass('slide-left');
-		$('#view-lobby .player').addClass('show');
-		//waitOnAudio('../speech/001-title.mp3', 1500);
-
-		setTimeout(function () {
-			return $('.player').addClass('joined');
-		}, 5000);
-		setTimeout(commands.triggerNextStep, 2000);
-		// end temp		
+		$('.typed').typed({
+			strings: ['The <a>English</a> have terrible teeth due to bad parenting.', '<a>Wasps</a> are in fact just angry little <a>Bees</a>.', '60% of the time it works <em>every</em> time.'],
+			typeSpeed: 0,
+			backSpeed: -200,
+			backDelay: 2000,
+			callback: function callback() {
+				$('#view-lobby .typed-cursor').addClass('hide');
+				$('#view-lobby .type-wrapper').addClass('slide-left');
+				$('#view-lobby .player').addClass('show');
+				waitOnAudio('../speech/001-title.mp3', 1500);
+				// temp
+				setTimeout(function () {
+					return $('.player').addClass('joined');
+				}, 2000);
+				setTimeout(commands.triggerNextStep, 3000);
+				// end temp
+			}
+		});
 	},
 	describeRound: function describeRound(round) {
 		if (round === 1) {
@@ -458,16 +442,16 @@ var gameSequence = {
 
 /*
 	generateGameSequence: called when the game is initialised
-	established how many voting/scoring phases are necessary, based on the number of players
-	and pushes these steps to the gameSequence steps[]
+	establishes how many voting & scoring phases are necessary (based on the number of players)
+	and pushes these steps to the gameSequence steps[] array
 */
 
 function generateGameSequence() {
-	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
-	//gameSequence.steps.push(gamePhases.roundOne);
-	//gameSequence.steps.push(gamePhases.voting);
-	//gameSequence.steps.push(gamePhases.scoring);
-	//gameSequence.steps.push(gamePhases.leaderboard);
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
+	gameSequence.steps.push(gamePhases.roundOne);
+	gameSequence.steps.push(gamePhases.voting);
+	gameSequence.steps.push(gamePhases.scoring);
+	gameSequence.steps.push(gamePhases.leaderboard);
 	//gameSequence.steps.push(gamePhases.sendTriggerPrompt);
 	gameSequence.steps.push(gamePhases.roundTwo);
 	for (var i in room.players) {
@@ -478,7 +462,7 @@ function generateGameSequence() {
 	//gameSequence.steps.push(gamePhases.sendTriggerPrompt);
 	//gameSequence.steps.push(gamePhases.roundThree);
 	for (var i in room.players) {}
-	//gameSequence.steps.push(gamePhases.leaderboard);
+	gameSequence.steps.push(gamePhases.leaderboard);
 	gameSequence.steps.push(gamePhases.endGame);
 }
 
@@ -842,6 +826,18 @@ function Player(conf) {
 	this.previousScore = null;
 	this.submissionsComplete = {};
 }
+/*		
+
+// temp
+$('.typed').text('60% of the time it works <em>every</em> time.');
+$('#view-lobby .typed-cursor').addClass('hide');
+$('#view-lobby .type-wrapper').addClass('slide-left');
+$('#view-lobby .player').addClass('show');
+//waitOnAudio('../speech/001-title.mp3', 1500);
+	setTimeout(() => $('.player').addClass('joined'), 5000);
+setTimeout(commands.triggerNextStep, 2000);		
+// end temp	
+*/
 
 // if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
 // then reveal them in order			
