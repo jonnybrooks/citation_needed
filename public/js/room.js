@@ -31,8 +31,7 @@ socket.on('relay', message => {
 let commands = {
 	triggerNextStep: message => {
 		if(room.round === 0) {
-			createDummyPlayers(3);
-			addPlayersToAnswerPhase();
+			createDummyPlayers(4);			
 			generateGameSequence();
 		}
 		gameSequence.next();
@@ -69,7 +68,10 @@ let questionPool  = {
 		{id: 2, article: 'Arthur, King of the Britains'},
 		{id: 3, article: 'An African or a European Swallow?'},
 		{id: 4, article: 'NONE SHALL PASS'},
-		{id: 5, article: 'Nee!'}
+		{id: 5, article: 'Nee!'},
+		{id: 6, article: 'Ya arm\'s off!'},
+		{id: 7, article: 'Breathe, sweet Concorde'},
+		{id: 8, article: 'He\'s going to tell (He\'s going to tell)'}
 	],
 	roundThree: [
 		{id: 0, article: 'Blue, no, green!'},
@@ -77,7 +79,10 @@ let questionPool  = {
 		{id: 2, article: 'Arthur, King of the Britains'},
 		{id: 3, article: 'An African or a European Swallow?'},
 		{id: 4, article: 'NONE SHALL PASS'},
-		{id: 5, article: 'Nee!'}
+		{id: 5, article: 'Nee!'},
+		{id: 6, article: 'Ya arm\'s off!'},
+		{id: 7, article: 'Breathe, sweet Concorde'},
+		{id: 8, article: 'He\'s going to tell (He\'s going to tell)'}
 	]
 }
 
@@ -155,7 +160,6 @@ let gamePhases = {
 		room.questions[q.id] = { question: q.excerpt, submissions: {} };
 		room.round = 1;
 
-		$('#view-answer-phase .question').text(q.excerpt);
 		room.questions[q.id].submissions[room.roomKey] = q.article;
 
 		for(let pid in room.players) {
@@ -163,10 +167,12 @@ let gamePhases = {
 			room.players[pid].submissionsComplete[q.id] = false;
 		}
 
-		$('#view-container').attr('data-current-view', `answer-phase`); // show the question
-		$('#view-answer-phase .question-anchor').addClass('reveal');
-
-		setTimeout(() => {		
+		addContentToAnswerPhase(q.excerpt)
+		.then(() => $('#view-container').attr('data-current-view', `answer-phase`)) // show the answer phase view
+		.then(() => wait(50)) // delay neccesary for weird reveal behaviour
+		.then(() => $('#view-answer-phase .question-anchor').addClass('reveal')) // update the view
+		.then(() => wait(5000))
+		.then(() => {
 			$('#view-answer-phase .question-anchor').addClass('tuck');			
 			// temp
 			$(`#view-answer-phase .player`).addClass('answered'); // show player as answered in lobby
@@ -176,19 +182,12 @@ let gamePhases = {
 			})
 			room.timer.limit = 1;
 			startTimer(room.timer.limit);
-		}, 5000);
+		})
 	},
 	roundTwo: function() {
 		let players = shuffle(Object.keys(room.players)); // get player ids and randomize
 		let questions = questionPool.roundTwo; // get this rounds question pool
 		room.round = 2;
-
-		$('#view-answer-phase .question-anchor').removeClass('reveal tuck'); // reset
-		$(`#view-answer-phase .player`).removeClass('answered'); // reset
-		$('#view-answer-phase .question').text('Look at your phone to answer your questions');
-
-		$('#view-container').attr('data-current-view', `answer-phase`); // show the question
-		$('#view-answer-phase .question-anchor').addClass('reveal');
 
 		for(let i = 0; i < players.length; i++) {
 			let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
@@ -200,40 +199,48 @@ let gamePhases = {
 			room.players[p1].submissionsComplete[q.id] = false;
 			room.players[p1].submissionsComplete[q.id] = false;
 
-			setTimeout(() => {		
+			wait(5000).then(() => {
 				socket.emit('relay', {
 					from: room.roomKey, to: p1, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
 				})
 				socket.emit('relay', {
 					from: room.roomKey, to: p2, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
-				})				
-			}, 5000);
-		}		
-		setTimeout(() => {		
-			$('#view-answer-phase .question-anchor').addClass('tuck');
+				})	
+			})
+		}
+
+		addContentToAnswerPhase('Look at your phone to answer your questions')
+		.then(() => $('#view-container').attr('data-current-view', `answer-phase`)) // show the answer phase view
+		.then(() => wait(50)) // delay neccesary for weird reveal behaviour
+		.then(() => $('#view-answer-phase .question-anchor').addClass('reveal')) // update the view
+		.then(() => wait(5000))
+		.then(() => {
+			$('#view-answer-phase .question-anchor').addClass('tuck');			
 			// temp
 			$(`#view-answer-phase .player`).addClass('answered'); // show player as answered in lobby
-			// end temp
+			// end temp			
 			room.timer.limit = 1; // set the time limit to 60 seconds
 			startTimer(room.timer.limit);
-		}, 5000);
+		})
 	},
 	roundThree: function() {
 		let players = Object.keys(room.players); // get player ids
 		let questions = questionPool.roundThree; // get this rounds question pool
 		room.round = 3;
 
-		$('#view-answer-phase .question-anchor').removeClass('tuck');
-		$('#view-answer-phase .question').text('Look at your phone to answer your questions');
-
 		for(let pid in room.players) {
 			let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random		
 			room.questions[q.id] = { question: q.article, submissions: {} };			
 
 			room.questions[q.id].submissions[pid] = null;
-			room.players[pid].submissionsComplete[q.id] = false;			
+			room.players[pid].submissionsComplete[q.id] = false;
 
-			setTimeout(() => {		
+			addContentToAnswerPhase('Look at your phone to answer your questions')
+			.then(() => $('#view-container').attr('data-current-view', `answer-phase`)) // show the answer phase view
+			.then(() => wait(50)) // delay neccesary for weird reveal behaviour
+			.then(() => $('#view-answer-phase .question-anchor').addClass('reveal')) // update the view
+			.then(() => wait(5000))
+			.then(() => {
 				$('#view-answer-phase .question-anchor').addClass('tuck');
 				// temp
 				$(`#view-answer-phase .player`).addClass('answered'); // show player as answered in lobby
@@ -243,7 +250,7 @@ let gamePhases = {
 				})
 				room.timer.limit = 1; // set the time limit to 60 seconds
 				startTimer(room.timer.limit);
-			}, 5000);
+			})
 		}		
 	},
 	voting: function() {
@@ -319,17 +326,33 @@ let gamePhases = {
 			})
 		}
 		else if(room.round === 3) {
-			let pid = Object.keys(q.submissions)[0];
-			for(let i in room.players) {
-				if(pid === i) continue;
-				room.votes[i] = null; // set every player's vote to null
+			let subid = Object.keys(q.submissions)[0]; // get the first submission in the list
+
+			// temp
+			let answers = ['Archipelago', 'wrong', '[CITATION NEEDED]'];
+			q.submissions[subid] = "Arhcipelago";
+			// end temp	
+
+			for(let pid in room.players) {
+				if(subid === pid) continue;
+				room.votes[pid] = null; // set every player's vote to null
+				//temp
+				room.votes[pid] = answers.splice(Math.floor(Math.random() * answers.length), 1)[0];
+				//end temp
 				socket.emit('relay', { 
 					from: room.roomKey, 
-					to: i, 
+					to: pid, 
 					command: 'prepareQuestion', 
-					args: { qid: q.id, question: q.submissions[pid], round: '3-vote' }
+					args: { qid: q.id, question: q.submissions[subid], round: '3-vote' }
 				})				
-			}			
+			}
+			addContentToVotingPhase(q)
+			.then(() => {				
+				// temp
+				addVotesToVotingPhase(room.votes);			
+				// end temp				
+				$('#view-container').attr('data-current-view', `voting-phase`);
+			})
 		}
 		startTimer(room.timer.limit);
 	},
@@ -343,12 +366,17 @@ let gamePhases = {
 			let scoringAnswers = $('.answer[data-will-score]').not(correctAnswer); // get all scoring answers that aren't correct
 			let sequence = shuffle($(scoringAnswers).toArray()); // shuffle the scoring answers, and convert it to a js array
 			sequence.push($(correctAnswer)[0]); //  and push the correct one to the end of the sequence
-			revealVotesSequentially(sequence); // then reveal them in order
+			revealVotesSequentially(sequence).then(gameSequence.next) // then reveal them in order			
 		}
 		if(room.round === 2) {
 			let scoringAnswers = $('.answer[data-will-score]'); // get all scoring answers that aren't correct
 			let sequence = shuffle($(scoringAnswers).toArray()); // shuffle the scoring answers, and convert it to a js array			
-			revealVotesSequentially(sequence); // then reveal them in order
+			revealVotesSequentially(sequence).then(gameSequence.next) // then reveal them in order
+		}
+		if(room.round === 3) {
+			// ROUND 3 SCORES BASED ON IF PLAYER SUBMISSIONS MATCH THE ARTICLE TITLE
+			// CITATIONS WILL HAVE TO RSULT IN A DIFFERENT ANIMATION			
+			gameSequence.next();
 		}
 
 		for(let pid in room.players) {
@@ -356,18 +384,20 @@ let gamePhases = {
 		}
 		
 		for(let i in room.votes) {
-			if(room.round === 3 && room.votes[i] === "[CITATION NEEDED]") citations++;
-			else {
-				if(room.votes[i] === room.roomKey) room.players[i].score += 100;
-				if(room.players[room.votes[i]]) room.players[room.votes[i]].score += 100;	
+			if(room.round === 3 && room.votes[i] === "[CITATION NEEDED]") citations++; // for round 3, count the citations
+			else { // for every other round
+				if(room.votes[i] === room.roomKey) room.players[i].score += 100; // score for correct answers
+				if(room.players[room.votes[i]]) room.players[room.votes[i]].score += 100; // and for votes on players
 			}
 		}
 		if(room.round === 3){
-			if(citations >= Math.ceil(Object.keys(room.votes).length / 2)) {
-				r3Player.score -= 100;
+			if(citations >= Math.ceil(Object.keys(room.votes).length / 2)) { // if most votes are citations 
+				r3Player.score -= 100; // deduct points from the submitting player
 			}
 			else {
-				citations = 0;
+				citations = 0; // reset citations
+				// update this with comments, think the logic needs to change slightly
+				// to score players who successfully citate bullshit answers
 				for(let i in room.votes) {
 					if(room.votes[i] !== room.questions[qid].question) continue;
 					room.players[i].score += 50;
@@ -421,10 +451,10 @@ let gameSequence = {
 
 function generateGameSequence() {
 	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
-	gameSequence.steps.push(gamePhases.roundOne);
-	gameSequence.steps.push(gamePhases.voting);
-	gameSequence.steps.push(gamePhases.scoring);
-	gameSequence.steps.push(gamePhases.leaderboard);
+	//gameSequence.steps.push(gamePhases.roundOne);
+	//gameSequence.steps.push(gamePhases.voting);
+	//gameSequence.steps.push(gamePhases.scoring);
+	//gameSequence.steps.push(gamePhases.leaderboard);
 	//gameSequence.steps.push(gamePhases.sendTriggerPrompt);
 	gameSequence.steps.push(gamePhases.roundTwo);
 	for(let i in room.players) {
@@ -438,6 +468,7 @@ function generateGameSequence() {
 		//gameSequence.steps.push(gamePhases.voting);		
 		//gameSequence.steps.push(gamePhases.scoring);
 	}	
+	//gameSequence.steps.push(gamePhases.leaderboard);
 	gameSequence.steps.push(gamePhases.endGame);
 }
 
@@ -512,40 +543,23 @@ function addPlayerToLobby(player) {
 }
 
 /*
-	addPlayersToAnswer: creates a player fragment and adds it to the answer phase view
+	addContentToAnswerPhase: add the answers randomly (using an object keys shuffle) to the voting phase view
+	this is necessary to obscure the answer's owner
 */
 
-function addPlayersToAnswerPhase() {
-	for(let p in room.players) {
-		let frag = fragment($('#template-player').html());
-		$(frag).find('.player').attr('data-player-id', room.players[p].socketId);
-		$(frag).find('.player .name').text(room.players[p].name);		
-		$('#view-answer-phase .players').append(frag);	
-	}	
-}
-
-/*
-	addQuestionToPage: legacy
-*/
-
-function addQuestionToPage(question) {
-	let frag = fragment($('#template-question').html());
-	$(frag).find('.question').attr('data-question-id', question.id);
-	$(frag).find('.question .id').text(question.id);
-	$(frag).find('.question .answer').text(question.socketId);
-	$('#view-lobby .questions').append(frag);	
-}
-
-/*
-	addAnswerToQuestion: legacy
-*/
-
-function addAnswerToQuestion(q, player) {
-	let frag = fragment($('#template-answer').html());
-	$(frag).find('.answer').attr('data-player-id', player.socketId);
-	$(frag).find('.answer .player').text(player.name);
-	$(frag).find('.answer .content').text('Pending');
-	$(`#view-lobby .question[data-question-id="${q.id}"] .answers`).append(frag);
+function addContentToAnswerPhase(question) {	
+	return new Promise((resolve, reject) => {
+		let vcFrag = fragment($('#template-answer-phase-content').html());
+		$(vcFrag).find('.answer-phase-content .question').text(question);
+		for(let pid in room.players) {
+			let pFrag = fragment($('#template-player').html());
+			$(pFrag).find('.player').attr('data-player-id', pid);
+			$(pFrag).find('.player .name').text(room.players[pid].name);
+			$(vcFrag).find('.players').append(pFrag);
+		}
+		$('#view-answer-phase').html(vcFrag);
+		resolve();
+	})	
 }
 
 /*
@@ -556,10 +570,10 @@ function addAnswerToQuestion(q, player) {
 function addContentToVotingPhase(q) {
 	return new Promise((resolve, reject) => {
 		let randomKeys = shuffle(Object.keys(q.submissions));
-		let fragVc = fragment($('#template-voting-content').html()) // create the new content
-		let tl = new TimelineMax();
+		let fragVc = fragment($('#template-voting-phase-content').html()) // create the new content
+		let tmln = new TimelineMax();
 
-		$(fragVc).find('.voting-content'); // queue the content for reveal
+		$(fragVc).find('.voting-phase-content'); // queue the content for reveal
 		$(fragVc).find('.question').text(q.question); // set the quesiton on this view	
 		for(let i = 0; i < randomKeys.length; i++){
 			let fragA = fragment($('#template-answer').html());
@@ -574,8 +588,8 @@ function addContentToVotingPhase(q) {
 		}
 
 		$(fragVc).appendTo('#view-voting-phase');
-		tl.to('#view-voting-phase .queued', 1, { top: 0, ease: Power4.easeOut, onComplete: () => $('.voting-content').not('.queued').remove() })
-		  .set('#view-voting-phase .queued', {className: '-=queued', onComplete: resolve})
+		tmln.to('#view-voting-phase .queued', 1, { top: 0, ease: Power4.easeOut, onComplete: () => $('.voting-phase-content').not('.queued').remove() })
+			.set('#view-voting-phase .queued', {className: '-=queued', onComplete: resolve})
 	})	
 }
 
@@ -589,19 +603,17 @@ function addVotesToVotingPhase(votes) {
 		let frag = fragment($('#template-vote').html());
 		$(frag).find('.vote').attr('data-player-id', pid);
 		$(frag).find('.vote').addClass(`player-${room.players[pid].number}-bg`);
-		// $(frag).find('.vote .name').text(room.players[pid].name);
 		$(`.answer[data-player-id="${votes[pid]}"]`).attr('data-will-score', 'true').find('.votes').append(frag);
 	}	
 }
 
 /*
-	addPlayersToLeaderboard: 
+	addPlayersToLeaderboard: add the players to the leaderboard
 */
 
 function addPlayersToLeaderboard(players) {
 	if($('#view-leaderboard .player').length > 0) return;
-	for(let pid in players) {
-		console.log("player %s - previous score: %s, new score: %s", players[pid].number, players[pid].previousScore, players[pid].score);
+	for(let pid in players) {		
 		let frag = fragment($('#template-player').html());
 		$(frag).find('.player').attr('data-player-id', pid).addClass(`player-${room.players[pid].number}-bg coloured`);		
 		$(frag).find('.player .name').text(room.players[pid].name);
@@ -616,10 +628,12 @@ function addPlayersToLeaderboard(players) {
 */
 
 function revealVotesSequentially (answers){
-	answers.reduce((p, answer) => {
-		return p.then(() => wait(1000).then(() => revealVote(answer)));
-	}, Promise.resolve())
-	.then(gameSequence.next);
+	return new Promise((resolve, reject) => {
+		answers.reduce((p, answer) => {
+			return p.then(() => wait(1000).then(() => revealVote(answer)));
+		}, Promise.resolve())
+		.then(resolve);
+	})	
 }
 
 /*
@@ -633,7 +647,7 @@ function revealVote(answer){
 		let staggerDuration = 0.8;
 		let correctFloat = 0;
 		let floatDuration = ((votes-1) * offset) + staggerDuration;		
-		let tl = new TimelineMax();
+		let tmln = new TimelineMax();
 
 		$('#view-voting-phase .answer').removeClass('fade').not(answer).addClass('fade'); // isolate the showcased answer
 		$(answer).find('.score').text(votes * 100); // set the score in the view		
@@ -651,12 +665,12 @@ function revealVote(answer){
 			$(answer).find('.score').text('100'); // set them all to +100
 		}
 			
-		tl.staggerTo($(answer).find('.vote'), staggerDuration, { width: '100%', ease: Power4.easeOut, delay: 2 }, (offset * -1)) // reveal the votes
-		  .to(answer, floatDuration, { y: `-=${15 * votes}px`, ease: Power2.easeOut }, `-=${floatDuration}`) // rise the answer proportionately
-		  .to(answer, 0.6, { y: 0, ease: Power4.easeInOut, delay: 1}) // then slam the answer down
-		  .staggerTo($(answer).find('.score'), 1.5, { y: "-=200px", ease: Power3.easeOut }, offset, "-=0.6") // float the score up
-		  .staggerTo($(answer).find('.score'), 0.5, { opacity: 1, ease: Power3.easeIn}, offset, `-=${correctFloat + 1.5}`) // with a fade in
-		  .staggerTo($(answer).find('.score'), 1, { opacity: 0, ease: Power2.easeOut }, offset, `-=${correctFloat + 0.5}`, resolve) // after fade out, resolve the promise
+		tmln.staggerTo($(answer).find('.vote'), staggerDuration, { width: '100%', ease: Power4.easeOut, delay: 2 }, (offset * -1)) // reveal the votes
+			.to(answer, floatDuration, { y: `-=${15 * votes}px`, ease: Power2.easeOut }, `-=${floatDuration}`) // rise the answer proportionately
+			.to(answer, 0.6, { y: 0, ease: Power4.easeInOut, delay: 1}) // then slam the answer down
+			.staggerTo($(answer).find('.score'), 1.5, { y: "-=200px", ease: Power3.easeOut }, offset, "-=0.6") // float the score up
+			.staggerTo($(answer).find('.score'), 0.5, { opacity: 1, ease: Power3.easeIn}, offset, `-=${correctFloat + 1.5}`) // with a fade in
+			.staggerTo($(answer).find('.score'), 1, { opacity: 0, ease: Power2.easeOut }, offset, `-=${correctFloat + 0.5}`, resolve) // after fade out, resolve the promise
 	})
 }
 
@@ -685,18 +699,17 @@ function createDummyPlayers(amount) {
 function drawCountdown(end) {
 	let countdown = `#view-${$('#view-container').attr('data-current-view')} .countdown`;
 	if(!end) return TweenLite.to(`${countdown} .circle`, room.timer.limit, { strokeDashoffset: 0, ease: Linear.easeNone });
-	let tl = new TimelineMax();
-	tl.set('.countdown *', {clearProps: 'all'})
-	  .to(`${countdown} .circle`, 1, { strokeDashoffset: 0, ease: Power4.easeInOut })
-	  .to(`${countdown} .timer`, 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5')
-  	  .to(`${countdown} .circle`, 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) })
-      .to(`${countdown} .circle`, 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3')      
-      .to(`${countdown} .white-box`, 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3')
-    .from(`${countdown} .white-box`, 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4')
+	let tmln = new TimelineMax();
+	tmln.to(`${countdown} .circle`, 1, { strokeDashoffset: 0, ease: Power4.easeInOut })
+		.to(`${countdown} .timer`, 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5')
+  		.to(`${countdown} .circle`, 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) })
+    	.to(`${countdown} .circle`, 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3')      
+    	.to(`${countdown} .white-box`, 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3')
+    	.from(`${countdown} .white-box`, 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4')
 }
 
 /*
-	updateLeaderboard: updates the circular leaderboard with a nice size / orientation transition
+	updateLeaderboard: updates the circular leaderboard with a nice scale/offset proportionate to score
 */
 
 function updateLeaderboard() {
@@ -706,20 +719,27 @@ function updateLeaderboard() {
 		for(let pid in room.players) {
 			totalScore += room.players[pid].score;
 		}
-		averageScore = totalScore / Object.keys(room.players).length;
+		averageScore = totalScore / Object.keys(room.players).length; // mean of the scores
 
 		for(let pid in room.players) {
-			let $player = $(`#view-leaderboard .player[data-player-id="${pid}"]`);
-			let offset = ((room.players[pid].score - averageScore) / 2) * -1;
-			let percent = `${Math.round((room.players[pid].score / totalScore) * 100/4)}%`;
-			let tl = new TimelineMax();	
-			let initialWidth = $player.width();
-			let newWidth = initialWidth;
-			tl.set($player, { width: percent, onComplete: () => newWidth = $player.width() })
-			  .set($player, { width: initialWidth })
-			  .to($player, 4, { height: newWidth, width: newWidth, ease: Power3.easeInOut, delay: 0.5 })
-			  .to($player, 3, { y: offset, ease: Power3.easeInOut }, "-=3")
-			  .staggerTo('#view-leaderboard .content-wrapper', 1.2, { opacity: 1, ease: Power4.easeInOut }, 0.1, 4, resolve)
+			let $player = $(`#view-leaderboard .player[data-player-id="${pid}"]`); // get this player from the DOM
+			let offset = ((room.players[pid].score - averageScore) / 2) * -1; // calculate the y offset based on deviation from the mean
+			let percent = `${(room.players[pid].score / totalScore) * (100/4)}%`; // calculate percentage width as a ratio of the total score
+			let tmln = new TimelineMax();	
+			let initialWidth = $player.width(); // get the initial width of the player circles
+			let newWidth;
+
+			$player.find('.score').text(room.players[pid].score) // set the player's score in the view
+
+			tmln.set($player, { width: percent, onComplete: () => { // first, set the width as percentage
+						newWidth = $player.width(); // in order to get absolute in pixels
+						//console.log("total score: %s, average score: %s, player score: %s, percent: %s, old width: %s, new width: %s", totalScore, averageScore, room.players[pid].score, percent, initialWidth, newWidth);
+					}
+				})
+				.set($player, { width: initialWidth }) // then set it back to it's initial width, ready for tweening
+				.to($player, 4, { height: newWidth, width: newWidth, ease: Power3.easeInOut, delay: 0.5 }) // tween the width and height
+				.to($player, 3, { y: offset, ease: Power3.easeInOut }, "-=3") // and tween the y offset
+				.staggerTo('#view-leaderboard .content-wrapper', 1.2, { opacity: 1, ease: Power4.easeInOut }, 0.1, 4, resolve) // then fade in the player names
 		}
 	})		
 }
