@@ -728,11 +728,11 @@ function updateLeaderboard() {
 
 			tmln.set($player, { width: percent, onComplete: function onComplete() {
 					// first, set the width as percentage
-					newWidth = $player.width(); // in order to get absolute in pixels
-					//console.log("total score: %s, average score: %s, player score: %s, percent: %s, old width: %s, new width: %s", totalScore, averageScore, room.players[pid].score, percent, initialWidth, newWidth);
+					newWidth = $player.width(); // in order to get absolute in pixels						
 				}
 			}).set($player, { width: initialWidth }) // then set it back to it's initial width, ready for tweening
 			.to($player, 4, { height: newWidth, width: newWidth, ease: Power3.easeInOut, delay: 0.5 }) // tween the width and height
+			// .staggerTo('.circle', 1.8, { ease: Elastic.easeOut.config(0.4, 0.15), scale: 3, delay: 1 }, 0.2); tween with a staggered pop
 			.to($player, 3, { y: offset, ease: Power3.easeInOut }, '-=3') // and tween the y offset
 			.staggerTo('#view-leaderboard .content-wrapper', 1.2, { opacity: 1, ease: Power4.easeInOut }, 0.1, 4, resolve);
 		};
@@ -834,7 +834,7 @@ $('#view-lobby .typed-cursor').addClass('hide');
 $('#view-lobby .type-wrapper').addClass('slide-left');
 $('#view-lobby .player').addClass('show');
 //waitOnAudio('../speech/001-title.mp3', 1500);
-	setTimeout(() => $('.player').addClass('joined'), 5000);
+		setTimeout(() => $('.player').addClass('joined'), 5000);
 setTimeout(commands.triggerNextStep, 2000);		
 // end temp	
 */
