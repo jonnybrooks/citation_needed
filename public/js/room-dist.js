@@ -53,9 +53,10 @@ var commands = {
 */
 
 var questionPool = {
-	roundOne: [{ id: 0, excerpt: 'What is your favourite colour?', article: 'Blue, no, green!' }, { id: 1, excerpt: 'What is your quest?', article: 'I seek the Holy Grail' }, { id: 2, excerpt: 'What is your name?', article: 'Arthur, King of the Britains' }, { id: 3, excerpt: 'What is the air speed velocity of a fully laden Swallow?', article: 'An African or a European Swallow?' }, { id: 4, excerpt: 'None shall pass', article: 'NONE SHALL PASS' }, { id: 5, excerpt: 'We are the knights who say...', article: 'Nee!' }],
-	roundTwo: [{ id: 0, article: 'Blue, no, green!' }, { id: 1, article: 'I seek the Holy Grail' }, { id: 2, article: 'Arthur, King of the Britains' }, { id: 3, article: 'An African or a European Swallow?' }, { id: 4, article: 'NONE SHALL PASS' }, { id: 5, article: 'Nee!' }, { id: 6, article: 'Ya arm\'s off!' }, { id: 7, article: 'Breathe, sweet Concorde' }, { id: 8, article: 'He\'s going to tell (He\'s going to tell)' }],
-	roundThree: [{ id: 0, article: 'Blue, no, green!' }, { id: 1, article: 'I seek the Holy Grail' }, { id: 2, article: 'Arthur, King of the Britains' }, { id: 3, article: 'An African or a European Swallow?' }, { id: 4, article: 'NONE SHALL PASS' }, { id: 5, article: 'Nee!' }, { id: 6, article: 'Ya arm\'s off!' }, { id: 7, article: 'Breathe, sweet Concorde' }, { id: 8, article: 'He\'s going to tell (He\'s going to tell)' }]
+	guessTheArticle: [{ id: 0, excerpt: 'What is your favourite colour?', article: 'Blue, no, green!' }, { id: 1, excerpt: 'What is your quest?', article: 'I seek the Holy Grail' }, { id: 2, excerpt: 'What is your name?', article: 'Arthur, King of the Britains' }, { id: 3, excerpt: 'What is the air speed velocity of a fully laden Swallow?', article: 'An African or a European Swallow?' }, { id: 4, excerpt: 'None shall pass', article: 'NONE SHALL PASS' }, { id: 5, excerpt: 'We are the knights who say...', article: 'Nee!' }],
+	excerptBattle: [{ id: 0, article: 'Blue, no, green!' }, { id: 1, article: 'I seek the Holy Grail' }, { id: 2, article: 'Arthur, King of the Britains' }, { id: 3, article: 'An African or a European Swallow?' }, { id: 4, article: 'NONE SHALL PASS' }, { id: 5, article: 'Nee!' }, { id: 6, article: 'Ya arm\'s off!' }, { id: 7, article: 'Breathe, sweet Concorde' }, { id: 8, article: 'He\'s going to tell (He\'s going to tell)' }],
+	coopCitationNeeded: [{ id: 0, article: 'Blue, no, green!' }, { id: 1, article: 'I seek the Holy Grail' }, { id: 2, article: 'Arthur, King of the Britains' }, { id: 3, article: 'An African or a European Swallow?' }, { id: 4, article: 'NONE SHALL PASS' }, { id: 5, article: 'Nee!' }, { id: 6, article: 'Ya arm\'s off!' }, { id: 7, article: 'Breathe, sweet Concorde' }, { id: 8, article: 'He\'s going to tell (He\'s going to tell)' }],
+	editBattle: [{ id: 0, excerpt: 'The first law of thermodynamics is ____', article: 'The first law of thermodynamics' }, { id: 1, excerpt: 'The second law of thermodynamics is ____', article: 'The second law of thermodynamics' }, { id: 4, excerpt: 'The third law of thermodynamics is ____', article: 'The third law of thermodynamics' }, { id: 2, excerpt: 'The fourth law of thermodynamics is ____', article: 'The fourth law of thermodynamics' }, { id: 3, excerpt: 'The fifth law of thermodynamics is ____', article: 'The fifth law of thermodynamics' }, { id: 5, excerpt: 'The sixth law of thermodynamics is ____', article: 'The sixth law of thermodynamics' }]
 };
 
 /*
@@ -65,66 +66,110 @@ var questionPool = {
 var gamePhases = {
 	lobby: function lobby() {
 		$('.host').attr('href', location.host + '/player').find('span').text(location.host + '/player');
+		/*
+  $('.typed').typed({			
+  	strings: [
+  		"The <a>English</a> have terrible teeth due to bad parenting.", 
+  		"<a>Wasps</a> are in fact just angry little <a>Bees</a>.",
+  		"60% of the time it works <em>every</em> time."
+  	],
+  	typeSpeed: 0,
+  	backSpeed: -200,
+  	backDelay: 2000,
+  	callback: function() {
+  		$('#view-lobby .typed-cursor').addClass('hide');
+  		$('#view-lobby .type-wrapper').addClass('slide-left');
+  		$('#view-lobby .player').addClass('show');
+  		waitOnAudio('../speech/001-title.mp3', 1500);
+  		// temp
+  		setTimeout(() => $('.player').addClass('joined'), 2000);
+  		setTimeout(commands.triggerNextStep, 3000);
+  		// end temp
+  	}
+  })
+  */
 
-		$('.typed').typed({
-			strings: ['The <a>English</a> have terrible teeth due to bad parenting.', '<a>Wasps</a> are in fact just angry little <a>Bees</a>.', '60% of the time it works <em>every</em> time.'],
-			typeSpeed: 0,
-			backSpeed: -200,
-			backDelay: 2000,
-			callback: function callback() {
-				$('#view-lobby .typed-cursor').addClass('hide');
-				$('#view-lobby .type-wrapper').addClass('slide-left');
-				$('#view-lobby .player').addClass('show');
-				waitOnAudio('../speech/001-title.mp3', 1500);
-				// temp
-				setTimeout(function () {
-					return $('.player').addClass('joined');
-				}, 2000);
-				setTimeout(commands.triggerNextStep, 3000);
-				// end temp
-			}
-		});
+		// temp
+		$('.typed').text('60% of the time it works <em>every</em> time.');
+		$('#view-lobby .typed-cursor').addClass('hide');
+		$('#view-lobby .type-wrapper').addClass('slide-left');
+		$('#view-lobby .player').addClass('show');
+		//waitOnAudio('../speech/001-title.mp3', 1500);
+
+		setTimeout(function () {
+			return $('.player').addClass('joined');
+		}, 5000);
+		setTimeout(commands.triggerNextStep, 2000);
+		// end temp	
 	},
 	describeRound: function describeRound(round) {
 		if (round === 1) {
-			$('#view-lobby .player').each(function () {});
 			waitOnAudio('../speech/002-intro.mp3').then(function () {
 				return waitOnAudio('../speech/003-round1-intro.mp3');
 			}).then(function () {
 				return $('#view-container').attr('data-current-view', 'describe-round-' + round);
 			}).then(function () {
-				return $('.description li').eq(0).addClass('show');
+				return $('#view-describe-round-' + round + ' li').eq(0).addClass('show');
 			}).then(function () {
 				return waitOnAudio('../speech/004-round1-desc.mp3', 1000);
 			}).then(function () {
-				return $('.description li').eq(1).addClass('show');
+				return $('#view-describe-round-' + round + ' li').eq(1).addClass('show');
 			}).then(function () {
 				return waitOnAudio('../speech/005-round1-desc.mp3');
 			}).then(function () {
-				return $('.description li').eq(2).addClass('show');
+				return $('#view-describe-round-' + round + ' li').eq(2).addClass('show');
 			}).then(function () {
 				return waitOnAudio('../speech/006-round1-desc.mp3');
 			}).then(function () {
-				return $('.description li').eq(3).addClass('show');
+				return $('#view-describe-round-' + round + ' li').eq(3).addClass('show');
 			}).then(function () {
 				return waitOnAudio('../speech/007-round1-desc.mp3');
 			}).then(function () {
-				return $('.description li').eq(4).addClass('show');
+				return $('#view-describe-round-' + round + ' li').eq(4).addClass('show');
 			}).then(function () {
 				return waitOnAudio('../speech/008-round1-desc.mp3');
 			}).then(function () {
-				return $('.description li').eq(5).addClass('show');
+				return $('#view-describe-round-' + round + ' li').eq(5).addClass('show');
 			}).then(function () {
 				return waitOnAudio('../speech/009-round1-desc.mp3');
 			}).then(function () {
-				return $('.description li').eq(6).addClass('show');
+				return $('#view-describe-round-' + round + ' li').eq(6).addClass('show');
+			}).then(gameSequence.next);
+		} else {
+			waitOnAudio('../speech/003-round1-intro.mp3').then(function () {
+				return $('#view-container').attr('data-current-view', 'describe-round-' + round);
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(0).addClass('show');
+			}).then(function () {
+				return waitOnAudio('../speech/004-round1-desc.mp3', 1000);
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(1).addClass('show');
+			}).then(function () {
+				return waitOnAudio('../speech/005-round1-desc.mp3');
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(2).addClass('show');
+			}).then(function () {
+				return waitOnAudio('../speech/006-round1-desc.mp3');
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(3).addClass('show');
+			}).then(function () {
+				return waitOnAudio('../speech/007-round1-desc.mp3');
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(4).addClass('show');
+			}).then(function () {
+				return waitOnAudio('../speech/008-round1-desc.mp3');
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(5).addClass('show');
+			}).then(function () {
+				return waitOnAudio('../speech/009-round1-desc.mp3');
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(6).addClass('show');
 			}).then(gameSequence.next);
 		}
 	},
-	roundOne: function roundOne() {
-
+	guessTheArticle: function guessTheArticle() {
 		var players = Object.keys(room.players); // get player ids
-		var questions = questionPool.roundOne; // get this rounds question pool
+		var questions = questionPool.guessTheArticle; // get this rounds question pool
 		var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
 
 		room.questions[q.id] = { question: q.excerpt, submissions: {} };
@@ -160,9 +205,9 @@ var gamePhases = {
 			startTimer(room.timer.limit);
 		});
 	},
-	roundTwo: function roundTwo() {
+	excerptBattle: function excerptBattle() {
 		var players = shuffle(Object.keys(room.players)); // get player ids and randomize
-		var questions = questionPool.roundTwo; // get this rounds question pool
+		var questions = questionPool.excerptBattle; // get this rounds question pool
 		room.round = 2;
 
 		var _loop = function (i) {
@@ -209,12 +254,61 @@ var gamePhases = {
 			startTimer(room.timer.limit);
 		});
 	},
-	roundThree: function roundThree() {
+	editBattle: function editBattle() {
+		var players = shuffle(Object.keys(room.players)); // get player ids and randomize
+		var questions = questionPool.editBattle; // get this rounds question pool
+		room.round = 2;
+
+		var _loop2 = function (i) {
+			var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
+			var p1 = players[i];
+			var p2 = players[i + 1] || players[0];
+			room.questions[q.id] = { question: q.article, submissions: {} };
+			room.questions[q.id].submissions[p1] = null;
+			room.questions[q.id].submissions[p2] = null;
+			room.players[p1].submissionsComplete[q.id] = false;
+			room.players[p1].submissionsComplete[q.id] = false;
+
+			wait(5000).then(function () {
+				socket.emit('relay', {
+					from: room.roomKey, to: p1, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
+				});
+				socket.emit('relay', {
+					from: room.roomKey, to: p2, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
+				});
+			});
+		};
+
+		for (var i = 0; i < players.length; i++) {
+			_loop2(i);
+		}
+
+		addContentToAnswerPhase('Look at your phone to answer your questions').then(function () {
+			return $('#view-container').attr('data-current-view', 'answer-phase');
+		}) // show the answer phase view
+		.then(function () {
+			return wait(50);
+		}) // delay neccesary for weird reveal behaviour
+		.then(function () {
+			return $('#view-answer-phase .question-anchor').addClass('reveal');
+		}) // update the view
+		.then(function () {
+			return wait(5000);
+		}).then(function () {
+			$('#view-answer-phase .question-anchor').addClass('tuck');
+			// temp
+			$('#view-answer-phase .player').addClass('answered'); // show player as answered in lobby
+			// end temp			
+			room.timer.limit = 1; // set the time limit to 60 seconds
+			startTimer(room.timer.limit);
+		});
+	},
+	coopCitationNeeded: function coopCitationNeeded() {
 		var players = Object.keys(room.players); // get player ids
-		var questions = questionPool.roundThree; // get this rounds question pool
+		var questions = questionPool.coopCitationNeeded; // get this rounds question pool
 		room.round = 3;
 
-		var _loop2 = function (pid) {
+		var _loop3 = function (pid) {
 			var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random		
 			room.questions[q.id] = { question: q.article, submissions: {} };
 
@@ -246,7 +340,7 @@ var gamePhases = {
 		};
 
 		for (var pid in room.players) {
-			_loop2(pid);
+			_loop3(pid);
 		}
 	},
 	voting: function voting() {
@@ -448,20 +542,23 @@ var gameSequence = {
 
 function generateGameSequence() {
 	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
-	gameSequence.steps.push(gamePhases.roundOne);
+	gameSequence.steps.push(gamePhases.guessTheArticle);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
 	gameSequence.steps.push(gamePhases.leaderboard);
-	//gameSequence.steps.push(gamePhases.sendTriggerPrompt);
-	gameSequence.steps.push(gamePhases.roundTwo);
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 2));
+	gameSequence.steps.push(gamePhases.excerptBattle);
 	for (var i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
 		gameSequence.steps.push(gamePhases.scoring);
 	}
 	gameSequence.steps.push(gamePhases.leaderboard);
-	//gameSequence.steps.push(gamePhases.sendTriggerPrompt);
-	//gameSequence.steps.push(gamePhases.roundThree);
-	for (var i in room.players) {}
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 3));
+	gameSequence.steps.push(gamePhases.editBattle);
+	for (var i in room.players) {
+		gameSequence.steps.push(gamePhases.voting);
+		gameSequence.steps.push(gamePhases.scoring);
+	}
 	gameSequence.steps.push(gamePhases.leaderboard);
 	gameSequence.steps.push(gamePhases.endGame);
 }
@@ -716,7 +813,7 @@ function updateLeaderboard() {
 			totalScore += room.players[pid].score;
 		}
 		averageScore = totalScore / Object.keys(room.players).length;
-		var _loop3 = function (pid) {
+		var _loop4 = function (pid) {
 			var $player = $('#view-leaderboard .player[data-player-id="' + pid + '"]'); // get this player from the DOM
 			var offset = (room.players[pid].score - averageScore) / 2 * -1; // calculate the y offset based on deviation from the mean
 			var percent = room.players[pid].score / totalScore * (100 / 4) + '%'; // calculate percentage width as a ratio of the total score
@@ -740,7 +837,7 @@ function updateLeaderboard() {
 		// mean of the scores
 
 		for (var pid in room.players) {
-			_loop3(pid);
+			_loop4(pid);
 		}
 	});
 }
@@ -826,24 +923,7 @@ function Player(conf) {
 	this.previousScore = null;
 	this.submissionsComplete = {};
 }
-/*		
-
-// temp
-$('.typed').text('60% of the time it works <em>every</em> time.');
-$('#view-lobby .typed-cursor').addClass('hide');
-$('#view-lobby .type-wrapper').addClass('slide-left');
-$('#view-lobby .player').addClass('show');
-//waitOnAudio('../speech/001-title.mp3', 1500);
-		setTimeout(() => $('.player').addClass('joined'), 5000);
-setTimeout(commands.triggerNextStep, 2000);		
-// end temp	
-*/
-
-// if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
 // then reveal them in order			
 // then reveal them in order
-
-//gameSequence.steps.push(gamePhases.voting);		
-//gameSequence.steps.push(gamePhases.scoring);
 // after fade out, resolve the promise
 // then fade in the player names

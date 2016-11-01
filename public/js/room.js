@@ -54,7 +54,7 @@ let commands = {
 */
 
 let questionPool  = {
-	roundOne: [
+	guessTheArticle: [
 		{id: 0, excerpt: 'What is your favourite colour?', article: 'Blue, no, green!'},
 		{id: 1, excerpt: 'What is your quest?', article: 'I seek the Holy Grail'},
 		{id: 2, excerpt: 'What is your name?', article: 'Arthur, King of the Britains'},
@@ -62,7 +62,7 @@ let questionPool  = {
 		{id: 4, excerpt: 'None shall pass', article: 'NONE SHALL PASS'},
 		{id: 5, excerpt: 'We are the knights who say...', article: 'Nee!'}
 	],
-	roundTwo: [
+	excerptBattle: [
 		{id: 0, article: 'Blue, no, green!'},
 		{id: 1, article: 'I seek the Holy Grail'},
 		{id: 2, article: 'Arthur, King of the Britains'},
@@ -73,7 +73,7 @@ let questionPool  = {
 		{id: 7, article: 'Breathe, sweet Concorde'},
 		{id: 8, article: 'He\'s going to tell (He\'s going to tell)'}
 	],
-	roundThree: [
+	coopCitationNeeded: [
 		{id: 0, article: 'Blue, no, green!'},
 		{id: 1, article: 'I seek the Holy Grail'},
 		{id: 2, article: 'Arthur, King of the Britains'},
@@ -83,7 +83,15 @@ let questionPool  = {
 		{id: 6, article: 'Ya arm\'s off!'},
 		{id: 7, article: 'Breathe, sweet Concorde'},
 		{id: 8, article: 'He\'s going to tell (He\'s going to tell)'}
-	]
+	],	
+	editBattle: [
+		{id: 0, excerpt: 'The first law of thermodynamics is ____', article: 'The first law of thermodynamics'},
+		{id: 1, excerpt: 'The second law of thermodynamics is ____', article: 'The second law of thermodynamics'},
+		{id: 4, excerpt: 'The third law of thermodynamics is ____', article: 'The third law of thermodynamics'},
+		{id: 2, excerpt: 'The fourth law of thermodynamics is ____', article: 'The fourth law of thermodynamics'},
+		{id: 3, excerpt: 'The fifth law of thermodynamics is ____', article: 'The fifth law of thermodynamics'},
+		{id: 5, excerpt: 'The sixth law of thermodynamics is ____', article: 'The sixth law of thermodynamics'}
+	],
 }
 
 /*
@@ -93,7 +101,7 @@ let questionPool  = {
 let gamePhases = {
 	lobby: function(){
 		$('.host').attr('href', `${location.host}/player`).find('span').text(`${location.host}/player`);
-		
+		/*
 		$('.typed').typed({			
 			strings: [
 				"The <a>English</a> have terrible teeth due to bad parenting.", 
@@ -114,7 +122,7 @@ let gamePhases = {
 				// end temp
 			}
 		})
-		/*		
+		*/				
 		
 		// temp
 		$('.typed').text('60% of the time it works <em>every</em> time.');
@@ -124,38 +132,52 @@ let gamePhases = {
 		//waitOnAudio('../speech/001-title.mp3', 1500);
 
 		setTimeout(() => $('.player').addClass('joined'), 5000);
-		setTimeout(commands.triggerNextStep, 2000);		
+		setTimeout(commands.triggerNextStep, 2000);
 		// end temp	
-		*/	
+			
 	},
 	describeRound: function(round) {
-		if(round === 1){
-			$('#view-lobby .player').each(function(){
-				// if ($(this).attr('data-player-id') === "") $(this).removeClass('show'); // hide the empty player slots
-			})
+		if(round === 1) {
 			waitOnAudio('../speech/002-intro.mp3')
-				.then(() => waitOnAudio('../speech/003-round1-intro.mp3'))
-				.then(() => $('#view-container').attr('data-current-view', `describe-round-${round}`))
-				.then(() => $('.description li').eq(0).addClass('show'))
-				.then(() => waitOnAudio('../speech/004-round1-desc.mp3', 1000))				
-				.then(() => $('.description li').eq(1).addClass('show'))
-				.then(() => waitOnAudio('../speech/005-round1-desc.mp3'))				
-				.then(() => $('.description li').eq(2).addClass('show'))
-				.then(() => waitOnAudio('../speech/006-round1-desc.mp3'))				
-				.then(() => $('.description li').eq(3).addClass('show'))
-				.then(() => waitOnAudio('../speech/007-round1-desc.mp3'))				
-				.then(() => $('.description li').eq(4).addClass('show'))
-				.then(() => waitOnAudio('../speech/008-round1-desc.mp3'))				
-				.then(() => $('.description li').eq(5).addClass('show'))
-				.then(() => waitOnAudio('../speech/009-round1-desc.mp3'))				
-				.then(() => $('.description li').eq(6).addClass('show'))	
-				.then(gameSequence.next)
-		}		
+			.then(() => waitOnAudio('../speech/003-round1-intro.mp3'))
+			.then(() => $('#view-container').attr('data-current-view', `describe-round-${round}`))
+			.then(() => $(`#view-describe-round-${round} li`).eq(0).addClass('show'))
+			.then(() => waitOnAudio('../speech/004-round1-desc.mp3', 1000))
+			.then(() => $(`#view-describe-round-${round} li`).eq(1).addClass('show'))
+			.then(() => waitOnAudio('../speech/005-round1-desc.mp3'))
+			.then(() => $(`#view-describe-round-${round} li`).eq(2).addClass('show'))
+			.then(() => waitOnAudio('../speech/006-round1-desc.mp3'))
+			.then(() => $(`#view-describe-round-${round} li`).eq(3).addClass('show'))
+			.then(() => waitOnAudio('../speech/007-round1-desc.mp3'))
+			.then(() => $(`#view-describe-round-${round} li`).eq(4).addClass('show'))
+			.then(() => waitOnAudio('../speech/008-round1-desc.mp3'))
+			.then(() => $(`#view-describe-round-${round} li`).eq(5).addClass('show'))
+			.then(() => waitOnAudio('../speech/009-round1-desc.mp3'))
+			.then(() => $(`#view-describe-round-${round} li`).eq(6).addClass('show'))
+			.then(gameSequence.next)
+		}
+		else {
+			waitOnAudio('../speech/003-round1-intro.mp3')
+			.then(() => $('#view-container').attr('data-current-view', `describe-round-${round}`))
+			.then(() => $(`#view-describe-round-${round} li`).eq(0).addClass('show'))
+			.then(() => waitOnAudio('../speech/004-round1-desc.mp3', 1000))
+			.then(() => $(`#view-describe-round-${round} li`).eq(1).addClass('show'))
+			.then(() => waitOnAudio('../speech/005-round1-desc.mp3'))
+			.then(() => $(`#view-describe-round-${round} li`).eq(2).addClass('show'))
+			.then(() => waitOnAudio('../speech/006-round1-desc.mp3'))
+			.then(() => $(`#view-describe-round-${round} li`).eq(3).addClass('show'))
+			.then(() => waitOnAudio('../speech/007-round1-desc.mp3'))
+			.then(() => $(`#view-describe-round-${round} li`).eq(4).addClass('show'))
+			.then(() => waitOnAudio('../speech/008-round1-desc.mp3'))
+			.then(() => $(`#view-describe-round-${round} li`).eq(5).addClass('show'))
+			.then(() => waitOnAudio('../speech/009-round1-desc.mp3'))
+			.then(() => $(`#view-describe-round-${round} li`).eq(6).addClass('show'))
+			.then(gameSequence.next)
+		}			
 	},
-	roundOne: function() {
-
+	guessTheArticle: function() {
 		let players = Object.keys(room.players); // get player ids
-		let questions = questionPool.roundOne; // get this rounds question pool
+		let questions = questionPool.guessTheArticle; // get this rounds question pool
 		let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
 
 		room.questions[q.id] = { question: q.excerpt, submissions: {} };
@@ -185,9 +207,48 @@ let gamePhases = {
 			startTimer(room.timer.limit);
 		})
 	},
-	roundTwo: function() {
+	excerptBattle: function() {
 		let players = shuffle(Object.keys(room.players)); // get player ids and randomize
-		let questions = questionPool.roundTwo; // get this rounds question pool
+		let questions = questionPool.excerptBattle; // get this rounds question pool
+		room.round = 2;
+
+		for(let i = 0; i < players.length; i++) {
+			let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
+			let p1 = players[i];
+			let p2 = players[i+1] || players[0];
+			room.questions[q.id] = { question: q.article, submissions: {} };
+			room.questions[q.id].submissions[p1] = null;
+			room.questions[q.id].submissions[p2] = null;
+			room.players[p1].submissionsComplete[q.id] = false;
+			room.players[p1].submissionsComplete[q.id] = false;
+
+			wait(5000).then(() => {
+				socket.emit('relay', {
+					from: room.roomKey, to: p1, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
+				})
+				socket.emit('relay', {
+					from: room.roomKey, to: p2, command: 'prepareQuestion', args: { qid: q.id, question: q.article, round: 2 }
+				})	
+			})
+		}
+
+		addContentToAnswerPhase('Look at your phone to answer your questions')
+		.then(() => $('#view-container').attr('data-current-view', `answer-phase`)) // show the answer phase view
+		.then(() => wait(50)) // delay neccesary for weird reveal behaviour
+		.then(() => $('#view-answer-phase .question-anchor').addClass('reveal')) // update the view
+		.then(() => wait(5000))
+		.then(() => {
+			$('#view-answer-phase .question-anchor').addClass('tuck');			
+			// temp
+			$(`#view-answer-phase .player`).addClass('answered'); // show player as answered in lobby
+			// end temp			
+			room.timer.limit = 1; // set the time limit to 60 seconds
+			startTimer(room.timer.limit);
+		})
+	},	
+	editBattle: function() {
+		let players = shuffle(Object.keys(room.players)); // get player ids and randomize
+		let questions = questionPool.editBattle; // get this rounds question pool
 		room.round = 2;
 
 		for(let i = 0; i < players.length; i++) {
@@ -224,9 +285,9 @@ let gamePhases = {
 			startTimer(room.timer.limit);
 		})
 	},
-	roundThree: function() {
+	coopCitationNeeded: function() {
 		let players = Object.keys(room.players); // get player ids
-		let questions = questionPool.roundThree; // get this rounds question pool
+		let questions = questionPool.coopCitationNeeded; // get this rounds question pool
 		room.round = 3;
 
 		for(let pid in room.players) {
@@ -452,24 +513,24 @@ let gameSequence = {
 
 function generateGameSequence() {
 	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
-	gameSequence.steps.push(gamePhases.roundOne);
+	gameSequence.steps.push(gamePhases.guessTheArticle);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
 	gameSequence.steps.push(gamePhases.leaderboard);
-	//gameSequence.steps.push(gamePhases.sendTriggerPrompt);
-	gameSequence.steps.push(gamePhases.roundTwo);
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 2));
+	gameSequence.steps.push(gamePhases.excerptBattle);
 	for(let i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
 		gameSequence.steps.push(gamePhases.scoring);
 	}	
 	gameSequence.steps.push(gamePhases.leaderboard);
-	//gameSequence.steps.push(gamePhases.sendTriggerPrompt);
-	//gameSequence.steps.push(gamePhases.roundThree);
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 3));
+	gameSequence.steps.push(gamePhases.editBattle);
 	for(let i in room.players) {
-		//gameSequence.steps.push(gamePhases.voting);		
-		//gameSequence.steps.push(gamePhases.scoring);
+		gameSequence.steps.push(gamePhases.voting);		
+		gameSequence.steps.push(gamePhases.scoring);
 	}	
-	gameSequence.steps.push(gamePhases.leaderboard);
+	gameSequence.steps.push(gamePhases.leaderboard);	
 	gameSequence.steps.push(gamePhases.endGame);
 }
 

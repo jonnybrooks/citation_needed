@@ -102,17 +102,23 @@ a {
 		&[data-current-view="describe-round-1"] {
 			right: 100%;
 		}
-		&[data-current-view="answer-phase"] {
+		&[data-current-view="describe-round-2"] {
 			right: 200%;
 		}
-		&[data-current-view="voting-phase"] {
+		&[data-current-view="describe-round-3"] {
 			right: 300%;
 		}
-		&[data-current-view="leaderboard"] {
+		&[data-current-view="answer-phase"] {
 			right: 400%;
 		}
-		&[data-current-view="endgame"] {
+		&[data-current-view="voting-phase"] {
 			right: 500%;
+		}
+		&[data-current-view="leaderboard"] {
+			right: 600%;
+		}
+		&[data-current-view="endgame"] {
+			right: 700%;
 		}
 	}
 	.view {
@@ -287,7 +293,7 @@ a {
 			}
 		}
 	}
-	#view-describe-round-1 {
+	div[id*="view-describe-round"] { // for all the round description views
 		.type-wrapper {
 			font-size: 7.2em;
 			margin: 0;
