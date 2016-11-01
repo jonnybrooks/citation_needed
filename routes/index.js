@@ -51,7 +51,8 @@ module.exports = io => {
 				let player = new Player({
 					socketId: socket.id,
 					roomKey: reg.roomKey,
-					name: reg.name
+					name: reg.name,
+					number: Object.keys(room.players).length+1
 				})
 
 				room.players[socket.id] = player;				
@@ -100,6 +101,7 @@ function Player(conf) {
 	this.socketId = conf.socketId;
 	this.roomKey = conf.roomKey;
 	this.name = conf.name;
+	this.number = conf.number || 0;
 	this.score = 0;
 	this.submissionsComplete = {};	
 }

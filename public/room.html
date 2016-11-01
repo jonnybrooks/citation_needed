@@ -24,35 +24,35 @@
 				<div class="players">
 					<div class="player" data-player-id="">
 						<h2 class="name">Player 1</h2>
-						<p class="status">Empty</p>
+						<p class="status">&nbsp;</p>
 					</div>
 					<div class="player" data-player-id="">
 						<h2 class="name">Player 2</h2>
-						<p class="status">Empty</p>
+						<p class="status">&nbsp;</p>
 					</div>
 					<div class="player" data-player-id="">
 						<h2 class="name">Player 3</h2>
-						<p class="status">Empty</p>
+						<p class="status">&nbsp;</p>
 					</div>
 					<div class="player" data-player-id="">
 						<h2 class="name">Player 4</h2>
-						<p class="status">Empty</p>
+						<p class="status">&nbsp;</p>
 					</div>
 					<div class="player" data-player-id="">
 						<h2 class="name">Player 5</h2>
-						<p class="status">Empty</p>
+						<p class="status">&nbsp;</p>
 					</div>
 					<div class="player" data-player-id="">
 						<h2 class="name">Player 6</h2>
-						<p class="status">Empty</p>
+						<p class="status">&nbsp;</p>
 					</div>
 					<div class="player" data-player-id="">
 						<h2 class="name">Player 7</h2>
-						<p class="status">Empty</p>
+						<p class="status">&nbsp;</p>
 					</div>
 					<div class="player" data-player-id="">
 						<h2 class="name">Player 8</h2>
-						<p class="status">Empty</p>
+						<p class="status">&nbsp;</p>
 					</div>
 				</div>
 			</div>
@@ -70,6 +70,41 @@
 				</div>
 			</div>			
 			<div id="view-answer-phase" class="view">
+				<div class="answer-phase-content"></div>
+			</div>			
+			<div id="view-voting-phase" class="view">
+				<div class="voting-phase-content"></div>
+			</div>		
+			<div id="view-leaderboard" class="view">
+				<div class="players"></div>				
+			</div>
+			<div id="view-endgame" class="view">
+				<div class="content">
+					<h1>That's the end of the visual demo!</h1>
+					<p>Things left to add:</p>
+					<ul>
+						<li style="text-decoration: line-through;">Little score things at the end of the voting phase</li>
+						<li style="text-decoration: line-through;">Score overview at the end of each round</li>
+						<li style="text-decoration: line-through;">Fix the answer phase reset logic</li>
+						<li style="text-decoration: line-through;">FE for round 2</li>
+						<li>FE for round 3</li>						
+						<li>The endgame sequence</li>
+						<li>All of the sound effects</li>
+						<li>CONTENT</li>
+					</ul>
+				</div>				
+			</div>								
+		</div>
+		<script id="template-player" type="text/template">
+			<div class="player" data-player-id="">				
+				<div class="content-wrapper">
+					<p class="name"></p>
+					<div class="score"></div>
+				</div>				
+			</div>
+		</script>
+		<script id="template-answer-phase-content" type="text/template">
+			<div class="answer-phase-content">
 				<div class="question-anchor">
 					<p class="question"></p>					
 				</div>
@@ -82,32 +117,30 @@
 				</div>
 				<div class="players"></div>
 			</div>
-			<!--
-			<div id="view-voting-phase" class="view">
-				<h1 class="question"></h1>
-				<div class="answers"></div>
-			</div>
-			<div id="view-scores" class="view">
-				<div class="leaderboard"></div>				
-			</div>				
-			-->		
-		</div>
-		<script id="template-player" type="text/template">
-			<div class="player" data-player-id="">
-				<div class="time-left"></div>
-				<h2 class="name"></h2>
-			</div>
 		</script>
-		<script id="template-question" type="text/template">
-			<div class="question" data-question-id="">
-				<h2 class="id"></h2>
+		<script id="template-voting-phase-content" type="text/template">
+			<div class="voting-phase-content queued">
+				<p class="question"></p>
+				<div class="countdown">
+					<svg xmlns="http://www.w3.org/2000/svg" width="100" height="200" viewBox="0 0 100 100">
+						<circle class="circle" cx="50" cy="50" r="40" stroke="#ccc" stroke-width="2" fill="#f00" fill-opacity="0"/>
+						<rect class="white-box" x="25" y="45" width="50" height="10" fill="#fff" rx="1" ry="1" fill-opacity="0"/>
+					</svg>
+					<div class="timer"></div>
+				</div>
 				<div class="answers"></div>
 			</div>
 		</script>
 		<script id="template-answer" type="text/template">
 			<div class="answer" data-player-id="">
-				<h3 class="player"></h3>
 				<p class="content"></p>
+				<div class="votes"></div>
+				<div class="score"></div>
+			</div>
+		</script>
+		<script id="template-vote" type="text/template">
+			<div class="vote coloured" data-player-id="">
+				<p class="name"></p>
 			</div>
 		</script>
 		<script src="/js/room-dist.js"></script>
