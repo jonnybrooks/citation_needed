@@ -1,9 +1,11 @@
 @import 'https://fonts.googleapis.com/css?family=PT+Serif:400,400i|Roboto+Slab|Roboto:300,400,700';
-@font-face { font-family: 'icomoon'; src: url("fonts/icomoon.eot?5q993w"); src: url("fonts/icomoon.eot?5q993w#iefix") format("embedded-opentype"), url("fonts/icomoon.ttf?5q993w") format("truetype"), url("fonts/icomoon.woff?5q993w") format("woff"), url("fonts/icomoon.svg?5q993w#icomoon") format("svg"); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'icomoon'; src: url("fonts/icomoon.eot?mtpxc5"); src: url("fonts/icomoon.eot?mtpxc5#iefix") format("embedded-opentype"), url("fonts/icomoon.ttf?mtpxc5") format("truetype"), url("fonts/icomoon.woff?mtpxc5") format("woff"), url("fonts/icomoon.svg?mtpxc5#icomoon") format("svg"); font-weight: normal; font-style: normal; }
 
 [class^="icon-"], [class*=" icon-"] { /* use !important to prevent issues with browser extensions that change fonts */ font-family: 'icomoon' !important; speak: none; font-style: normal; font-weight: normal; font-variant: normal; text-transform: none; line-height: 1; /* Better Font Rendering =========== */ -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
 .icon-key:before { content: "\e902"; }
+
+.icon-mobile:before { content: "\e900"; }
 
 * { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
 
@@ -235,21 +237,21 @@ a { color: #0645ad; text-decoration: none; }
 
 #client-room #view-answer-phase .player .name { font-size: 1.8em; font-weight: 300; margin: 0; position: relative; word-break: break-all; bottom: 0; color: #aaa; background: transparent; padding: 5px 0; -webkit-transition: 1s bottom cubic-bezier(0.86, 0, 0.07, 1), 0.6s background ease-in-out 0.4s, 0.6s color ease-in-out 0.4s; transition: 1s bottom cubic-bezier(0.86, 0, 0.07, 1), 0.6s background ease-in-out 0.4s, 0.6s color ease-in-out 0.4s; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(1) .name { color: white; background: #ED6D79; bottom: 60px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(1) .name { color: white; background: #ED6D79; bottom: 121px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(2) .name { color: white; background: #90D4F7; bottom: 109px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(2) .name { color: white; background: #90D4F7; bottom: 63px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(3) .name { color: white; background: #FFDC89; bottom: 72px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(3) .name { color: white; background: #FFDC89; bottom: 103px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(4) .name { color: white; background: #71E096; bottom: 117px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(4) .name { color: white; background: #71E096; bottom: 148px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(5) .name { color: white; background: #F5A26F; bottom: 139px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(5) .name { color: white; background: #F5A26F; bottom: 146px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(6) .name { color: white; background: #D4A697; bottom: 62px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(6) .name { color: white; background: #D4A697; bottom: 89px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(7) .name { color: white; background: #DA97E0; bottom: 69px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(7) .name { color: white; background: #DA97E0; bottom: 122px; }
 
-#client-room #view-answer-phase .player.answered:nth-of-type(8) .name { color: white; background: #FFB3BA; bottom: 141px; }
+#client-room #view-answer-phase .player.answered:nth-of-type(8) .name { color: white; background: #FFB3BA; bottom: 118px; }
 
 #client-room #view-answer-phase .countdown { position: absolute; top: 40%; right: 50%; -webkit-transform: translate(50%, -50%); -ms-transform: translate(50%, -50%); transform: translate(50%, -50%); width: -webkit-calc(20% + 25px); width: calc(20% + 25px); }
 
