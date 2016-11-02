@@ -190,7 +190,7 @@ let gamePhases = {
 			room.players[pid].submissionsComplete[q.id] = false;
 		}
 
-		addContentToAnswerPhase(q.excerpt)
+		addContentToAnswerPhase(q.excerpt) // add content to view, setting the question to the excerpt
 		.then(() => $('#view-container').attr('data-current-view', `answer-phase`)) // show the answer phase view
 		.then(() => wait(50)) // delay neccesary for weird reveal behaviour
 		.then(() => $('#view-answer-phase .question-anchor').addClass('reveal')) // update the view
@@ -232,7 +232,7 @@ let gamePhases = {
 			})
 		}
 
-		addContentToAnswerPhase('Look at your phone to answer your questions')
+		addContentToAnswerPhase(null, true) // add content to view with phoneVisible set to true
 		.then(() => $('#view-container').attr('data-current-view', `answer-phase`)) // show the answer phase view
 		.then(() => wait(50)) // delay neccesary for weird reveal behaviour
 		.then(() => $('#view-answer-phase .question-anchor').addClass('reveal')) // update the view
@@ -271,7 +271,7 @@ let gamePhases = {
 			})
 		}
 
-		addContentToAnswerPhase('Look at your phone to answer your questions')
+		addContentToAnswerPhase(null, true) // add content to view with phoneVisible set to true
 		.then(() => $('#view-container').attr('data-current-view', `answer-phase`)) // show the answer phase view
 		.then(() => wait(50)) // delay neccesary for weird reveal behaviour
 		.then(() => $('#view-answer-phase .question-anchor').addClass('reveal')) // update the view
@@ -297,7 +297,7 @@ let gamePhases = {
 			room.questions[q.id].submissions[pid] = null;
 			room.players[pid].submissionsComplete[q.id] = false;
 
-			addContentToAnswerPhase('Look at your phone to answer your questions')
+			addContentToAnswerPhase(null, true) // add content to view with phoneVisible set to true
 			.then(() => $('#view-container').attr('data-current-view', `answer-phase`)) // show the answer phase view
 			.then(() => wait(50)) // delay neccesary for weird reveal behaviour
 			.then(() => $('#view-answer-phase .question-anchor').addClass('reveal')) // update the view
@@ -512,19 +512,19 @@ let gameSequence = {
 */
 
 function generateGameSequence() {
-	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
+	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
 	gameSequence.steps.push(gamePhases.guessTheArticle);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
 	gameSequence.steps.push(gamePhases.leaderboard);
-	gameSequence.steps.push(gamePhases.describeRound.bind(null, 2));
+	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 2));
 	gameSequence.steps.push(gamePhases.excerptBattle);
 	for(let i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
 		gameSequence.steps.push(gamePhases.scoring);
 	}	
 	gameSequence.steps.push(gamePhases.leaderboard);
-	gameSequence.steps.push(gamePhases.describeRound.bind(null, 3));
+	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 3));
 	gameSequence.steps.push(gamePhases.editBattle);
 	for(let i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);		
@@ -609,9 +609,10 @@ function addPlayerToLobby(player) {
 	this is necessary to obscure the answer's owner
 */
 
-function addContentToAnswerPhase(question) {	
+function addContentToAnswerPhase(question, phoneVisible) {	
 	return new Promise((resolve, reject) => {
 		let vcFrag = fragment($('#template-answer-phase-content').html());
+		if(true) $(vcFrag).find('.answer-phase-content').addClass('phone-visible'); // EDIT TRUE TO phoneVisible
 		$(vcFrag).find('.answer-phase-content .question').text(question);
 		for(let pid in room.players) {
 			let pFrag = fragment($('#template-player').html());

@@ -365,7 +365,15 @@ a {
 		    width: 100%;	
 		    top: 0;
 		    left: 0;
-		}
+		    &.phone-visible {
+				.question-anchor {
+					display: none;
+				}
+				.look-at-phone {
+					display: block;
+				}
+			}
+		}		
 		.question-anchor {
 			position: absolute;
 			width: 100%;
@@ -409,6 +417,36 @@ a {
 					border-left: 7px solid lightgrey;
 				    padding: 10px 40px;
 				}
+			}
+		}
+		.look-at-phone {
+			display: none;
+			position: absolute;
+			left: 50%;
+			top: 100%;
+			transform: translate(50%, 50%);
+			width: 100%;
+			opacity: 0;
+			&.reveal {
+				transition: 
+					0.5s opacity $easeInOutQuint 1s,
+			    	0.5s top $easeInOutQuint 1s;				
+				opacity: 1;
+				top: 40%;
+			}
+			&.tuck {
+				top: 40px;
+				transform: translate(0%, 0%);
+				transition: 					
+			    	0.7s top $easeOutQuint,
+			    	0.7s transform $easeOutQuint;
+			}
+			span {
+				font-size: 2em;
+			}
+			.icon-mobile {
+				font-size: 5em;
+				font-size: #ccc;
 			}
 		}
 		.players {

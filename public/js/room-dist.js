@@ -182,7 +182,8 @@ var gamePhases = {
 			room.players[pid].submissionsComplete[q.id] = false;
 		}
 
-		addContentToAnswerPhase(q.excerpt).then(function () {
+		addContentToAnswerPhase(q.excerpt) // add content to view, setting the question to the excerpt
+		.then(function () {
 			return $('#view-container').attr('data-current-view', 'answer-phase');
 		}) // show the answer phase view
 		.then(function () {
@@ -234,7 +235,8 @@ var gamePhases = {
 			_loop(i);
 		}
 
-		addContentToAnswerPhase('Look at your phone to answer your questions').then(function () {
+		addContentToAnswerPhase(null, true) // add content to view with phoneVisible set to true
+		.then(function () {
 			return $('#view-container').attr('data-current-view', 'answer-phase');
 		}) // show the answer phase view
 		.then(function () {
@@ -283,7 +285,8 @@ var gamePhases = {
 			_loop2(i);
 		}
 
-		addContentToAnswerPhase('Look at your phone to answer your questions').then(function () {
+		addContentToAnswerPhase(null, true) // add content to view with phoneVisible set to true
+		.then(function () {
 			return $('#view-container').attr('data-current-view', 'answer-phase');
 		}) // show the answer phase view
 		.then(function () {
@@ -315,7 +318,8 @@ var gamePhases = {
 			room.questions[q.id].submissions[pid] = null;
 			room.players[pid].submissionsComplete[q.id] = false;
 
-			addContentToAnswerPhase('Look at your phone to answer your questions').then(function () {
+			addContentToAnswerPhase(null, true) // add content to view with phoneVisible set to true
+			.then(function () {
 				return $('#view-container').attr('data-current-view', 'answer-phase');
 			}) // show the answer phase view
 			.then(function () {
@@ -541,19 +545,19 @@ var gameSequence = {
 */
 
 function generateGameSequence() {
-	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
+	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
 	gameSequence.steps.push(gamePhases.guessTheArticle);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
 	gameSequence.steps.push(gamePhases.leaderboard);
-	gameSequence.steps.push(gamePhases.describeRound.bind(null, 2));
+	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 2));
 	gameSequence.steps.push(gamePhases.excerptBattle);
 	for (var i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
 		gameSequence.steps.push(gamePhases.scoring);
 	}
 	gameSequence.steps.push(gamePhases.leaderboard);
-	gameSequence.steps.push(gamePhases.describeRound.bind(null, 3));
+	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 3));
 	gameSequence.steps.push(gamePhases.editBattle);
 	for (var i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
@@ -641,9 +645,10 @@ function addPlayerToLobby(player) {
 	this is necessary to obscure the answer's owner
 */
 
-function addContentToAnswerPhase(question) {
+function addContentToAnswerPhase(question, phoneVisible) {
 	return new Promise(function (resolve, reject) {
 		var vcFrag = fragment($('#template-answer-phase-content').html());
+		if (true) $(vcFrag).find('.answer-phase-content').addClass('phone-visible'); // EDIT TRUE TO phoneVisible
 		$(vcFrag).find('.answer-phase-content .question').text(question);
 		for (var pid in room.players) {
 			var pFrag = fragment($('#template-player').html());
