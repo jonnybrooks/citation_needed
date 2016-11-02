@@ -101,7 +101,7 @@ let questionPool  = {
 let gamePhases = {
 	lobby: function(){
 		$('.host').attr('href', `${location.host}/player`).find('span').text(`${location.host}/player`);
-		/*
+		
 		$('.typed').typed({			
 			strings: [
 				"The <a>English</a> have terrible teeth due to bad parenting.", 
@@ -115,26 +115,26 @@ let gamePhases = {
 				$('#view-lobby .typed-cursor').addClass('hide');
 				$('#view-lobby .type-wrapper').addClass('slide-left');
 				$('#view-lobby .player').addClass('show');
-				waitOnAudio('title-card', 1500);
+				waitOnAudio('citation-needed', 1500);
 				// temp
 				setTimeout(() => $('.player').addClass('joined'), 2000);
 				setTimeout(commands.triggerNextStep, 3000);
 				// end temp
 			}
 		})
-		*/				
-		
+						
+		/*
 		// temp
 		$('.typed').text('60% of the time it works <em>every</em> time.');
 		$('#view-lobby .typed-cursor').addClass('hide');
 		$('#view-lobby .type-wrapper').addClass('slide-left');
 		$('#view-lobby .player').addClass('show');
-		//waitOnAudio('title-card', 1500);
+		//waitOnAudio('citation-needed', 1500);
 
 		setTimeout(() => $('.player').addClass('joined'), 5000);
 		setTimeout(commands.triggerNextStep, 2000);
 		// end temp	
-			
+		*/	
 	},
 	describeRound: function(round) {
 		if(round === 1) {
@@ -487,7 +487,34 @@ let gamePhases = {
 		})
 	},
 	endGame: function() {
-		$('#view-container').attr('data-current-view', 'endgame');
+		let max = 0;
+		let winner = null;		
+		for(var pid in room.players) {
+			if(room.players[pid].score > max) {
+				max = room.players[pid].score;
+				winner = pid;
+			}
+		}
+		let backdrop = $(`#view-leaderboard .player[data-player-id="${winner}"]`);
+		let frag = fragment(backdrop[0].outerHTML);		
+		let tmln = new TimelineMax();
+		$('#view-leaderboard .winning-player').text(`${room.players[winner].name} wins!`)
+		$(frag).find('.content-wrapper').remove();		
+		$(frag).find('.player')
+			.addClass('backdrop')
+			.css({ position: 'fixed', transform: 'none', top: backdrop.offset().top, left: backdrop.offset().left, right: 'auto', bottom: 'auto', zIndex: 100, margin: 0 })
+			.appendTo('#view-leaderboard');
+
+		// change this animation sequence
+		// endgame winner announcement should NOT be fixed position
+		tmln.to('#view-leaderboard .backdrop', 0.5, { top: 0, right: 0, bottom: 0, left: 0, width: $(window).width(), height: $(window).width(), borderRadius: 0, ease: Power4.easeInOut })
+			.set('#view-leaderboard .backdrop', { width: 'auto', height: 'auto' })		
+			.to('#view-leaderboard .winning-player', 0.8, { top: '40%', ease: Power4.easeInOut })
+			.to('#view-leaderboard .winning-player', 0.5, { autoAlpha: 0, ease: Power4.easeInOut, delay: 2})
+			.to('#view-leaderboard .backdrop', 1, { top: '100%', ease: Power4.easeInOut, onComplete: gameSequence.next }, "-=0.5")
+	},
+	todo: function() {
+		$('#view-container').attr('data-current-view', 'todo');
 	}
 }
 
@@ -512,26 +539,27 @@ let gameSequence = {
 */
 
 function generateGameSequence() {
-	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
 	gameSequence.steps.push(gamePhases.guessTheArticle);
 	gameSequence.steps.push(gamePhases.voting);
 	gameSequence.steps.push(gamePhases.scoring);
 	gameSequence.steps.push(gamePhases.leaderboard);
-	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 2));
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 2));	
 	gameSequence.steps.push(gamePhases.excerptBattle);
 	for(let i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
 		gameSequence.steps.push(gamePhases.scoring);
 	}	
 	gameSequence.steps.push(gamePhases.leaderboard);
-	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 3));
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 3));
 	gameSequence.steps.push(gamePhases.editBattle);
 	for(let i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);		
 		gameSequence.steps.push(gamePhases.scoring);
 	}	
-	gameSequence.steps.push(gamePhases.leaderboard);	
+	gameSequence.steps.push(gamePhases.leaderboard);			
 	gameSequence.steps.push(gamePhases.endGame);
+	gameSequence.steps.push(gamePhases.todo);
 }
 
 /*
@@ -612,7 +640,7 @@ function addPlayerToLobby(player) {
 function addContentToAnswerPhase(question, phoneVisible) {	
 	return new Promise((resolve, reject) => {
 		let vcFrag = fragment($('#template-answer-phase-content').html());
-		if(true) $(vcFrag).find('.answer-phase-content').addClass('phone-visible'); // EDIT TRUE TO phoneVisible
+		if(phoneVisible) $(vcFrag).find('.answer-phase-content').addClass('phone-visible');
 		$(vcFrag).find('.answer-phase-content .question').text(question);
 		for(let pid in room.players) {
 			let pFrag = fragment($('#template-player').html());
@@ -675,7 +703,9 @@ function addVotesToVotingPhase(votes) {
 */
 
 function addPlayersToLeaderboard(players) {
-	if($('#view-leaderboard .player').length > 0) return;
+	if($('#view-leaderboard .player').length > 0) {
+		return TweenLite.set('.player', { clearProps: 'all' });
+	}
 	for(let pid in players) {		
 		let frag = fragment($('#template-player').html());
 		$(frag).find('.player').attr('data-player-id', pid).addClass(`player-${room.players[pid].number}-bg coloured`);		

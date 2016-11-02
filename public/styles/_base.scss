@@ -65,7 +65,10 @@ a {
 	}
 }
 .question {
-	font-family: $ff-ptSerif;
+	//font-family: $ff-ptSerif;
+	letter-spacing: 1px;
+    font-weight: 100;
+    font-size: 0.5em;
 }
 
 //player colour loop
@@ -117,7 +120,7 @@ a {
 		&[data-current-view="leaderboard"] {
 			right: 600%;
 		}
-		&[data-current-view="endgame"] {
+		&[data-current-view="todo"] {
 			right: 700%;
 		}
 	}
@@ -366,7 +369,7 @@ a {
 		    top: 0;
 		    left: 0;
 		    &.phone-visible {
-				.question-anchor {
+				.question {
 					display: none;
 				}
 				.look-at-phone {
@@ -381,14 +384,15 @@ a {
 			opacity: 0;
 			top: 100%;
 			transition: none;
-			.question {
+			.question, 
+			.look-at-phone {
 				font-size: 5em;				
 				position: absolute;
 				top: 0%;
 				left: 50%;
 				transform: translate(-50%, 0%);
 				margin: 0;
-				border-left: 7px solid transparent;
+				border-left: 7px olid transparent;
 				padding: 0;
 				transition: 					
 			    	0.6s width $easeOutQuint, // easeOutQuint
@@ -397,6 +401,19 @@ a {
 			    	0.6s padding ease-out,
 			    	0.6s border-left ease-out,
 			    	0.6s left $easeOutQuint;
+			}
+			.look-at-phone {
+				display: none;
+				.icon-mobile {
+					vertical-align: middle;
+					color: #666;
+				}
+				.instruction {
+					vertical-align: middle;
+				    letter-spacing: 1px;
+				    font-weight: 100;
+				    font-size: 0.7em;
+				}
 			}
 			&.reveal {
 				transition: 
@@ -409,7 +426,8 @@ a {
 				top: 40px;
 				transition: 					
 			    	0.7s top $easeOutQuint;
-				.question {
+				.question,
+				.look-at-phone {
 					left: 40px;
 					min-width: 50%;
 					transform: translate(0%, 0%);
@@ -417,36 +435,6 @@ a {
 					border-left: 7px solid lightgrey;
 				    padding: 10px 40px;
 				}
-			}
-		}
-		.look-at-phone {
-			display: none;
-			position: absolute;
-			left: 50%;
-			top: 100%;
-			transform: translate(50%, 50%);
-			width: 100%;
-			opacity: 0;
-			&.reveal {
-				transition: 
-					0.5s opacity $easeInOutQuint 1s,
-			    	0.5s top $easeInOutQuint 1s;				
-				opacity: 1;
-				top: 40%;
-			}
-			&.tuck {
-				top: 40px;
-				transform: translate(0%, 0%);
-				transition: 					
-			    	0.7s top $easeOutQuint,
-			    	0.7s transform $easeOutQuint;
-			}
-			span {
-				font-size: 2em;
-			}
-			.icon-mobile {
-				font-size: 5em;
-				font-size: #ccc;
 			}
 		}
 		.players {
@@ -677,8 +665,18 @@ a {
 			    }
 		    }
 		}
+		.winning-player {
+			position: absolute;
+			z-index: 200;
+			top: 150%;
+			right: 50%;
+			transform: translate(50%, -50%);			
+			color: white;
+		    font-size: 5em;
+		    margin: 0;
+		}
 	}
-	#view-endgame {
+	#view-todo {
 		.content {
 			position: absolute;
 		    right: 50%;

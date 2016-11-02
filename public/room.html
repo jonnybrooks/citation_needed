@@ -102,19 +102,20 @@
 				<div class="voting-phase-content"></div>
 			</div>		
 			<div id="view-leaderboard" class="view">
-				<div class="players"></div>				
+				<div class="players"></div>
+				<p class="winning-player"></p>
 			</div>
-			<div id="view-endgame" class="view">
+			<div id="view-todo" class="view">
 				<div class="content">
-					<h1>That's the end of the visual demo!</h1>
-					<p>Things left to add:</p>
+					<h1>Thanks for playing the alpha!</h1>
+					<p>Todo list</p>
 					<ul>
 						<li style="text-decoration: line-through;">Little score things at the end of the voting phase</li>
 						<li style="text-decoration: line-through;">Score overview at the end of each round</li>
 						<li style="text-decoration: line-through;">Fix the answer phase reset logic</li>
 						<li style="text-decoration: line-through;">FE for round 2</li>
 						<li style="text-decoration: line-through;">FE for round 3</li>
-						<li>The endgame sequence</li>
+						<li style="text-decoration: line-through;">The endgame sequence</li>						
 						<li>All of the speech elements and sound effects</li>
 						<li>CONTENT</li>
 					</ul>
@@ -132,12 +133,12 @@
 		<script id="template-answer-phase-content" type="text/template">
 			<div class="answer-phase-content">
 				<div class="question-anchor">
-					<p class="question"></p>					
-				</div>
-				<div class="look-at-phone">
-					<span class="icon-mobile"></span>	
-					<span>Use your phone to submit</span>				
-				</div>
+					<p class="question"></p>
+					<p class="look-at-phone">
+						<span class="icon-mobile"></span>	
+						<span class="instruction">Look at your device now</span>				
+					</p>
+				</div>				
 				<div class="countdown">
 					<svg xmlns="http://www.w3.org/2000/svg" width="100" height="400" viewBox="0 0 100 100">
 						<circle class="circle" cx="50" cy="50" r="40" stroke="#ccc" stroke-width="2" fill="#f00" fill-opacity="0"/>
