@@ -80,7 +80,7 @@ var gamePhases = {
   		$('#view-lobby .typed-cursor').addClass('hide');
   		$('#view-lobby .type-wrapper').addClass('slide-left');
   		$('#view-lobby .player').addClass('show');
-  		waitOnAudio('../speech/001-title.mp3', 1500);
+  		waitOnAudio('title-card', 1500);
   		// temp
   		setTimeout(() => $('.player').addClass('joined'), 2000);
   		setTimeout(commands.triggerNextStep, 3000);
@@ -94,7 +94,7 @@ var gamePhases = {
 		$('#view-lobby .typed-cursor').addClass('hide');
 		$('#view-lobby .type-wrapper').addClass('slide-left');
 		$('#view-lobby .player').addClass('show');
-		//waitOnAudio('../speech/001-title.mp3', 1500);
+		//waitOnAudio('title-card', 1500);
 
 		setTimeout(function () {
 			return $('.player').addClass('joined');
@@ -104,64 +104,64 @@ var gamePhases = {
 	},
 	describeRound: function describeRound(round) {
 		if (round === 1) {
-			waitOnAudio('../speech/002-intro.mp3').then(function () {
-				return waitOnAudio('../speech/003-round1-intro.mp3');
+			waitOnAudio('welcome').then(function () {
+				return waitOnAudio('pre-round1');
 			}).then(function () {
 				return $('#view-container').attr('data-current-view', 'describe-round-' + round);
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(0).addClass('show');
 			}).then(function () {
-				return waitOnAudio('../speech/004-round1-desc.mp3', 1000);
+				return waitOnAudio('guess-the-article-desc-1', 1000);
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(1).addClass('show');
 			}).then(function () {
-				return waitOnAudio('../speech/005-round1-desc.mp3');
+				return waitOnAudio('guess-the-article-desc-2');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(2).addClass('show');
 			}).then(function () {
-				return waitOnAudio('../speech/006-round1-desc.mp3');
+				return waitOnAudio('guess-the-article-desc-3');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(3).addClass('show');
 			}).then(function () {
-				return waitOnAudio('../speech/007-round1-desc.mp3');
+				return waitOnAudio('guess-the-article-desc-4');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(4).addClass('show');
 			}).then(function () {
-				return waitOnAudio('../speech/008-round1-desc.mp3');
+				return waitOnAudio('guess-the-article-desc-5');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(5).addClass('show');
 			}).then(function () {
-				return waitOnAudio('../speech/009-round1-desc.mp3');
+				return waitOnAudio('guess-the-article-desc-6');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(6).addClass('show');
 			}).then(gameSequence.next);
 		} else {
-			waitOnAudio('../speech/003-round1-intro.mp3').then(function () {
+			waitOnAudio('003-round1-intro').then(function () {
 				return $('#view-container').attr('data-current-view', 'describe-round-' + round);
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(0).addClass('show');
 			}).then(function () {
-				return waitOnAudio('../speech/004-round1-desc.mp3', 1000);
+				return waitOnAudio('004-round1-desc', 1000);
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(1).addClass('show');
 			}).then(function () {
-				return waitOnAudio('../speech/005-round1-desc.mp3');
+				return waitOnAudio('005-round1-desc');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(2).addClass('show');
 			}).then(function () {
-				return waitOnAudio('../speech/006-round1-desc.mp3');
+				return waitOnAudio('006-round1-desc');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(3).addClass('show');
 			}).then(function () {
-				return waitOnAudio('../speech/007-round1-desc.mp3');
+				return waitOnAudio('007-round1-desc');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(4).addClass('show');
 			}).then(function () {
-				return waitOnAudio('../speech/008-round1-desc.mp3');
+				return waitOnAudio('008-round1-desc');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(5).addClass('show');
 			}).then(function () {
-				return waitOnAudio('../speech/009-round1-desc.mp3');
+				return waitOnAudio('009-round1-desc');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(6).addClass('show');
 			}).then(gameSequence.next);
@@ -886,12 +886,12 @@ function rand(min, max) {
 	waitOnAudio: wait for the audio clip to finish before continuing
 */
 
-function waitOnAudio(path) {
+function waitOnAudio(name) {
 	var delay = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
 	var immediate = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
 	return new Promise(function (resolve, reject) {
-		var audio = new Audio(path);
+		var audio = new Audio('../speech/' + name + '.mp3');
 		$(audio).on('ended', resolve);
 		setTimeout(function (e) {
 			return audio.play();

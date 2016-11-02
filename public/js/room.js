@@ -115,7 +115,7 @@ let gamePhases = {
 				$('#view-lobby .typed-cursor').addClass('hide');
 				$('#view-lobby .type-wrapper').addClass('slide-left');
 				$('#view-lobby .player').addClass('show');
-				waitOnAudio('../speech/001-title.mp3', 1500);
+				waitOnAudio('title-card', 1500);
 				// temp
 				setTimeout(() => $('.player').addClass('joined'), 2000);
 				setTimeout(commands.triggerNextStep, 3000);
@@ -129,7 +129,7 @@ let gamePhases = {
 		$('#view-lobby .typed-cursor').addClass('hide');
 		$('#view-lobby .type-wrapper').addClass('slide-left');
 		$('#view-lobby .player').addClass('show');
-		//waitOnAudio('../speech/001-title.mp3', 1500);
+		//waitOnAudio('title-card', 1500);
 
 		setTimeout(() => $('.player').addClass('joined'), 5000);
 		setTimeout(commands.triggerNextStep, 2000);
@@ -138,39 +138,39 @@ let gamePhases = {
 	},
 	describeRound: function(round) {
 		if(round === 1) {
-			waitOnAudio('../speech/002-intro.mp3')
-			.then(() => waitOnAudio('../speech/003-round1-intro.mp3'))
+			waitOnAudio('welcome')
+			.then(() => waitOnAudio('pre-round1'))
 			.then(() => $('#view-container').attr('data-current-view', `describe-round-${round}`))
 			.then(() => $(`#view-describe-round-${round} li`).eq(0).addClass('show'))
-			.then(() => waitOnAudio('../speech/004-round1-desc.mp3', 1000))
+			.then(() => waitOnAudio('guess-the-article-desc-1', 1000))
 			.then(() => $(`#view-describe-round-${round} li`).eq(1).addClass('show'))
-			.then(() => waitOnAudio('../speech/005-round1-desc.mp3'))
+			.then(() => waitOnAudio('guess-the-article-desc-2'))
 			.then(() => $(`#view-describe-round-${round} li`).eq(2).addClass('show'))
-			.then(() => waitOnAudio('../speech/006-round1-desc.mp3'))
+			.then(() => waitOnAudio('guess-the-article-desc-3'))
 			.then(() => $(`#view-describe-round-${round} li`).eq(3).addClass('show'))
-			.then(() => waitOnAudio('../speech/007-round1-desc.mp3'))
+			.then(() => waitOnAudio('guess-the-article-desc-4'))
 			.then(() => $(`#view-describe-round-${round} li`).eq(4).addClass('show'))
-			.then(() => waitOnAudio('../speech/008-round1-desc.mp3'))
+			.then(() => waitOnAudio('guess-the-article-desc-5'))
 			.then(() => $(`#view-describe-round-${round} li`).eq(5).addClass('show'))
-			.then(() => waitOnAudio('../speech/009-round1-desc.mp3'))
+			.then(() => waitOnAudio('guess-the-article-desc-6'))
 			.then(() => $(`#view-describe-round-${round} li`).eq(6).addClass('show'))
 			.then(gameSequence.next)
 		}
 		else {
-			waitOnAudio('../speech/003-round1-intro.mp3')
+			waitOnAudio('003-round1-intro')
 			.then(() => $('#view-container').attr('data-current-view', `describe-round-${round}`))
 			.then(() => $(`#view-describe-round-${round} li`).eq(0).addClass('show'))
-			.then(() => waitOnAudio('../speech/004-round1-desc.mp3', 1000))
+			.then(() => waitOnAudio('004-round1-desc', 1000))
 			.then(() => $(`#view-describe-round-${round} li`).eq(1).addClass('show'))
-			.then(() => waitOnAudio('../speech/005-round1-desc.mp3'))
+			.then(() => waitOnAudio('005-round1-desc'))
 			.then(() => $(`#view-describe-round-${round} li`).eq(2).addClass('show'))
-			.then(() => waitOnAudio('../speech/006-round1-desc.mp3'))
+			.then(() => waitOnAudio('006-round1-desc'))
 			.then(() => $(`#view-describe-round-${round} li`).eq(3).addClass('show'))
-			.then(() => waitOnAudio('../speech/007-round1-desc.mp3'))
+			.then(() => waitOnAudio('007-round1-desc'))
 			.then(() => $(`#view-describe-round-${round} li`).eq(4).addClass('show'))
-			.then(() => waitOnAudio('../speech/008-round1-desc.mp3'))
+			.then(() => waitOnAudio('008-round1-desc'))
 			.then(() => $(`#view-describe-round-${round} li`).eq(5).addClass('show'))
-			.then(() => waitOnAudio('../speech/009-round1-desc.mp3'))
+			.then(() => waitOnAudio('009-round1-desc'))
 			.then(() => $(`#view-describe-round-${round} li`).eq(6).addClass('show'))
 			.then(gameSequence.next)
 		}			
@@ -846,9 +846,9 @@ function rand(min, max) {
 	waitOnAudio: wait for the audio clip to finish before continuing
 */
 
-function waitOnAudio(path, delay = 0, immediate = false) {
+function waitOnAudio(name, delay = 0, immediate = false) {
 	return new Promise(function(resolve, reject){
-		let audio = new Audio(path);
+		let audio = new Audio(`../speech/${name}.mp3`);
 		$(audio).on('ended', resolve);
 		setTimeout(e => audio.play(), delay);
 		if(immediate) resolve();		
