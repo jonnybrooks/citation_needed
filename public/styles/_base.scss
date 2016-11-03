@@ -10,6 +10,7 @@ $colour-playerGreen: #71E096;
 $colour-playerPurple: #DA97E0;
 $colour-playerBlue: #90D4F7;
 $colour-playerPink: #FFB3BA;
+$colour-bgGradient: linear-gradient(180deg, white, #efefef);
 
 $colour-playerColors: $colour-playerRed, $colour-playerBlue, $colour-playerYellow, $colour-playerGreen, $colour-playerOrange, $colour-playerBrown, $colour-playerPurple, $colour-playerPink;
 
@@ -39,6 +40,7 @@ html, body {
 	width: 100%;
 	height: 100%;	
 	overflow: hidden;
+	background: $colour-bgGradient;
 }
 body, .sans-serif {	
 	font-family: $ff-roboto;
@@ -98,7 +100,7 @@ a {
 		height: 100%;
 		white-space: nowrap;
 		position: relative;
-		transition: 1s right $easeInOutQuint;
+		transition: 1s right $easeInOutQuint;		
 		&[data-current-view="lobby"] {
 			right: 0;
 		}
@@ -132,9 +134,15 @@ a {
 	    vertical-align: top;
 	    white-space: normal;
 	    overflow: hidden;
-	    background: linear-gradient(180deg, white, #efefef);
+	    background: $colour-bgGradient;
 	    padding: 0 0 0 5px;
 	    margin: 0 -5px 0 0;
+	    opacity: 1;
+	    transition: 
+	    	1s opacity ease-out;
+	    &.obscure {
+	    	opacity: 0;
+	    }
 	}
 	#view-lobby {
 		transition: 0s max-height linear 1s;
@@ -407,6 +415,7 @@ a {
 				.icon-mobile {
 					vertical-align: middle;
 					color: #666;
+					margin-right: 10px;					
 				}
 				.instruction {
 					vertical-align: middle;
@@ -545,7 +554,7 @@ a {
 		}
 		.answers {
 			display: flex;
-			justify-content: space-between;
+			justify-content: center;
 			align-items: flex-start;
 			flex-wrap: wrap;
 
@@ -559,8 +568,7 @@ a {
 		.answer {
 			background: #222;
 			color: white;
-			padding: 40px 40px calc(5% + 100px);
-			flex-grow: 1;
+			padding: 40px 80px calc(5% + 100px) 40px;			
 			margin: 0 3px 3px 0px;
 			position: relative;
 			min-width: 15%;

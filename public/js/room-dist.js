@@ -76,7 +76,7 @@ var gamePhases = {
 				$('#view-lobby .typed-cursor').addClass('hide');
 				$('#view-lobby .type-wrapper').addClass('slide-left');
 				$('#view-lobby .player').addClass('show');
-				waitOnAudio('citation-needed', 1500);
+				waitOnSpeech('citation-needed', 1500);
 				// temp
 				setTimeout(function () {
 					return $('.player').addClass('joined');
@@ -88,64 +88,64 @@ var gamePhases = {
 	},
 	describeRound: function describeRound(round) {
 		if (round === 1) {
-			waitOnAudio('welcome').then(function () {
-				return waitOnAudio('pre-round1');
+			waitOnSpeech('welcome').then(function () {
+				return waitOnSpeech('pre-round1');
 			}).then(function () {
-				return $('#view-container').attr('data-current-view', 'describe-round-' + round);
+				return changeToView('describe-round-' + round);
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(0).addClass('show');
 			}).then(function () {
-				return waitOnAudio('guess-the-article-desc-1', 1000);
+				return waitOnSpeech('guess-the-article-desc-1', 1000);
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(1).addClass('show');
 			}).then(function () {
-				return waitOnAudio('guess-the-article-desc-2');
+				return waitOnSpeech('guess-the-article-desc-2');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(2).addClass('show');
 			}).then(function () {
-				return waitOnAudio('guess-the-article-desc-3');
+				return waitOnSpeech('guess-the-article-desc-3');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(3).addClass('show');
 			}).then(function () {
-				return waitOnAudio('guess-the-article-desc-4');
+				return waitOnSpeech('guess-the-article-desc-4');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(4).addClass('show');
 			}).then(function () {
-				return waitOnAudio('guess-the-article-desc-5');
+				return waitOnSpeech('guess-the-article-desc-5');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(5).addClass('show');
 			}).then(function () {
-				return waitOnAudio('guess-the-article-desc-6');
+				return waitOnSpeech('guess-the-article-desc-6');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(6).addClass('show');
 			}).then(gameSequence.next);
 		} else {
-			waitOnAudio('003-round1-intro').then(function () {
-				return $('#view-container').attr('data-current-view', 'describe-round-' + round);
+			waitOnSpeech('pre-round1').then(function () {
+				return changeToView('describe-round-' + round);
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(0).addClass('show');
 			}).then(function () {
-				return waitOnAudio('004-round1-desc', 1000);
+				return waitOnSfx('correct-v1', 1000);
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(1).addClass('show');
 			}).then(function () {
-				return waitOnAudio('005-round1-desc');
+				return waitOnSfx('correct-v2');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(2).addClass('show');
 			}).then(function () {
-				return waitOnAudio('006-round1-desc');
+				return waitOnSfx('intro');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(3).addClass('show');
 			}).then(function () {
-				return waitOnAudio('007-round1-desc');
+				return waitOnSfx('select');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(4).addClass('show');
 			}).then(function () {
-				return waitOnAudio('008-round1-desc');
+				return waitOnSfx('wrong');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(5).addClass('show');
 			}).then(function () {
-				return waitOnAudio('009-round1-desc');
+				return waitOnSfx('correct-v1');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(6).addClass('show');
 			}).then(gameSequence.next);
@@ -168,7 +168,7 @@ var gamePhases = {
 
 		addContentToAnswerPhase(q.excerpt) // add content to view, setting the question to the excerpt
 		.then(function () {
-			return $('#view-container').attr('data-current-view', 'answer-phase');
+			return changeToView('answer-phase');
 		}) // show the answer phase view
 		.then(function () {
 			return wait(50);
@@ -221,7 +221,7 @@ var gamePhases = {
 
 		addContentToAnswerPhase(null, true) // add content to view with phoneVisible set to true
 		.then(function () {
-			return $('#view-container').attr('data-current-view', 'answer-phase');
+			return changeToView('answer-phase');
 		}) // show the answer phase view
 		.then(function () {
 			return wait(50);
@@ -271,7 +271,7 @@ var gamePhases = {
 
 		addContentToAnswerPhase(null, true) // add content to view with phoneVisible set to true
 		.then(function () {
-			return $('#view-container').attr('data-current-view', 'answer-phase');
+			return changeToView('answer-phase');
 		}) // show the answer phase view
 		.then(function () {
 			return wait(50);
@@ -304,7 +304,7 @@ var gamePhases = {
 
 			addContentToAnswerPhase(null, true) // add content to view with phoneVisible set to true
 			.then(function () {
-				return $('#view-container').attr('data-current-view', 'answer-phase');
+				return changeToView('answer-phase');
 			}) // show the answer phase view
 			.then(function () {
 				return wait(50);
@@ -363,7 +363,7 @@ var gamePhases = {
 			addVotesToVotingPhase(room.votes);
 			// end temp
 
-			$('#view-container').attr('data-current-view', 'voting-phase');
+			changeToView('voting-phase');
 
 			socket.emit('relay', {
 				from: room.roomKey, to: room.roomKey, command: 'prepareVote', args: { answers: q.submissions }
@@ -398,7 +398,7 @@ var gamePhases = {
 				// temp
 				addVotesToVotingPhase(room.votes);
 				// end temp				
-				$('#view-container').attr('data-current-view', 'voting-phase');
+				changeToView('voting-phase');
 			});
 		} else if (room.round === 3) {
 			var subid = Object.keys(q.submissions)[0]; // get the first submission in the list
@@ -425,7 +425,7 @@ var gamePhases = {
 				// temp
 				addVotesToVotingPhase(room.votes);
 				// end temp				
-				$('#view-container').attr('data-current-view', 'voting-phase');
+				changeToView('voting-phase');
 			});
 		}
 		startTimer(room.timer.limit);
@@ -486,7 +486,7 @@ var gamePhases = {
 	},
 	leaderboard: function leaderboard() {
 		addPlayersToLeaderboard(room.players);
-		$('#view-container').attr('data-current-view', 'leaderboard');
+		changeToView('leaderboard');
 		updateLeaderboard().then(function () {
 			return wait(1000);
 		}).then(gameSequence.next);
@@ -520,7 +520,7 @@ var gamePhases = {
 		tmln.to('#view-leaderboard .backdrop', 0.5, { top: 0, right: 0, bottom: 0, left: 0, width: $(window).width(), height: $(window).width(), borderRadius: 0, ease: Power4.easeInOut }).set('#view-leaderboard .backdrop', { width: 'auto', height: 'auto' }).to('#view-leaderboard .winning-player', 0.8, { top: '40%', ease: Power4.easeInOut }).to('#view-leaderboard .winning-player', 0.5, { autoAlpha: 0, ease: Power4.easeInOut, delay: 2 }).to('#view-leaderboard .backdrop', 1, { top: '100%', ease: Power4.easeInOut, onComplete: gameSequence.next }, '-=0.5');
 	},
 	todo: function todo() {
-		$('#view-container').attr('data-current-view', 'todo');
+		changeToView('todo');
 	}
 };
 
@@ -718,7 +718,8 @@ function addVotesToVotingPhase(votes) {
 
 function addPlayersToLeaderboard(players) {
 	if ($('#view-leaderboard .player').length > 0) {
-		return TweenLite.set('.player', { clearProps: 'all' });
+		//return TweenLite.set('#view-leaderboard .content-wrapper', { clearProps: 'all' }); // reset the player fade-in
+		return;
 	}
 	for (var pid in players) {
 		var frag = fragment($('#template-player').html());
@@ -785,32 +786,20 @@ function revealVote(answer) {
 }
 
 /*
-	createDummyPlayers: create dummy players for fast forwarding through the connection process
-	for testing
-*/
-
-function createDummyPlayers(amount) {
-	for (var i = 0; i < amount; i++) {
-		var id = Math.random();
-		room.players[id] = new Player({
-			socketId: id,
-			roomKey: room.roomKey,
-			name: 'Player ' + (i + 1),
-			number: Object.keys(room.players).length + 1
-		});
-	}
-}
-
-/*
 	drawCountdown: draws the circular clock timer thingy, with an optional argument to draw the
 	end frames if all submissions are recieved before timeout
 */
 
 function drawCountdown(end) {
-	var countdown = '#view-' + $('#view-container').attr('data-current-view') + ' .countdown';
-	if (!end) return TweenLite.to(countdown + ' .circle', room.timer.limit, { strokeDashoffset: 0, ease: Linear.easeNone });
-	var tmln = new TimelineMax();
-	tmln.to(countdown + ' .circle', 1, { strokeDashoffset: 0, ease: Power4.easeInOut }).to(countdown + ' .timer', 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5').to(countdown + ' .circle', 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) }).to(countdown + ' .circle', 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3').to(countdown + ' .white-box', 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3').from(countdown + ' .white-box', 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4');
+	var countdown = '#view-' + $('#view-container').attr('data-current-view') + ' .countdown'; // only target the countdown on the active view
+	if (!end) return TweenLite.to(countdown + ' .circle', room.timer.limit, { strokeDashoffset: 0, ease: Linear.easeNone }); // continue animation if there's time left
+	var tmln = new TimelineMax(); // otherwise create the timeline for the timeout animation
+	tmln.to(countdown + ' .circle', 1, { strokeDashoffset: 0, ease: Power4.easeInOut }) // finish the border outline
+	.to(countdown + ' .timer', 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5') // fade out the time figure
+	.to(countdown + ' .circle', 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) }) // scale the circle down a bit
+	.to(countdown + ' .circle', 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3') // change it's colour to red
+	.to(countdown + ' .white-box', 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3') // fade in the white bar
+	.from(countdown + ' .white-box', 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4');
 }
 
 /*
@@ -855,6 +844,32 @@ function updateLeaderboard() {
 }
 
 /*
+	createDummyPlayers: create dummy players for fast forwarding through the connection process
+	for testing
+*/
+
+function createDummyPlayers(amount) {
+	for (var i = 0; i < amount; i++) {
+		var id = Math.random();
+		room.players[id] = new Player({
+			socketId: id,
+			roomKey: room.roomKey,
+			name: 'Player ' + (i + 1),
+			number: Object.keys(room.players).length + 1
+		});
+	}
+}
+
+/*
+	changeToView: helper function for switching the view (and obscuring the others during the transition)
+*/
+
+function changeToView(view) {
+	$('.view').removeClass('obscure').not('#view-' + view).addClass('obscure'); // obscure the inactive views
+	$('#view-container').attr('data-current-view', view); // transition to the new active view
+}
+
+/*
 	fragment: creates a document fragment for appending to the DOM
 */
 
@@ -895,15 +910,33 @@ function rand(min, max) {
 }
 
 /*
-	waitOnAudio: wait for the audio clip to finish before continuing
+	waitOnSpeech: wait for the speech clip to finish before continuing
 */
 
-function waitOnAudio(name) {
+function waitOnSpeech(name) {
 	var delay = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
 	var immediate = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
 	return new Promise(function (resolve, reject) {
-		var audio = new Audio('../speech/' + name + '.mp3');
+		var audio = new Audio('../audio/speech/' + name + '.mp3');
+		$(audio).on('ended', resolve);
+		setTimeout(function (e) {
+			return audio.play();
+		}, delay);
+		if (immediate) resolve();
+	});
+}
+
+/*
+	waitOnSfx: wait for the sfx clip to finish before continuing
+*/
+
+function waitOnSfx(name) {
+	var delay = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+	var immediate = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
+	return new Promise(function (resolve, reject) {
+		var audio = new Audio('../audio/sfx/' + name + '.wav');
 		$(audio).on('ended', resolve);
 		setTimeout(function (e) {
 			return audio.play();
@@ -941,7 +974,7 @@ $('.typed').text('60% of the time it works <em>every</em> time.');
 $('#view-lobby .typed-cursor').addClass('hide');
 $('#view-lobby .type-wrapper').addClass('slide-left');
 $('#view-lobby .player').addClass('show');
-//waitOnAudio('citation-needed', 1500);
+//waitOnSpeech('citation-needed', 1500);
 		setTimeout(() => $('.player').addClass('joined'), 5000);
 setTimeout(commands.triggerNextStep, 2000);
 // end temp	
@@ -949,4 +982,5 @@ setTimeout(commands.triggerNextStep, 2000);
 // then reveal them in order			
 // then reveal them in order
 // after fade out, resolve the promise
+// and move it into view
 // then fade in the player names
