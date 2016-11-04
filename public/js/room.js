@@ -49,52 +49,6 @@ let commands = {
 }
 
 /*
-	questionPool: question pool, for use during the testing phase
-	will be updated the load from a mongoDB in the future I imagine
-*/
-
-let questionPool  = {
-	guessTheArticle: [
-		{id: 0, excerpt: 'What is your favourite colour?', article: 'Blue, no, green!'},
-		{id: 1, excerpt: 'What is your quest?', article: 'I seek the Holy Grail'},
-		{id: 2, excerpt: 'What is your name?', article: 'Arthur, King of the Britains'},
-		{id: 3, excerpt: 'What is the air speed velocity of a fully laden Swallow?', article: 'An African or a European Swallow?'},
-		{id: 4, excerpt: 'None shall pass', article: 'NONE SHALL PASS'},
-		{id: 5, excerpt: 'We are the knights who say...', article: 'Nee!'}
-	],
-	excerptBattle: [
-		{id: 0, article: 'Blue, no, green!'},
-		{id: 1, article: 'I seek the Holy Grail'},
-		{id: 2, article: 'Arthur, King of the Britains'},
-		{id: 3, article: 'An African or a European Swallow?'},
-		{id: 4, article: 'NONE SHALL PASS'},
-		{id: 5, article: 'Nee!'},
-		{id: 6, article: 'Ya arm\'s off!'},
-		{id: 7, article: 'Breathe, sweet Concorde'},
-		{id: 8, article: 'He\'s going to tell (He\'s going to tell)'}
-	],
-	coopCitationNeeded: [
-		{id: 0, article: 'Blue, no, green!'},
-		{id: 1, article: 'I seek the Holy Grail'},
-		{id: 2, article: 'Arthur, King of the Britains'},
-		{id: 3, article: 'An African or a European Swallow?'},
-		{id: 4, article: 'NONE SHALL PASS'},
-		{id: 5, article: 'Nee!'},
-		{id: 6, article: 'Ya arm\'s off!'},
-		{id: 7, article: 'Breathe, sweet Concorde'},
-		{id: 8, article: 'He\'s going to tell (He\'s going to tell)'}
-	],	
-	editBattle: [
-		{id: 0, excerpt: 'The first law of thermodynamics is ____', article: 'The first law of thermodynamics'},
-		{id: 1, excerpt: 'The second law of thermodynamics is ____', article: 'The second law of thermodynamics'},
-		{id: 4, excerpt: 'The third law of thermodynamics is ____', article: 'The third law of thermodynamics'},
-		{id: 2, excerpt: 'The fourth law of thermodynamics is ____', article: 'The fourth law of thermodynamics'},
-		{id: 3, excerpt: 'The fifth law of thermodynamics is ____', article: 'The fifth law of thermodynamics'},
-		{id: 5, excerpt: 'The sixth law of thermodynamics is ____', article: 'The sixth law of thermodynamics'}
-	],
-}
-
-/*
 	gamePhases: phases of the games which act as elements in the game sequence steps[]
 */
 
@@ -118,8 +72,10 @@ let gamePhases = {
 				waitOnSpeech('citation-needed', 1500);
 				// temp
 				setTimeout(() => $('.player').addClass('joined'), 2000);
-				setTimeout(commands.triggerNextStep, 3000);
 				// end temp
+				getQuestionPool()
+				.then(qp => room.questionPool = qp)
+				.then(commands.triggerNextStep)
 			}
 		})
 						
@@ -177,7 +133,7 @@ let gamePhases = {
 	},
 	guessTheArticle: function() {
 		let players = Object.keys(room.players); // get player ids
-		let questions = questionPool.guessTheArticle; // get this rounds question pool
+		let questions = room.questionPool.guessTheArticle; // get this rounds question pool
 		let q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
 
 		room.questions[q.id] = { question: q.excerpt, submissions: {} };
@@ -209,7 +165,7 @@ let gamePhases = {
 	},
 	excerptBattle: function() {
 		let players = shuffle(Object.keys(room.players)); // get player ids and randomize
-		let questions = questionPool.excerptBattle; // get this rounds question pool
+		let questions = room.questionPool.excerptBattle; // get this rounds question pool
 		room.round = 2;
 
 		for(let i = 0; i < players.length; i++) {
@@ -248,7 +204,7 @@ let gamePhases = {
 	},	
 	editBattle: function() {
 		let players = shuffle(Object.keys(room.players)); // get player ids and randomize
-		let questions = questionPool.editBattle; // get this rounds question pool
+		let questions = room.questionPool.editBattle; // get this rounds question pool
 		room.round = 2;
 
 		for(let i = 0; i < players.length; i++) {
@@ -287,7 +243,7 @@ let gamePhases = {
 	},
 	coopCitationNeeded: function() {
 		let players = Object.keys(room.players); // get player ids
-		let questions = questionPool.coopCitationNeeded; // get this rounds question pool
+		let questions = room.questionPool.coopCitationNeeded; // get this rounds question pool
 		room.round = 3;
 
 		for(let pid in room.players) {
@@ -836,6 +792,17 @@ function createDummyPlayers(amount) {
 			number: Object.keys(room.players).length + 1
 		});
 	}	
+}
+
+/*
+	getQuestionPool: get question pool from remote JSON
+*/
+
+function getQuestionPool() {
+	return new Promise((resolve, reject) => {
+		jQuery.getJSON('questions.json', data => resolve(data))
+		.fail(e => console.log('error: %s', e))
+	})	
 }
 
 /*
