@@ -48,18 +48,6 @@ var commands = {
 };
 
 /*
-	questionPool: question pool, for use during the testing phase
-	will be updated the load from a mongoDB in the future I imagine
-*/
-
-var questionPool = {
-	guessTheArticle: [{ id: 0, excerpt: 'What is your favourite colour?', article: 'Blue, no, green!' }, { id: 1, excerpt: 'What is your quest?', article: 'I seek the Holy Grail' }, { id: 2, excerpt: 'What is your name?', article: 'Arthur, King of the Britains' }, { id: 3, excerpt: 'What is the air speed velocity of a fully laden Swallow?', article: 'An African or a European Swallow?' }, { id: 4, excerpt: 'None shall pass', article: 'NONE SHALL PASS' }, { id: 5, excerpt: 'We are the knights who say...', article: 'Nee!' }],
-	excerptBattle: [{ id: 0, article: 'Blue, no, green!' }, { id: 1, article: 'I seek the Holy Grail' }, { id: 2, article: 'Arthur, King of the Britains' }, { id: 3, article: 'An African or a European Swallow?' }, { id: 4, article: 'NONE SHALL PASS' }, { id: 5, article: 'Nee!' }, { id: 6, article: 'Ya arm\'s off!' }, { id: 7, article: 'Breathe, sweet Concorde' }, { id: 8, article: 'He\'s going to tell (He\'s going to tell)' }],
-	coopCitationNeeded: [{ id: 0, article: 'Blue, no, green!' }, { id: 1, article: 'I seek the Holy Grail' }, { id: 2, article: 'Arthur, King of the Britains' }, { id: 3, article: 'An African or a European Swallow?' }, { id: 4, article: 'NONE SHALL PASS' }, { id: 5, article: 'Nee!' }, { id: 6, article: 'Ya arm\'s off!' }, { id: 7, article: 'Breathe, sweet Concorde' }, { id: 8, article: 'He\'s going to tell (He\'s going to tell)' }],
-	editBattle: [{ id: 0, excerpt: 'The first law of thermodynamics is ____', article: 'The first law of thermodynamics' }, { id: 1, excerpt: 'The second law of thermodynamics is ____', article: 'The second law of thermodynamics' }, { id: 4, excerpt: 'The third law of thermodynamics is ____', article: 'The third law of thermodynamics' }, { id: 2, excerpt: 'The fourth law of thermodynamics is ____', article: 'The fourth law of thermodynamics' }, { id: 3, excerpt: 'The fifth law of thermodynamics is ____', article: 'The fifth law of thermodynamics' }, { id: 5, excerpt: 'The sixth law of thermodynamics is ____', article: 'The sixth law of thermodynamics' }]
-};
-
-/*
 	gamePhases: phases of the games which act as elements in the game sequence steps[]
 */
 
@@ -81,8 +69,10 @@ var gamePhases = {
 				setTimeout(function () {
 					return $('.player').addClass('joined');
 				}, 2000);
-				setTimeout(commands.triggerNextStep, 3000);
 				// end temp
+				getQuestionPool().then(function (qp) {
+					return room.questionPool = qp;
+				}).then(commands.triggerNextStep);
 			}
 		});
 	},
@@ -153,7 +143,7 @@ var gamePhases = {
 	},
 	guessTheArticle: function guessTheArticle() {
 		var players = Object.keys(room.players); // get player ids
-		var questions = questionPool.guessTheArticle; // get this rounds question pool
+		var questions = room.questionPool.guessTheArticle; // get this rounds question pool
 		var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
 
 		room.questions[q.id] = { question: q.excerpt, submissions: {} };
@@ -192,7 +182,7 @@ var gamePhases = {
 	},
 	excerptBattle: function excerptBattle() {
 		var players = shuffle(Object.keys(room.players)); // get player ids and randomize
-		var questions = questionPool.excerptBattle; // get this rounds question pool
+		var questions = room.questionPool.excerptBattle; // get this rounds question pool
 		room.round = 2;
 
 		var _loop = function (i) {
@@ -242,7 +232,7 @@ var gamePhases = {
 	},
 	editBattle: function editBattle() {
 		var players = shuffle(Object.keys(room.players)); // get player ids and randomize
-		var questions = questionPool.editBattle; // get this rounds question pool
+		var questions = room.questionPool.editBattle; // get this rounds question pool
 		room.round = 2;
 
 		var _loop2 = function (i) {
@@ -292,7 +282,7 @@ var gamePhases = {
 	},
 	coopCitationNeeded: function coopCitationNeeded() {
 		var players = Object.keys(room.players); // get player ids
-		var questions = questionPool.coopCitationNeeded; // get this rounds question pool
+		var questions = room.questionPool.coopCitationNeeded; // get this rounds question pool
 		room.round = 3;
 
 		var _loop3 = function (pid) {
@@ -861,6 +851,20 @@ function createDummyPlayers(amount) {
 }
 
 /*
+	getQuestionPool: get question pool from remote JSON
+*/
+
+function getQuestionPool() {
+	return new Promise(function (resolve, reject) {
+		jQuery.getJSON('questions.json', function (data) {
+			return resolve(data);
+		}).fail(function (e) {
+			return console.log('error: %s', e);
+		});
+	});
+}
+
+/*
 	changeToView: helper function for switching the view (and obscuring the others during the transition)
 */
 
@@ -975,7 +979,7 @@ $('#view-lobby .typed-cursor').addClass('hide');
 $('#view-lobby .type-wrapper').addClass('slide-left');
 $('#view-lobby .player').addClass('show');
 //waitOnSpeech('citation-needed', 1500);
-		setTimeout(() => $('.player').addClass('joined'), 5000);
+	setTimeout(() => $('.player').addClass('joined'), 5000);
 setTimeout(commands.triggerNextStep, 2000);
 // end temp	
 */
