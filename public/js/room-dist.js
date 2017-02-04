@@ -1,7 +1,7 @@
 'use strict';
 
-var socket = undefined;
-var room = undefined;
+var socket = void 0;
+var room = void 0;
 
 socket = io('http://' + location.host + '/room');
 socket.on('connect', function () {}); // on connect callback
@@ -56,7 +56,7 @@ var gamePhases = {
 		$('.host').attr('href', location.host + '/player').find('span').text(location.host + '/player');
 
 		$('.typed').typed({
-			strings: ['The <a>English</a> have terrible teeth due to bad parenting.', '<a>Wasps</a> are in fact just angry little <a>Bees</a>.', '60% of the time it works <em>every</em> time.'],
+			strings: ["The <a>English</a> have terrible teeth due to bad parenting.", "<a>Wasps</a> are in fact just angry little <a>Bees</a>.", "60% of the time it works <em>every</em> time."],
 			typeSpeed: 0,
 			backSpeed: -200,
 			backDelay: 2000,
@@ -75,6 +75,18 @@ var gamePhases = {
 				}).then(commands.triggerNextStep);
 			}
 		});
+
+		/*
+  // temp
+  $('.typed').text('60% of the time it works <em>every</em> time.');
+  $('#view-lobby .typed-cursor').addClass('hide');
+  $('#view-lobby .type-wrapper').addClass('slide-left');
+  $('#view-lobby .player').addClass('show');
+  //waitOnSpeech('citation-needed', 1500);
+  	setTimeout(() => $('.player').addClass('joined'), 5000);
+  setTimeout(commands.triggerNextStep, 2000);
+  // end temp	
+  */
 	},
 	describeRound: function describeRound(round) {
 		if (round === 1) {
@@ -185,7 +197,7 @@ var gamePhases = {
 		var questions = room.questionPool.excerptBattle; // get this rounds question pool
 		room.round = 2;
 
-		var _loop = function (i) {
+		var _loop = function _loop(i) {
 			var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
 			var p1 = players[i];
 			var p2 = players[i + 1] || players[0];
@@ -235,7 +247,7 @@ var gamePhases = {
 		var questions = room.questionPool.editBattle; // get this rounds question pool
 		room.round = 2;
 
-		var _loop2 = function (i) {
+		var _loop2 = function _loop2(i) {
 			var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random
 			var p1 = players[i];
 			var p2 = players[i + 1] || players[0];
@@ -285,7 +297,7 @@ var gamePhases = {
 		var questions = room.questionPool.coopCitationNeeded; // get this rounds question pool
 		room.round = 3;
 
-		var _loop3 = function (pid) {
+		var _loop3 = function _loop3(pid) {
 			var q = questions.splice(Math.floor(Math.random() * questions.length), 1)[0]; // select a question at random		
 			room.questions[q.id] = { question: q.article, submissions: {} };
 
@@ -329,16 +341,16 @@ var gamePhases = {
 
 			// temp
 			//q = {excerpt: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare arcu vel risus interdum mattis. Aliquam semper neque quis maximus efficitur. Sed eget aliquam est, ut aliquam erat.", submissions: {}}
-			var subs = ['Archipelago', 'Dances with Wolves (film)', 'Acid reflux', 'Quantum Leap', 'Gone with the wind', 'OMG (Abbreviation)', 'Christmas', 'Minced oath'];
+			var subs = ["Archipelago", "Dances with Wolves (film)", "Acid reflux", "Quantum Leap", "Gone with the wind", "OMG (Abbreviation)", "Christmas", "Minced oath"];
 			var sub_i = 0;
-			var p1 = null;
+			var _p = null;
 			//end temp
 
 			for (var pid in room.players) {
 				room.votes[pid] = null; // set every player's vote to null
 
 				// temp
-				p1 = p1 === null ? pid : p1;
+				_p = _p === null ? pid : _p;
 				q.submissions[pid] = subs[sub_i++];
 				//room.votes[pid] = p1;				
 				//room.votes[pid] = room.roomKey;
@@ -362,25 +374,25 @@ var gamePhases = {
 
 			// temp
 			//console.log(JSON.stringify(room, null, '\t'));
-			var subs = ['Archipelago', 'Dances with Wolves (film)'];
-			var sub_i = 0;
-			for (var pid in q.submissions) {
-				q.submissions[pid] = subs[sub_i++];
+			var _subs = ["Archipelago", "Dances with Wolves (film)"];
+			var _sub_i = 0;
+			for (var _pid in q.submissions) {
+				q.submissions[_pid] = _subs[_sub_i++];
 			}
 			// end temp			
 
-			for (var pid in room.players) {
+			for (var _pid2 in room.players) {
 				var send = true;
 				for (var subpid in q.submissions) {
-					if (pid === subpid) send = false;
+					if (_pid2 === subpid) send = false;
 				}
 				if (send) {
-					room.votes[pid] = null; // set every player's vote to null
+					room.votes[_pid2] = null; // set every player's vote to null
 					//temp
-					room.votes[pid] = Object.keys(q.submissions)[rand(0, Object.keys(q.submissions).length - 1)];
+					room.votes[_pid2] = Object.keys(q.submissions)[rand(0, Object.keys(q.submissions).length - 1)];
 					//end temp
 					socket.emit('relay', {
-						from: room.roomKey, to: pid, command: 'prepareVote', args: { answers: q.submissions }
+						from: room.roomKey, to: _pid2, command: 'prepareVote', args: { answers: q.submissions }
 					});
 				}
 			}
@@ -395,18 +407,18 @@ var gamePhases = {
 
 			// temp
 			var answers = ['Archipelago', 'wrong', '[CITATION NEEDED]'];
-			q.submissions[subid] = 'Arhcipelago';
+			q.submissions[subid] = "Arhcipelago";
 			// end temp	
 
-			for (var pid in room.players) {
-				if (subid === pid) continue;
-				room.votes[pid] = null; // set every player's vote to null
+			for (var _pid3 in room.players) {
+				if (subid === _pid3) continue;
+				room.votes[_pid3] = null; // set every player's vote to null
 				//temp
-				room.votes[pid] = answers.splice(Math.floor(Math.random() * answers.length), 1)[0];
+				room.votes[_pid3] = answers.splice(Math.floor(Math.random() * answers.length), 1)[0];
 				//end temp
 				socket.emit('relay', {
 					from: room.roomKey,
-					to: pid,
+					to: _pid3,
 					command: 'prepareQuestion',
 					args: { qid: q.id, question: q.submissions[subid], round: '3-vote' }
 				});
@@ -430,12 +442,12 @@ var gamePhases = {
 			var scoringAnswers = $('.answer[data-will-score]').not(correctAnswer); // get all scoring answers that aren't correct
 			var sequence = shuffle($(scoringAnswers).toArray()); // shuffle the scoring answers, and convert it to a js array
 			sequence.push($(correctAnswer)[0]); //  and push the correct one to the end of the sequence
-			revealVotesSequentially(sequence).then(gameSequence.next);
+			revealVotesSequentially(sequence).then(gameSequence.next); // then reveal them in order			
 		}
 		if (room.round === 2) {
-			var scoringAnswers = $('.answer[data-will-score]'); // get all scoring answers that aren't correct
-			var sequence = shuffle($(scoringAnswers).toArray()); // shuffle the scoring answers, and convert it to a js array			
-			revealVotesSequentially(sequence).then(gameSequence.next);
+			var _scoringAnswers = $('.answer[data-will-score]'); // get all scoring answers that aren't correct
+			var _sequence = shuffle($(_scoringAnswers).toArray()); // shuffle the scoring answers, and convert it to a js array			
+			revealVotesSequentially(_sequence).then(gameSequence.next); // then reveal them in order
 		}
 		if (room.round === 3) {
 			// ROUND 3 SCORES BASED ON IF PLAYER SUBMISSIONS MATCH THE ARTICLE TITLE
@@ -448,24 +460,24 @@ var gamePhases = {
 		}
 
 		for (var i in room.votes) {
-			if (room.round === 3 && room.votes[i] === '[CITATION NEEDED]') citations++; // for round 3, count the citations
+			if (room.round === 3 && room.votes[i] === "[CITATION NEEDED]") citations++; // for round 3, count the citations
 			else {
-				// for every other round
-				if (room.votes[i] === room.roomKey) room.players[i].score += 100; // score for correct answers
-				if (room.players[room.votes[i]]) room.players[room.votes[i]].score += 100; // and for votes on players
-			}
+					// for every other round
+					if (room.votes[i] === room.roomKey) room.players[i].score += 100; // score for correct answers
+					if (room.players[room.votes[i]]) room.players[room.votes[i]].score += 100; // and for votes on players
+				}
 		}
 		if (room.round === 3) {
 			if (citations >= Math.ceil(Object.keys(room.votes).length / 2)) {
-				// if most votes are citations
+				// if most votes are citations 
 				r3Player.score -= 100; // deduct points from the submitting player
 			} else {
 				citations = 0; // reset citations
 				// update this with comments, think the logic needs to change slightly
 				// to score players who successfully citate bullshit answers
-				for (var i in room.votes) {
-					if (room.votes[i] !== room.questions[qid].question) continue;
-					room.players[i].score += 50;
+				for (var _i in room.votes) {
+					if (room.votes[_i] !== room.questions[qid].question) continue;
+					room.players[_i].score += 50;
 					citations++;
 				}
 				r3Player.score += 50 * (citations === 0 ? 0 : citations < Object.keys(room.votes).length ? 1 : 2);
@@ -507,7 +519,7 @@ var gamePhases = {
 
 		// change this animation sequence
 		// endgame winner announcement should NOT be fixed position
-		tmln.to('#view-leaderboard .backdrop', 0.5, { top: 0, right: 0, bottom: 0, left: 0, width: $(window).width(), height: $(window).width(), borderRadius: 0, ease: Power4.easeInOut }).set('#view-leaderboard .backdrop', { width: 'auto', height: 'auto' }).to('#view-leaderboard .winning-player', 0.8, { top: '40%', ease: Power4.easeInOut }).to('#view-leaderboard .winning-player', 0.5, { autoAlpha: 0, ease: Power4.easeInOut, delay: 2 }).to('#view-leaderboard .backdrop', 1, { top: '100%', ease: Power4.easeInOut, onComplete: gameSequence.next }, '-=0.5');
+		tmln.to('#view-leaderboard .backdrop', 0.5, { top: 0, right: 0, bottom: 0, left: 0, width: $(window).width(), height: $(window).width(), borderRadius: 0, ease: Power4.easeInOut }).set('#view-leaderboard .backdrop', { width: 'auto', height: 'auto' }).to('#view-leaderboard .winning-player', 0.8, { top: '40%', ease: Power4.easeInOut }).to('#view-leaderboard .winning-player', 0.5, { autoAlpha: 0, ease: Power4.easeInOut, delay: 2 }).to('#view-leaderboard .backdrop', 1, { top: '100%', ease: Power4.easeInOut, onComplete: gameSequence.next }, "-=0.5");
 	},
 	todo: function todo() {
 		changeToView('todo');
@@ -524,11 +536,11 @@ var gameSequence = {
 	current: -1,
 	steps: [],
 	next: function next() {
-		var args = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+		var args = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		setTimeout((function () {
+		setTimeout(function () {
 			gameSequence.steps[++gameSequence.current](args);
-		}).bind(gameSequence), 1100);
+		}.bind(gameSequence), 1100);
 	}
 };
 
@@ -553,7 +565,7 @@ function generateGameSequence() {
 	gameSequence.steps.push(gamePhases.leaderboard);
 	gameSequence.steps.push(gamePhases.describeRound.bind(null, 3));
 	gameSequence.steps.push(gamePhases.editBattle);
-	for (var i in room.players) {
+	for (var _i2 in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
 		gameSequence.steps.push(gamePhases.scoring);
 	}
@@ -573,9 +585,9 @@ function startTimer(t) {
 	}
 	if (!room.timer.active) return; // return if tne timer has been cancelled
 	else if (t === 0) {
-		drawCountdown(true); // finish the timer
-		return wait(1000).then(gameSequence.next);
-	} else setTimeout(startTimer.bind(null, --t), 1000); // decrement the timer
+			drawCountdown(true); // finish the timer
+			return wait(1000).then(gameSequence.next);
+		} else setTimeout(startTimer.bind(null, --t), 1000); // decrement the timer
 }
 
 /*
@@ -590,12 +602,12 @@ function checkAnswerPhaseStatus(m) {
 	if (playerDone) {
 		// if the player has finished their questions
 		var questionsComplete = true;
-		$('#view-answer-phase .player[data-player-id="' + m.from + '"]').addClass('answered'); // show player as answered in lobby
-		for (var i in room.questions) {
+		$('#view-answer-phase .player[data-player-id="' + m.from + '"]').addClass('answered'); // show player as answered in lobby 
+		for (var _i3 in room.questions) {
 			// then iterate through the room questions
-			for (var j in room.questions[i].submissions) {
+			for (var j in room.questions[_i3].submissions) {
 				// making sure they're all done
-				if (room.questions[i].submissions[j] === null) questionsComplete = false;
+				if (room.questions[_i3].submissions[j] === null) questionsComplete = false;
 			}
 		}
 		if (questionsComplete) {
@@ -769,9 +781,9 @@ function revealVote(answer) {
 		tmln.staggerTo($(answer).find('.vote'), staggerDuration, { width: '100%', ease: Power4.easeOut, delay: 2 }, offset * -1) // reveal the votes
 		.to(answer, floatDuration, { y: '-=' + 15 * votes + 'px', ease: Power2.easeOut }, '-=' + floatDuration) // rise the answer proportionately
 		.to(answer, 0.6, { y: 0, ease: Power4.easeInOut, delay: 1 }) // then slam the answer down
-		.staggerTo($(answer).find('.score'), 1.5, { y: '-=200px', ease: Power3.easeOut }, offset, '-=0.6') // float the score up
+		.staggerTo($(answer).find('.score'), 1.5, { y: "-=200px", ease: Power3.easeOut }, offset, "-=0.6") // float the score up
 		.staggerTo($(answer).find('.score'), 0.5, { opacity: 1, ease: Power3.easeIn }, offset, '-=' + (correctFloat + 1.5)) // with a fade in
-		.staggerTo($(answer).find('.score'), 1, { opacity: 0, ease: Power2.easeOut }, offset, '-=' + (correctFloat + 0.5), resolve);
+		.staggerTo($(answer).find('.score'), 1, { opacity: 0, ease: Power2.easeOut }, offset, '-=' + (correctFloat + 0.5), resolve); // after fade out, resolve the promise
 	});
 }
 
@@ -789,7 +801,7 @@ function drawCountdown(end) {
 	.to(countdown + ' .circle', 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) }) // scale the circle down a bit
 	.to(countdown + ' .circle', 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3') // change it's colour to red
 	.to(countdown + ' .white-box', 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3') // fade in the white bar
-	.from(countdown + ' .white-box', 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4');
+	.from(countdown + ' .white-box', 0.3, { x: 100, ease: Power4.easeInOut }, '-=0.4'); // and move it into view
 }
 
 /*
@@ -803,16 +815,17 @@ function updateLeaderboard() {
 		for (var pid in room.players) {
 			totalScore += room.players[pid].score;
 		}
-		averageScore = totalScore / Object.keys(room.players).length;
-		var _loop4 = function (pid) {
-			var $player = $('#view-leaderboard .player[data-player-id="' + pid + '"]'); // get this player from the DOM
-			var offset = (room.players[pid].score - averageScore) / 2 * -1; // calculate the y offset based on deviation from the mean
-			var percent = room.players[pid].score / totalScore * (100 / 4) + '%'; // calculate percentage width as a ratio of the total score
+		averageScore = totalScore / Object.keys(room.players).length; // mean of the scores
+
+		var _loop4 = function _loop4(_pid4) {
+			var $player = $('#view-leaderboard .player[data-player-id="' + _pid4 + '"]'); // get this player from the DOM
+			var offset = (room.players[_pid4].score - averageScore) / 2 * -1; // calculate the y offset based on deviation from the mean
+			var percent = room.players[_pid4].score / totalScore * (100 / 4) + '%'; // calculate percentage width as a ratio of the total score
 			var tmln = new TimelineMax();
 			var initialWidth = $player.width(); // get the initial width of the player circles
-			var newWidth = undefined;
+			var newWidth = void 0;
 
-			$player.find('.score').text(room.players[pid].score); // set the player's score in the view
+			$player.find('.score').text(room.players[_pid4].score); // set the player's score in the view
 
 			tmln.set($player, { width: percent, onComplete: function onComplete() {
 					// first, set the width as percentage
@@ -821,14 +834,12 @@ function updateLeaderboard() {
 			}).set($player, { width: initialWidth }) // then set it back to it's initial width, ready for tweening
 			.to($player, 4, { height: newWidth, width: newWidth, ease: Power3.easeInOut, delay: 0.5 }) // tween the width and height
 			// .staggerTo('.circle', 1.8, { ease: Elastic.easeOut.config(0.4, 0.15), scale: 3, delay: 1 }, 0.2); tween with a staggered pop
-			.to($player, 3, { y: offset, ease: Power3.easeInOut }, '-=3') // and tween the y offset
-			.staggerTo('#view-leaderboard .content-wrapper', 1.2, { opacity: 1, ease: Power4.easeInOut }, 0.1, 4, resolve);
+			.to($player, 3, { y: offset, ease: Power3.easeInOut }, "-=3") // and tween the y offset
+			.staggerTo('#view-leaderboard .content-wrapper', 1.2, { opacity: 1, ease: Power4.easeInOut }, 0.1, 4, resolve); // then fade in the player names
 		};
 
-		// mean of the scores
-
-		for (var pid in room.players) {
-			_loop4(pid);
+		for (var _pid4 in room.players) {
+			_loop4(_pid4);
 		}
 	});
 }
@@ -893,8 +904,8 @@ function fragment(htmlStr) {
 
 function shuffle(array) {
 	var currentIndex = array.length,
-	    temporaryValue = undefined,
-	    randomIndex = undefined;
+	    temporaryValue = void 0,
+	    randomIndex = void 0;
 	while (0 !== currentIndex) {
 		randomIndex = Math.floor(Math.random() * currentIndex);
 		currentIndex -= 1;
@@ -918,8 +929,8 @@ function rand(min, max) {
 */
 
 function waitOnSpeech(name) {
-	var delay = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
-	var immediate = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+	var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+	var immediate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
 	return new Promise(function (resolve, reject) {
 		var audio = new Audio('../audio/speech/' + name + '.mp3');
@@ -936,8 +947,8 @@ function waitOnSpeech(name) {
 */
 
 function waitOnSfx(name) {
-	var delay = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
-	var immediate = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+	var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+	var immediate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
 	return new Promise(function (resolve, reject) {
 		var audio = new Audio('../audio/sfx/' + name + '.wav');
@@ -972,19 +983,3 @@ function Player(conf) {
 	this.previousScore = null;
 	this.submissionsComplete = {};
 }
-/*
-// temp
-$('.typed').text('60% of the time it works <em>every</em> time.');
-$('#view-lobby .typed-cursor').addClass('hide');
-$('#view-lobby .type-wrapper').addClass('slide-left');
-$('#view-lobby .player').addClass('show');
-//waitOnSpeech('citation-needed', 1500);
-	setTimeout(() => $('.player').addClass('joined'), 5000);
-setTimeout(commands.triggerNextStep, 2000);
-// end temp	
-*/
-// then reveal them in order			
-// then reveal them in order
-// after fade out, resolve the promise
-// and move it into view
-// then fade in the player names
