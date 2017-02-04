@@ -31,7 +31,9 @@ socket.on('relay', message => {
 let commands = {
 	triggerNextStep: message => {
 		if(room.round === 0) {
-			createDummyPlayers(4);			
+			// temp
+			createDummyPlayers(4);
+			// end temp
 			generateGameSequence();
 		}
 		gameSequence.next();
@@ -818,7 +820,7 @@ function createDummyPlayers(amount) {
 
 function getQuestionPool() {
 	return new Promise((resolve, reject) => {
-		jQuery.getJSON('questions.json', data => resolve(data))
+		jQuery.getJSON('js/questions.json', data => resolve(data))
 		.fail(e => console.log('error: %s', e))
 	})	
 }

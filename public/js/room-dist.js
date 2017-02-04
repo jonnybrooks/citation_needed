@@ -31,7 +31,9 @@ socket.on('relay', function (message) {
 var commands = {
 	triggerNextStep: function triggerNextStep(message) {
 		if (room.round === 0) {
+			// temp
 			createDummyPlayers(4);
+			// end temp
 			generateGameSequence();
 		}
 		gameSequence.next();
@@ -97,57 +99,87 @@ var gamePhases = {
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(0).addClass('show');
 			}).then(function () {
-				return waitOnSpeech('guess-the-article-desc-1', 1000);
+				return waitOnSpeech('guessed-appearance-desc-1', 1000);
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(1).addClass('show');
 			}).then(function () {
-				return waitOnSpeech('guess-the-article-desc-2');
+				return waitOnSpeech('guessed-appearance-desc-2');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(2).addClass('show');
 			}).then(function () {
-				return waitOnSpeech('guess-the-article-desc-3');
+				return waitOnSpeech('guessed-appearance-desc-3');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(3).addClass('show');
 			}).then(function () {
-				return waitOnSpeech('guess-the-article-desc-4');
+				return waitOnSpeech('guessed-appearance-desc-4');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(4).addClass('show');
 			}).then(function () {
-				return waitOnSpeech('guess-the-article-desc-5');
+				return waitOnSpeech('guessed-appearance-desc-5');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(5).addClass('show');
 			}).then(function () {
-				return waitOnSpeech('guess-the-article-desc-6');
+				return waitOnSpeech('guessed-appearance-desc-6');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(6).addClass('show');
 			}).then(gameSequence.next);
-		} else {
-			waitOnSpeech('pre-round1').then(function () {
+		} else if (round === 2) {
+			waitOnSpeech('pre-round2').then(function () {
 				return changeToView('describe-round-' + round);
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(0).addClass('show');
 			}).then(function () {
-				return waitOnSfx('correct-v1', 1000);
+				return waitOnSpeech('excerpt-opinions-desc-1', 1000);
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(1).addClass('show');
 			}).then(function () {
-				return waitOnSfx('correct-v2');
+				return waitOnSpeech('excerpt-opinions-desc-2');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(2).addClass('show');
 			}).then(function () {
-				return waitOnSfx('intro');
+				return waitOnSpeech('excerpt-opinions-desc-3');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(3).addClass('show');
 			}).then(function () {
-				return waitOnSfx('select');
+				return waitOnSpeech('excerpt-opinions-desc-4');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(4).addClass('show');
 			}).then(function () {
-				return waitOnSfx('wrong');
+				return waitOnSpeech('excerpt-opinions-desc-5');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(5).addClass('show');
 			}).then(function () {
-				return waitOnSfx('correct-v1');
+				return waitOnSpeech('excerpt-opinions-desc-6');
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(6).addClass('show');
+			}).then(gameSequence.next);
+		} else if (round === 3) {
+			waitOnSpeech('pre-round3').then(function () {
+				return changeToView('describe-round-' + round);
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(0).addClass('show');
+			}).then(function () {
+				return waitOnSpeech('you-complete-me-desc-1', 1000);
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(1).addClass('show');
+			}).then(function () {
+				return waitOnSpeech('you-complete-me-desc-2');
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(2).addClass('show');
+			}).then(function () {
+				return waitOnSpeech('you-complete-me-desc-3');
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(3).addClass('show');
+			}).then(function () {
+				return waitOnSpeech('you-complete-me-desc-4');
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(4).addClass('show');
+			}).then(function () {
+				return waitOnSpeech('you-complete-me-desc-5');
+			}).then(function () {
+				return $('#view-describe-round-' + round + ' li').eq(5).addClass('show');
+			}).then(function () {
+				return waitOnSpeech('you-complete-me-desc-6');
 			}).then(function () {
 				return $('#view-describe-round-' + round + ' li').eq(6).addClass('show');
 			}).then(gameSequence.next);
@@ -867,7 +899,7 @@ function createDummyPlayers(amount) {
 
 function getQuestionPool() {
 	return new Promise(function (resolve, reject) {
-		jQuery.getJSON('questions.json', function (data) {
+		jQuery.getJSON('js/questions.json', function (data) {
 			return resolve(data);
 		}).fail(function (e) {
 			return console.log('error: %s', e);
