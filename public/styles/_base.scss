@@ -309,7 +309,7 @@ a {
 			font-size: 7.2em;
 			margin: 0;
 			position: absolute;
-			top: 13%;
+			top: 10%;
 			left: 5%;
 			transform: translateX(0, 50%);
 			white-space: nowrap;
@@ -339,6 +339,7 @@ a {
 			    li {
 			    	margin: 0 0 1em 0;
 				    line-height: 1.5em;
+				    width: 90%;
 				    opacity: 0;
 				    position: relative;
 				    top: 200px;
@@ -394,7 +395,8 @@ a {
 			transition: none;
 			.question, 
 			.look-at-phone {
-				font-size: 5em;				
+				font-size: 4em;
+				width: 90%;			
 				position: absolute;
 				top: 0%;
 				left: 50%;
@@ -412,6 +414,8 @@ a {
 			}
 			.look-at-phone {
 				display: none;
+				font-size: 5em;
+				width: auto;	
 				.icon-mobile {
 					vertical-align: middle;
 					color: #666;
@@ -429,7 +433,7 @@ a {
 					0.5s opacity $easeInOutQuint 1s,
 			    	0.5s top $easeInOutQuint 1s;				
 				opacity: 1;
-				top: 40%;
+				top: 25%;
 			}
 			&.tuck {
 				top: 40px;
@@ -440,9 +444,12 @@ a {
 					left: 40px;
 					min-width: 50%;
 					transform: translate(0%, 0%);
-					font-size: 3em;
+					font-size: 2.5em;
 					border-left: 7px solid lightgrey;
 				    padding: 10px 40px;
+				}
+				.look-at-phone {
+					font-size: 3em;
 				}
 			}
 		}
@@ -484,7 +491,7 @@ a {
 		 }		 
 		.countdown {
 			position: absolute;
-			top: 40%;
+			top: 45%;
 			right: 50%;
 			transform: translate(50%, -50%);
 			width: calc(20% + 25px);
@@ -522,7 +529,7 @@ a {
 		.question {			
 		    width: 80%;
 		    margin: 0 auto;
-		    font-size: 3em;
+		    font-size: 2.5em;
 		    position: absolute;
 		    top: 40px;
 		    left: 40px;
@@ -682,6 +689,7 @@ a {
 			color: white;
 		    font-size: 5em;
 		    margin: 0;
+		    text-align: center;
 		}
 	}
 	#view-todo {
