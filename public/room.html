@@ -4,7 +4,7 @@
 		<title>Room - [citation needed]</title>
 		<link rel="stylesheet" href="styles/style.css"/>
 		<script src="js/lib/socket.io.min.js"></script>
-		<script src="js/lib/jquery-3.0.0.slim.min.js"></script>	
+		<script src="js/lib/jquery-3.0.0.min.js"></script>	
 		<script src="js/lib/tweenmax.min.js"></script>
 		<script src="js/lib/typed.min.js"></script>		
 	</head>
@@ -58,14 +58,40 @@
 			</div>
 			<div id="view-describe-round-1" class="view">
 				<div class="type-wrapper">
-					<p class="logo"><sup>[ <span>round one</span> ]</sup></p>
+					<p class="logo"><sup>[ <span>guessed appearance</span> ]</sup></p>
 					<ol class="description">
-						<li>An excerpt from a random <a href="http://wikipedia.org">Wikipedia</a> article will appear on the screen</li>
+						<li>An excerpt from a random <a href="http://wikipedia.org">Wikipedia</a> article will appear on the big screen</li>
 						<li>Using your smartphone, you must submit the title of an article you think the excerpt could have come from</li>
 						<li>When everyone's finished, the correct answer - along with all with your answers, will appear on the screen</li>
 						<li>You must then use your smartphone to vote for whichever answer you think is the truth</li>
 						<li>You get points for guessing the answer correctly, but also when players vote for your answer</li>
 						<li>So try to make your answer obscure - but keep it believable, or no one will vote for you!</li>
+					</ol>
+				</div>
+			</div>			
+			<div id="view-describe-round-2" class="view">
+				<div class="type-wrapper">
+					<p class="logo"><sup>[ <span>excerpt opinions</span> ]</sup></p>
+					<ol class="description">
+						<li>You will recieve the title of an article chosen at random from <a href="http://wikipedia.org">Wikipedia</a> on your smartphone</li>
+						<li>Using your smartphone, you must submit a snippet of text that could have come from the <a href="http://wikipedia.org">Wikipedia</a> article with that title</li>
+						<li>e.g., for the "Nazi chic" article, you might submit: "To keep morale up, the Nazis held a fashion show once a month"</li>
+						<li>When everyone's finished, each article-excerpt pair will appear on the big screen one after another</li>
+						<li>You must then use your smartphone to vote for whoever's snippet you find the funniest, most clever, or by whatever metric you deem worthy of your vote!</li>
+						<li><strong>Everyone answers twice this round! So make sure you submit a snippet for both of your articles</strong></li>
+					</ol>
+				</div>
+			</div>			
+			<div id="view-describe-round-3" class="view">
+				<div class="type-wrapper">
+					<p class="logo"><sup>[ <span>you complete me</span> ]</sup></p>
+					<ol class="description">
+						<li>An incomplete excerpt from a random <a href="http://wikipedia.org">Wikipedia</a> article will appear on your smartphone</li>
+						<li>Using your smartphone, you must complete the excerpt where you see the blank</li>
+						<li>e.g., for an excerpt saying "Nikola Tesla was known for inventing ____", you might submit "two for tuesday's at Domino's pizza&reg;"</li>
+						<li>When everyone's finished, each excerpt pair will appear on the big screen one after another</li>
+						<li>You must then use your smartphone to vote for whoever's snippet you find the funniest, most clever, or by whatever metric you deem worthy of your vote!</li>
+						<li><strong>Everyone answers twice this round! So make sure you fill in a blank for both snippets</strong></li>
 					</ol>
 				</div>
 			</div>			
@@ -76,21 +102,18 @@
 				<div class="voting-phase-content"></div>
 			</div>		
 			<div id="view-leaderboard" class="view">
-				<div class="players"></div>				
+				<div class="players"></div>
+				<p class="winning-player"></p>
 			</div>
-			<div id="view-endgame" class="view">
+			<div id="view-todo" class="view">
 				<div class="content">
-					<h1>That's the end of the visual demo!</h1>
-					<p>Things left to add:</p>
-					<ul>
-						<li style="text-decoration: line-through;">Little score things at the end of the voting phase</li>
-						<li style="text-decoration: line-through;">Score overview at the end of each round</li>
-						<li style="text-decoration: line-through;">Fix the answer phase reset logic</li>
-						<li style="text-decoration: line-through;">FE for round 2</li>
-						<li>FE for round 3</li>						
-						<li>The endgame sequence</li>
-						<li>All of the sound effects</li>
-						<li>CONTENT</li>
+					<h1>Thanks for playing the alpha!</h1>
+					<p>Apologies for all the weird sounds effects and the scary robot voice, all of this will be subject to change :)</p>
+					<p>All suggestions are welcome guys! I hope you enjoyed this visual demo</p>
+					<p>Stuff left to do:</p>
+					<ul>						
+						<li>All of the speech elements and sound effects</li>
+						<li>Actual question content</li>
 					</ul>
 				</div>				
 			</div>								
@@ -106,8 +129,12 @@
 		<script id="template-answer-phase-content" type="text/template">
 			<div class="answer-phase-content">
 				<div class="question-anchor">
-					<p class="question"></p>					
-				</div>
+					<p class="question"></p>
+					<p class="look-at-phone">
+						<span class="icon-mobile"></span>	
+						<span class="instruction">Look at your device now</span>				
+					</p>
+				</div>				
 				<div class="countdown">
 					<svg xmlns="http://www.w3.org/2000/svg" width="100" height="400" viewBox="0 0 100 100">
 						<circle class="circle" cx="50" cy="50" r="40" stroke="#ccc" stroke-width="2" fill="#f00" fill-opacity="0"/>
