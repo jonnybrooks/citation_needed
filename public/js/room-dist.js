@@ -206,7 +206,9 @@ var gamePhases = {
 				from: room.roomKey, to: room.roomKey, command: 'prepareQuestion', args: { qid: q.id, question: q.excerpt, round: 1 }
 			});
 			room.timer.limit = 60;
-			startTimer(room.timer.limit);
+			startTimer(room.timer.limit).then(function () {
+				return waitOnSpeech("guessed-appearance-end", 1000);
+			});
 		});
 	},
 	excerptBattle: function excerptBattle() {
@@ -253,7 +255,9 @@ var gamePhases = {
 		}).then(function () {
 			$('#view-answer-phase .question-anchor').addClass('tuck');
 			room.timer.limit = 90; // set the time limit to 60 seconds
-			startTimer(room.timer.limit);
+			startTimer(room.timer.limit).then(function () {
+				return waitOnSpeech("excerpt-opinions-end", 1000);
+			});
 		});
 	},
 	editBattle: function editBattle() {
@@ -300,8 +304,10 @@ var gamePhases = {
 			return wait(5000);
 		}).then(function () {
 			$('#view-answer-phase .question-anchor').addClass('tuck');
-			room.timer.limit = 90; // set the time limit to 60 seconds
-			startTimer(room.timer.limit);
+			room.timer.limit = 90; // set the time limit to 90 seconds
+			startTimer(room.timer.limit).then(function () {
+				return waitOnSpeech("you-complete-me-end", 1000);
+			});
 		});
 	},
 	voting: function voting() {
@@ -434,19 +440,19 @@ var gameSequence = {
 */
 
 function generateGameSequence() {
-	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
-	//gameSequence.steps.push(gamePhases.guessTheArticle);
-	//gameSequence.steps.push(gamePhases.voting);
-	//gameSequence.steps.push(gamePhases.scoring);
-	//gameSequence.steps.push(gamePhases.leaderboard);
-	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 2));	
-	//gameSequence.steps.push(gamePhases.excerptBattle);
-	for (var i in room.players) {}
-	//gameSequence.steps.push(gamePhases.voting);
-	//gameSequence.steps.push(gamePhases.scoring);
-
-	//gameSequence.steps.push(gamePhases.leaderboard);
-	//gameSequence.steps.push(gamePhases.describeRound.bind(null, 3));
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 1));
+	gameSequence.steps.push(gamePhases.guessTheArticle);
+	gameSequence.steps.push(gamePhases.voting);
+	gameSequence.steps.push(gamePhases.scoring);
+	gameSequence.steps.push(gamePhases.leaderboard);
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 2));
+	gameSequence.steps.push(gamePhases.excerptBattle);
+	for (var i in room.players) {
+		gameSequence.steps.push(gamePhases.voting);
+		gameSequence.steps.push(gamePhases.scoring);
+	}
+	gameSequence.steps.push(gamePhases.leaderboard);
+	gameSequence.steps.push(gamePhases.describeRound.bind(null, 3));
 	gameSequence.steps.push(gamePhases.editBattle);
 	for (var _i in room.players) {
 		gameSequence.steps.push(gamePhases.voting);
@@ -460,17 +466,24 @@ function generateGameSequence() {
 /*
 	startTimer: starts the timer and initiates/finishes the circular timer
 */
-function startTimer(t) {
-	$('.countdown .timer').text(t); // set the timer
-	if (t === room.timer.limit) {
-		drawCountdown(); // start filling the countdown timer
-		room.timer.active = true; // when first called
-	}
-	if (!room.timer.active) return; // return if tne timer has been cancelled
-	else if (t === 0) {
-			drawCountdown(true); // finish the timer
-			return wait(1000).then(gameSequence.next);
-		} else setTimeout(startTimer.bind(null, --t), 1000); // decrement the timer
+function startTimer(time) {
+	return new Promise(function (resolve, reject) {
+		function _recurse(t) {
+			$('.countdown .timer').text(t); // set the timer
+			if (t === room.timer.limit) {
+				drawCountdown(); // start filling the countdown timer
+				room.timer.active = true; // when first called
+			}
+			if (!room.timer.active) {
+				return resolve(); // return if tne timer has been cancelled
+			} else if (t === 0) {
+				drawCountdown(true) // finish the countdown
+				.then(resolve); // proceed to next step // finish the timer
+				return;
+			} else setTimeout(_recurse.bind(null, --t), 1000); // decrement the timer
+		}
+		_recurse(time);
+	});
 }
 
 /*
@@ -496,8 +509,8 @@ function checkAnswerPhaseStatus(m) {
 		if (questionsComplete) {
 			// if all questions are complete
 			room.timer.active = false; // disable the timer
-			drawCountdown(true); // finish the countdown
-			gameSequence.next(); // proceed to next step
+			drawCountdown(true) // finish the countdown
+			.then(gameSequence.next); // proceed to next step
 		}
 	}
 }
@@ -514,8 +527,8 @@ function checkVotePhaseStatus(m) {
 	if (votingDone) {
 		addVotesToVotingPhase(room.votes); // add the votes to the view
 		room.timer.active = false; // disable the timer
-		drawCountdown(true); // finish the countdown
-		gameSequence.next(); // proceed to next step
+		drawCountdown(true) // finish the countdown
+		.then(gameSequence.next); // proceed to next step
 	}
 }
 
@@ -686,16 +699,24 @@ function revealVote(answer) {
 */
 
 function drawCountdown(end) {
-	var countdown = '#view-' + $('#view-container').attr('data-current-view') + ' .countdown'; // only target the countdown on the active view
-	if (!end) return TweenLite.to(countdown + ' .circle', room.timer.limit, { strokeDashoffset: 0, ease: Linear.easeNone }); // continue animation if there's time left
-	var tmln = new TimelineMax(); // otherwise create the timeline for the timeout animation
-	tmln.to(countdown + ' .circle', 1, { strokeDashoffset: 0, ease: Power4.easeInOut }) // finish the border outline
-	.to(countdown + ' .timer', 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5') // fade out the time figure
-	.to(countdown + ' .circle', 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) }) // scale the circle down a bit
-	.to(countdown + ' .circle', 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3') // change it's colour to red
-	.to(countdown + ' .white-box', 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3') // fade in the white bar
-	.from( // and move it into view
-	countdown + ' .white-box', 0.3, { x: 100, ease: Power4.easeInOut, onStart: oneShotSfx, onStartParams: ["timeout-whistle.mp3"] }, '-=0.4');
+	return new Promise(function (resolve, reject) {
+		var countdown = '#view-' + $('#view-container').attr('data-current-view') + ' .countdown'; // only target the countdown on the active view
+		if (!end) {
+			TweenLite.to(countdown + ' .circle', room.timer.limit, { strokeDashoffset: 0, ease: Linear.easeNone }); // continue animation if there's time left
+			return resolve();
+		}
+		var tmln = new TimelineMax(); // otherwise create the timeline for the timeout animation
+		tmln.to(countdown + ' .circle', 1, { strokeDashoffset: 0, ease: Power4.easeInOut }) // finish the border outline
+		.to(countdown + ' .timer', 0.3, { opacity: 0, ease: Power2.easeOut }, '-=0.5') // fade out the time figure
+		.to(countdown + ' .circle', 0.8, { transformOrigin: '50% 50%', scale: 0.7, ease: Back.easeInOut.config(1.3) }) // scale the circle down a bit
+		.to(countdown + ' .circle', 0.3, { fillOpacity: 1, stroke: '#f00', ease: Power2.easeOut }, '-=0.3') // change it's colour to red
+		.to(countdown + ' .white-box', 0.3, { fillOpacity: 1, ease: Power2.easeOut }, '-=0.3') // fade in the white bar
+		.from(countdown + ' .white-box', 0.3, { x: 100, ease: Power4.easeInOut, onStart: _resolveWithWhistle }, '-=0.4'); // and move it into view
+
+		function _resolveWithWhistle() {
+			waitOnSfx("timeout-whistle").then(resolve);
+		}
+	});
 }
 
 /*
@@ -803,7 +824,7 @@ function fragment(htmlStr) {
 }
 
 /*
-	shuffle: randomise and array
+	shuffle: randomise an array
 */
 
 function shuffle(array) {
@@ -855,7 +876,7 @@ function waitOnSfx(name) {
 	var immediate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
 	return new Promise(function (resolve, reject) {
-		var audio = new Audio('../audio/sfx/' + name + '.wav');
+		var audio = new Audio('../audio/sfx/' + name + '.mp3');
 		$(audio).on('ended', resolve);
 		setTimeout(function (e) {
 			return audio.play();

@@ -1,7 +1,7 @@
 'use strict';
 
-var socket = undefined;
-var player = undefined;
+var socket = void 0;
+var player = void 0;
 
 socket = io('http://' + location.host + '/player');
 socket.on('connect', function () {
@@ -17,7 +17,7 @@ socket.on('player-registered', function (p) {
 });
 
 socket.on('player-refused', function () {
-	alert('Unable to join this room, it is probably full.');
+	alert('Unable to join this room, it\'s probably full.');
 });
 
 socket.on('relay', function (message) {

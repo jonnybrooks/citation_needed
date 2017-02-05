@@ -15,7 +15,7 @@ socket.on('player-registered', p => {
 })
 
 socket.on('player-refused', () => {
-	alert('Unable to join this room, it is probably full.');	
+	alert('Unable to join this room, it\'s probably full.');	
 })
 
 socket.on('relay', message => {
